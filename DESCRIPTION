@@ -1,5 +1,5 @@
-Package: fitHeavyTail
-Title: Mean and Covariance Matrix Estimation under Heavy Tails
+Package: intradayModel
+Title: State-Space Modeling of Intraday Volume and Volatility
 Version: 0.0.1
 Date: 2022-5-11
 Description: Robust estimation methods for the mean vector, scatter matrix,
