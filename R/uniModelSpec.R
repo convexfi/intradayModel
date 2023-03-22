@@ -23,7 +23,7 @@ uniModelSpec <- function(fit, init.pars = NULL, fixed.pars = NULL) {
   modelSpec$par$"r" <- NA
   modelSpec$par$"phi" <- NA
   modelSpec$par$"x0" <- matrix(NA, 2)
-  modelSpec$par$"V0" <- matrix(NA, 2, 2)
+  modelSpec$par$"V0" <- matrix(NA, 3)
   
   modelSpec$init <- modelSpec$par
 
