@@ -48,18 +48,23 @@ uniModelSpec <- function(fit, init.pars = NULL, fixed.pars = NULL) {
   }
 
   ## Output
+  modelSpec$fitFlag <- list()
   cat("fit = ", fit, "\n", sep = "")
   for (name in all.pars.name) {
     if (anyNA(modelSpec$par[[name]])) {
+      modelSpec$fitFlag[[name]] <- TRUE
       if (anyNA(modelSpec$init[[name]])) {
         cat(name, " is unfitted without initial value\n", sep = "")
       } else{
         cat(name, " is unfitted with initial value: ", modelSpec$init[[name]], "\n", sep = "")
       }
     } else {
+      modelSpec$fitFlag[[name]] <- FALSE
       cat(name, " is fixed at ", modelSpec$par[[name]], "\n", sep = "")
     }
   }
   
+  
+  return(modelSpec)
   
 }
