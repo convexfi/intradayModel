@@ -1,5 +1,6 @@
 #' Title
-#'
+#' 
+#' @param data.train data.frame of log volume
 #' @param fit 
 #' @param init.pars A list of initial values of unfixed parameters in EM algorithm 
 #' @param fixed.pars A list of values of fixed parameters
@@ -8,10 +9,23 @@
 #' @export
 #'
 #' @examples
-uniModelSpec <- function(fit, init.pars = NULL, fixed.pars = NULL) {
+uniModelSpec <- function(data.train = NULL, fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
   print("hello world")
   
   modelSpec <- list()
+  
+  # error control
+  if (is.null(data.train) && isTRUE(fit)) stop("data.train must not be NULL when fit is TRUE.")
+  if (!is.data.frame(data.train)) stop("data.train must be a data.frame.")
+  if (!is.null(init.pars) && !is.list(init.pars)) stop("init.pars must be a list.")
+  if (!is.null(fixed.pars) && !is.list(fixed.pars)) stop("fixed.pars must be a list.")
+  
+  # get basic info from data.train
+  if (!is.null(data.train)) {
+    modelSpec$nbin <- nrow(data.train)
+    modelSpec$nDay <- ncol(data.train)
+    modelSpec$nBin <- nrow(data.train) * ncol(data.train)
+  }
     
   # C-step: check the validity of inputs
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
@@ -21,7 +35,7 @@ uniModelSpec <- function(fit, init.pars = NULL, fixed.pars = NULL) {
   modelSpec$par$"var_eta" <- NA
   modelSpec$par$"var_mu" <- NA
   modelSpec$par$"r" <- NA
-  modelSpec$par$"phi" <- NA
+  modelSpec$par$"phi" <- matrix(NA, modelSpec$nbin)
   modelSpec$par$"x0" <- matrix(NA, 2)
   modelSpec$par$"V0" <- matrix(NA, 3)
   
