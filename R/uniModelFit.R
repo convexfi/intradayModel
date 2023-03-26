@@ -102,6 +102,7 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
   kalman.ours <- EM_param(kalman.ours,data.train_reform, Z.matrix, y.daily.matrix,n_bin, n_bin_total,n_day, jump_interval, control)
   
   modelSpec$par <- kalman.ours$par
+  modelSpec$fitFlag[] <- TRUE
   
   return (modelSpec)
   
