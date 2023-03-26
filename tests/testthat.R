@@ -1,4 +1,4 @@
 library(testthat)
-library(intradayModeling)
+library(intradayModel)
 
-test_check("intradayModeling")
+test_check("intradayModel")
