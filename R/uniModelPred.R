@@ -1,31 +1,22 @@
 #' Title
 #'
-#' @param data
-#' @param modelSpec
-#' @param control
+#' @param data.pre
+#' @param model
+#' @param n.ahead
+#' @param out_of_sample
 #'
 #' @return
 #' @export
 #'
 #' @examples
-uniModelFilter <- function(data.filter, modelSpec) {
-  # check if fit is necessary
-  if (!is.list(modelSpec)) stop("tbd.")
-  if (Reduce("+", modelSpec$fitFlag) != 0) {
-    stop("All parameters must be fixed.\n")
-  }
-  
-  # error control
-  if (!is.matrix(data.filter) && !is.data.frame(data.filter)) stop("data must be a matrix or data.frame.")
-  if (anyNA(data.filter)) stop("data must have no NA.")
-  
-  data.filter <- as.matrix(data.filter)
-  n_bin <- nrow(data.filter)
-  n_day <- ncol(data.filter)
+uniModelPred <- function(data, model, n.ahead = 1, out_of_sample){
+  data <- as.matrix(data)
+  n_bin <- nrow(data)
+  n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
   
   ## reform data
-  data.reform <- data.filter %>%
+  data <- data %>%
     as.list() %>%
     unlist()
   
@@ -71,5 +62,4 @@ uniModelFilter <- function(data.filter, modelSpec) {
   KfList.all <- MARSS::MARSSkfas(kalman.ours)
   
   return (KfList.all)
-  
 }
