@@ -27,3 +27,19 @@ test_that("unimodel specification return coincide with the predefined ones", {
   expect_equal(uniModelSpec(fit = TRUE, init.pars = init.pars, fixed.pars = fixed.pars), predefinde_model)
   
 })
+
+test_that("unimodel specification result error control",{
+  init.pars <- list()
+  init.pars$"a_eta" <- 1
+  init.pars$"x0" <- matrix(0, 2)
+  init.pars$"xxx" <- 3
+  
+  fixed.pars <- list()
+  fixed.pars$"a_mu" <- NA
+  fixed.pars$"var_eta" <- 4
+  fixed.pars$"yyy" <- 0
+  
+  expect_error(uniModelSpec(fit = FALSE, init.pars = init.pars, fixed.pars = fixed.pars),
+               c("Wrong input: unfitted model contains unknown parameters \n"))
+  
+})

@@ -49,7 +49,7 @@ uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
   ## C-step: check fit = FALSE case
   if (fit == FALSE) {
     if (anyNA(unlist(modelSpec$par))) {
-      cat("Wrong input: unfitted model contains unknown parameters \n")
+      stop("Wrong input: unfitted model contains unknown parameters \n")
       break
     }
   }
