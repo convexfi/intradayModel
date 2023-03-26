@@ -82,6 +82,7 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abst
   )
   
   ## Init param
+  MARSS_model$init.gen <- init_predefined
   
   ## EM
   kalman.ours <- MARSS::MARSS(data.train, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
@@ -90,6 +91,10 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abst
   y.daily.matrix <- matrix(data.train, nrow = n_bin)
   jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
   kalman.ours <- EM_param(kalman.ours, Z.matrix, y.daily.matrix ,n_bin_total, jump_interval, control)
+  
+  modelSpec$par <- kalman.ours$par
+  
+  return (modelSpec)
   
 }
 
@@ -168,3 +173,4 @@ EM_param <- function(kalman.ours,Z.matrix, y.daily.matrix , nBin_train, jump_int
   }
   return (kalman.ours)
 }
+
