@@ -9,7 +9,7 @@
 #'
 #' @examples
 uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
-  print("hello world")
+  # print("hello world")
   
   modelSpec <- list()
   
