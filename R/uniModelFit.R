@@ -9,11 +9,11 @@
 #' @export
 #'
 #' @examples
-uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abstol = 1e-4)) {
+uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abstol = 1e-4)) {
   
   # check if fit is necessary
   if (!is.list(modelSpec)) stop("tbd.")
-  if (sum(modelSpec$fitFlag) == 0) {
+  if (Reduce("+", modelSpec$fitFlag) == 0) {
     cat("All parameters are fixed. No need to fit.\n")
     break
   }
@@ -22,15 +22,21 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abst
   if (!is.matrix(data.train) && !is.data.frame(data.train)) stop("data.train must be a matrix or data.frame.")
   if (anyNA(data.train)) stop("data.train must have no NA.")
   
+  
   data.train <- as.matrix(data.train)
   n_bin <- nrow(data.train)
   n_day <- ncol(data.train)
   n_bin_total <- n_bin * n_day
   
+  ## reform data
+  data.train_reform <- data.train %>%
+    as.list() %>%
+    unlist()
+  
   ## MARSS parameters
   MARSS_model <- list()
   MARSS_model$model.gen <- list()
-  MARSS_mdoel$init.gen <- list()
+  MARSS_model$init.gen <- list()
   
   ## State Equation
   Bt <- array(list(0), c(2, 2, n_bin_total))
@@ -52,22 +58,23 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abst
   
   At = array(list(0), dim = c(1, 1, n_bin_total))
   a_vec = extract_value("phi", modelSpec)
-  if (a_vec == "phi" || length(a_vec) != nbin){
-    if (length(a_vec) != nbin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
+  if (a_vec == "phi" || length(a_vec) != n_bin){
+    if (a_vec != "phi" && length(a_vec) != n_bin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
                                        The values of fixed phi are ignored.")
     for (n in 1:n_bin) {
       a_vec[n] <- paste("a", n, sep = "")
     }
     
   }
+  
   At[1, 1, ] = rep(a_vec, n_day)
   
-  R <- extract_value("r1", modelSpec) %>%
+  R <- extract_value("r", modelSpec) %>%
     list() %>%
     matrix(1,1)
   
   ## Initial State
-  x0 <- extract_value("r1", modelSpec) %>%
+  x0 <- extract_value("x0", modelSpec) %>%
     matrix(2, 1)
   V0 <- extract_value("V0", modelSpec)
   
@@ -78,19 +85,21 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abst
                           R = 0.08,
                           Q = matrix(c(0.07, 0.06), 2, 1),
                           V0 = matrix(c(1e-10, 0, 1e-10), 3, 1),
-                          A = rowMeans(matrix(data.train, nrow = n_bin)) - mean(data.train)
+                          A = rowMeans(matrix(data.train_reform, nrow = n_bin)) - mean(data.train_reform)
   )
   
   ## Init param
   MARSS_model$init.gen <- init_predefined
   
   ## EM
-  kalman.ours <- MARSS::MARSS(data.train, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
+  kalman.ours <- MARSS::MARSS(data.train_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
   kalman.ours$par <- kalman.ours$start
+  
   Z.matrix <- matrix(unlist(Z), nrow = 1)
-  y.daily.matrix <- matrix(data.train, nrow = n_bin)
+  y.daily.matrix <- matrix(data.train_reform, nrow = n_bin)
   jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
-  kalman.ours <- EM_param(kalman.ours, Z.matrix, y.daily.matrix ,n_bin_total, jump_interval, control)
+  kalman.ours <- EM_param(kalman.ours,data.train_reform, Z.matrix, y.daily.matrix,n_bin, n_bin_total,n_day, jump_interval, control)
   
   modelSpec$par <- kalman.ours$par
   
@@ -99,7 +108,6 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abst
 }
 
 extract_value <- function(name, modelSpec) {
-  len <- length(modelSpec$par[[name]])
   if (modelSpec$fitFlag[[name]]) {
     name <- switch(name,
                    "x0"= list("x01","x02"),
@@ -111,7 +119,7 @@ extract_value <- function(name, modelSpec) {
   }
 }
 
-EM_param <- function(kalman.ours,Z.matrix, y.daily.matrix , nBin_train, jump_interval,contorl){
+EM_param <- function(kalman.ours,y_train, Z.matrix, y.daily.matrix,n_bin, nBin_train,nDay_train, jump_interval,control){
   maxit <- control$maxit
   abstol <- control$abstol
   for (i in 1: maxit) {
@@ -173,4 +181,3 @@ EM_param <- function(kalman.ours,Z.matrix, y.daily.matrix , nBin_train, jump_int
   }
   return (kalman.ours)
 }
-
