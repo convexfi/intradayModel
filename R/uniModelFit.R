@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, tol)) {
+uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, abstol = 1e-4)) {
   
   # check if fit is necessary
   if (!is.list(modelSpec)) stop("tbd.")
@@ -50,7 +50,7 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, tol)
   ## Measurement Equation
   Z <- array(list(1, 1), c(1, 2))
   
-  At = array(list(0), dim = c(1,1,n_bin_total))
+  At = array(list(0), dim = c(1, 1, n_bin_total))
   a_vec = extract_value("phi", modelSpec)
   if (a_vec == "phi" || length(a_vec) != nbin){
     if (length(a_vec) != nbin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
@@ -70,6 +70,27 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 1000, tol)
   x0 <- extract_value("r1", modelSpec) %>%
     matrix(2, 1)
   V0 <- extract_value("V0", modelSpec)
+  
+  
+  ## predefined init value
+  init_predefined <- list(x0 = matrix(c(10, 0), 2, 1),
+                          B = matrix(c(1,0.7), 2, 1),
+                          R = 0.08,
+                          Q = matrix(c(0.07, 0.06), 2, 1),
+                          V0 = matrix(c(1e-10, 0, 1e-10), 3, 1),
+                          A = rowMeans(matrix(data.train, nrow = n_bin)) - mean(data.train)
+  )
+  
+  ## Init param
+  
+  ## EM
+  kalman.ours <- MARSS::MARSS(data.train, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  kalman.ours$par <- kalman.ours$start
+  Z.matrix <- matrix(unlist(Z), nrow = 1)
+  y.daily.matrix <- matrix(data.train, nrow = n_bin)
+  jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
+  kalman.ours <- EM_param(kalman.ours, Z.matrix, y.daily.matrix ,n_bin_total, jump_interval, control)
+  
 }
 
 extract_value <- function(name, modelSpec) {
@@ -83,4 +104,67 @@ extract_value <- function(name, modelSpec) {
   } else {
     return(modelSpec$par[[name]])
   }
+}
+
+EM_param <- function(kalman.ours,Z.matrix, y.daily.matrix , nBin_train, jump_interval,contorl){
+  maxit <- control$maxit
+  abstol <- control$abstol
+  for (i in 1: maxit) {
+    # Kalman filter & smoother
+    Kf <- MARSS::MARSSkfas(kalman.ours)
+    curr_par <- kalman.ours$par
+    
+    # update parameter estimation
+    Pt <- Ptt1 <- array(NA, c(2, 2, nBin_train))
+    for (n in 1: nBin_train) {
+      Pt[, , n] <- Kf$VtT[, , n] + Kf$xtT[, n] %*% t(Kf$xtT[, n])
+    }
+    for (n in 2: nBin_train) {
+      Ptt1[, , n] <- Kf$Vtt1T[, , n] + Kf$xtT[, n] %*% t(Kf$xtT[, n - 1])
+    }
+    
+    curr_par$x0 <- Kf$x0T
+    curr_par$V0[1] <- Kf$V0T[1, 1]
+    curr_par$V0[2] <- Kf$V0T[2, 1]
+    curr_par$V0[3] <- Kf$V0T[2, 2]
+    
+    curr_par$B[1] <- sum(Ptt1[1, 1, jump_interval]) /
+      sum(Pt[1, 1, jump_interval - 1])
+    curr_par$B[2] <- sum(Ptt1[2, 2, 2: nBin_train]) /
+      sum(Pt[2, 2, 1: (nBin_train - 1)])
+    
+    curr_par$Q[1] <- mean(Pt[1, 1, jump_interval] +
+                            curr_par$B[1]^2 * Pt[1, 1, jump_interval - 1] -
+                            2 * curr_par$B[1] * Ptt1[1, 1, jump_interval])
+    curr_par$Q[2] <- mean(Pt[2, 2, 2: nBin_train] +
+                            curr_par$B[2]^2 * Pt[2, 2, 1: (nBin_train - 1)] -
+                            2 * curr_par$B[2] * Ptt1[2, 2, 2: nBin_train])
+    
+    phi.matrix <- rep(matrix(curr_par$A, nrow = 1), nDay_train)
+    curr_par$R <- mean(y_train^2 +
+                         apply(Pt, 3, function(p) Z.matrix %*% p %*% t(Z.matrix)) -
+                         2 * y_train * as.numeric(Z.matrix %*% Kf$xtT) +
+                         phi.matrix^2 -
+                         2 * y_train * phi.matrix +
+                         2 * phi.matrix * as.numeric(Z.matrix %*% Kf$xtT))
+    curr_par$A <-
+      rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))
+    
+    # stopping criteria
+    diff <- norm(as.numeric(unlist(kalman.ours$par)) -
+                   as.numeric(unlist(curr_par)), type = "2")
+    if (diff < abstol) {
+      break
+    }
+    
+    if (i %% 25 == 0) {
+      cat("iter:", i, " diff:", diff, "\n", sep = "")
+    }
+    
+    # if (log.switch == TRUE) {
+    #   par_log <- list.append(par_log, curr_par)
+    # }
+    kalman.ours$par <- curr_par
+  }
+  return (kalman.ours)
 }
