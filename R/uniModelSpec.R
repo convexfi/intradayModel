@@ -32,7 +32,7 @@ uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
   modelSpec$par$"x0" <- matrix(NA, 2)
   modelSpec$par$"V0" <- matrix(NA, 3)
   
-  modelSpec$init <- modelSpec$par
+  modelSpec$init <- list() #modelSpec$par
 
   for (name in all.pars.name) {
     if (name %in% names(fixed.pars)) {
@@ -41,9 +41,9 @@ uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
       modelSpec$par[[name]] <- fixed.pars[[name]]
     }
     
-    if (name %in% names(init.pars)) {
+    #if (name %in% names(init.pars)) {
       modelSpec$init[[name]] <- init.pars[[name]]
-    }
+    #}
   }
   
   ## C-step: check fit = FALSE case
