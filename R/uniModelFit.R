@@ -103,7 +103,7 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
   kalman.ours <- EM_param(kalman.ours, modelSpec,
                           data.train_reform, n_bin,
                           n_bin_total,
-                          n_day,
+                          n_day,At,
                           control)
   
   # modelSpec$par <- kalman.ours$par
@@ -162,14 +162,14 @@ extract_init <- function(init.default, init.pars, fitFlag){
 EM_param <- function(kalman.ours,modelSpec,
                      y_train, n_bin,
                      n_bin_total,
-                     n_day,
+                     n_day,At,
                      control){
   Z.matrix <- matrix(kalman.ours[["model"]][["fixed"]][["Z"]][,,1], nrow = 1) # matrix(unlist(Z), nrow = 1)
   jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
   y.daily.matrix <- matrix(y_train, n_bin)
   
   
-  maxit <- 1 #control$maxit
+  maxit <- control$maxit
   abstol <- control$abstol
   
   # fixed params
