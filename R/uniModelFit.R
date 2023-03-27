@@ -78,7 +78,6 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
     matrix(2, 1)
   V0 <- extract_value("V0", modelSpec)
   
-  
   ## predefined init value
   init.default <- list("x0" = matrix(c(10, 0), 2, 1),
                        "a_eta" = 1, "a_mu" = 0.7,
@@ -87,8 +86,6 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
                        "V0" = matrix(c(1e-10, 0, 1e-10), 3, 1),
                        "phi" = rowMeans(matrix(data.train_reform, nrow = n_bin)) - mean(data.train_reform)
   )
-  
-  
   ## Init param
   MARSS_model$init.gen <- extract_init(init.default, modelSpec$init, modelSpec$fitFlag)
   
@@ -96,17 +93,23 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
   kalman.ours <- MARSS::MARSS(data.train_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
   kalman.ours$par <- kalman.ours$start
-  print(kalman.ours$par)
-  #
-  # Z.matrix <- matrix(unlist(Z), nrow = 1)
-  # y.daily.matrix <- matrix(data.train_reform, nrow = n_bin)
-  # jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
-  # kalman.ours <- EM_param(kalman.ours,data.train_reform, Z.matrix, y.daily.matrix,n_bin, n_bin_total,n_day, jump_interval, control)
-  #
+  
+  # args <- list(y_train = data_log_volume,
+  #              n_bin = n_bin,
+  #              n_bin_total = n_bin_total,
+  #              n_day = n_day,
+  #              control = control
+  #              )
+  kalman.ours <- EM_param(kalman.ours, modelSpec,
+                          data.train_reform, n_bin,
+                          n_bin_total,
+                          n_day,
+                          control)
+  
   # modelSpec$par <- kalman.ours$par
   # modelSpec$fitFlag[] <- TRUE
   
-  return (modelSpec)
+  # return (modelSpec)
   
 }
 
@@ -156,51 +159,82 @@ extract_init <- function(init.default, init.pars, fitFlag){
   return (init.marss)
 }
 
-EM_param <- function(kalman.ours,y_train, Z.matrix, y.daily.matrix,n_bin, nBin_train,nDay_train, jump_interval,
-                     fix
-                     ,control){
-  maxit <- control$maxit
+EM_param <- function(kalman.ours,modelSpec,
+                     y_train, n_bin,
+                     n_bin_total,
+                     n_day,
+                     control){
+  Z.matrix <- matrix(kalman.ours[["model"]][["fixed"]][["Z"]][,,1], nrow = 1) # matrix(unlist(Z), nrow = 1)
+  jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
+  y.daily.matrix <- matrix(y_train, n_bin)
+  
+  
+  maxit <- 1 #control$maxit
   abstol <- control$abstol
+  
+  # fixed params
+  fix <- modelSpec$fitFlag
+  fixed.names <- names(fix[fix == FALSE])
+  unfixed.names <- names(fix[fix == TRUE])
+  
   for (i in 1: maxit) {
     # Kalman filter & smoother
     Kf <- MARSS::MARSSkfas(kalman.ours)
     curr_par <- kalman.ours$par
     
+    
     # update parameter estimation
-    Pt <- Ptt1 <- array(NA, c(2, 2, nBin_train))
-    for (n in 1: nBin_train) {
+    Pt <- Ptt1 <- array(NA, c(2, 2, n_bin_total))
+    for (n in 1: n_bin_total) {
       Pt[, , n] <- Kf$VtT[, , n] + Kf$xtT[, n] %*% t(Kf$xtT[, n])
     }
-    for (n in 2: nBin_train) {
+    for (n in 2: n_bin_total) {
       Ptt1[, , n] <- Kf$Vtt1T[, , n] + Kf$xtT[, n] %*% t(Kf$xtT[, n - 1])
     }
     
-    curr_par$x0 <- Kf$x0T
-    curr_par$V0[1] <- Kf$V0T[1, 1]
-    curr_par$V0[2] <- Kf$V0T[2, 1]
-    curr_par$V0[3] <- Kf$V0T[2, 2]
+    update_r <- function(){
+      if("phi" %in% unfixed.names) {phi.matrix <- rep(matrix(curr_par$A, nrow = 1), n_day) }
+      else {phi.matrix <-unlist(At)} # need input
+      curr_par$R <<- mean(y_train^2 + apply(Pt, 3, function(p) Z.matrix %*% p %*% t(Z.matrix)) -
+                            2 * y_train * as.numeric(Z.matrix %*% Kf$xtT) +
+                            phi.matrix^2 -
+                            2 * y_train * phi.matrix +
+                            2 * phi.matrix * as.numeric(Z.matrix %*% Kf$xtT))
+    }
+    update_var_eta <- function(){
+      if("a_eta" %in% unfixed.names) {curr_a_eta <- curr_par$B["a_eta",1] }
+      else {curr_a_eta <- modelSpec$par[["a_eta"]]} # need input
+      curr_par$Q["var_eta",1] <<- mean(Pt[1, 1, jump_interval] +
+                                         curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
+                                         2 * curr_a_eta * Ptt1[1, 1, jump_interval])
+    }
+    update_var_mu <- function(){
+      if("a_mu" %in% unfixed.names) {curr_a_mu <- curr_par$B["a_mu",1] }
+      else {curr_a_mu <- modelSpec$par[["a_mu"]]} # need input
+      curr_par$Q["var_mu",1] <<- mean(Pt[2, 2, 2: n_bin_total] +
+                                        curr_a_mu^2 * Pt[2, 2, 1: (n_bin_total - 1)] -
+                                        2 * curr_a_mu * Ptt1[2, 2, 2: n_bin_total])
+    }
     
-    curr_par$B[1] <- sum(Ptt1[1, 1, jump_interval]) /
-      sum(Pt[1, 1, jump_interval - 1])
-    curr_par$B[2] <- sum(Ptt1[2, 2, 2: nBin_train]) /
-      sum(Pt[2, 2, 1: (nBin_train - 1)])
     
-    curr_par$Q[1] <- mean(Pt[1, 1, jump_interval] +
-                            curr_par$B[1]^2 * Pt[1, 1, jump_interval - 1] -
-                            2 * curr_par$B[1] * Ptt1[1, 1, jump_interval])
-    curr_par$Q[2] <- mean(Pt[2, 2, 2: nBin_train] +
-                            curr_par$B[2]^2 * Pt[2, 2, 1: (nBin_train - 1)] -
-                            2 * curr_par$B[2] * Ptt1[2, 2, 2: nBin_train])
-    
-    phi.matrix <- rep(matrix(curr_par$A, nrow = 1), nDay_train)
-    curr_par$R <- mean(y_train^2 +
-                         apply(Pt, 3, function(p) Z.matrix %*% p %*% t(Z.matrix)) -
-                         2 * y_train * as.numeric(Z.matrix %*% Kf$xtT) +
-                         phi.matrix^2 -
-                         2 * y_train * phi.matrix +
-                         2 * phi.matrix * as.numeric(Z.matrix %*% Kf$xtT))
-    curr_par$A <-
-      rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))
+    for (name in unfixed.names){
+      switch(name,
+             "x0" = {curr_par$x0 <- Kf$x0T},
+             "V0" = {curr_par$V0[1] <- Kf$V0T[1, 1]
+             curr_par$V0[2] <- Kf$V0T[2, 1]
+             curr_par$V0[3] <- Kf$V0T[2, 2]
+             },
+             "phi" = {curr_par$A <- rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))},
+             "r" = {update_r()},
+             "a_eta" = {curr_par$B["a_eta",1] <- sum(Ptt1[1, 1, jump_interval]) /
+               sum(Pt[1, 1, jump_interval - 1])},
+             "a_mu" = {curr_par$B["a_mu",1] <- sum(Ptt1[2, 2, 2: n_bin_total]) /
+               sum(Pt[2, 2, 1: (n_bin_total - 1)])},
+             "var_eta" = {update_var_eta()},
+             "var_mu" = {update_var_mu()}
+             
+      )
+    }
     
     # stopping criteria
     diff <- norm(as.numeric(unlist(kalman.ours$par)) -
@@ -212,11 +246,8 @@ EM_param <- function(kalman.ours,y_train, Z.matrix, y.daily.matrix,n_bin, nBin_t
     if (i %% 25 == 0) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
-    
-    # if (log.switch == TRUE) {
-    #   par_log <- list.append(par_log, curr_par)
-    # }
     kalman.ours$par <- curr_par
   }
   return (kalman.ours)
 }
+
