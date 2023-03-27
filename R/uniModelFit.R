@@ -80,29 +80,31 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
   
   
   ## predefined init value
-  init_predefined <- list(x0 = matrix(c(10, 0), 2, 1),
-                          B = matrix(c(1,0.7), 2, 1),
-                          R = 0.08,
-                          Q = matrix(c(0.07, 0.06), 2, 1),
-                          V0 = matrix(c(1e-10, 0, 1e-10), 3, 1),
-                          A = rowMeans(matrix(data.train_reform, nrow = n_bin)) - mean(data.train_reform)
+  init.default <- list("x0" = matrix(c(10, 0), 2, 1),
+                       "a_eta" = 1, "a_mu" = 0.7,
+                       "r" = 0.08,
+                       "var_eta" = 0.07, "var_mu" = 0.06,
+                       "V0" = matrix(c(1e-10, 0, 1e-10), 3, 1),
+                       "phi" = rowMeans(matrix(data.train_reform, nrow = n_bin)) - mean(data.train_reform)
   )
   
+  
   ## Init param
-  MARSS_model$init.gen <- init_predefined
+  MARSS_model$init.gen <- extract_init(init.default, modelSpec$init, modelSpec$fitFlag)
   
   ## EM
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
   kalman.ours <- MARSS::MARSS(data.train_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
   kalman.ours$par <- kalman.ours$start
-  
-  Z.matrix <- matrix(unlist(Z), nrow = 1)
-  y.daily.matrix <- matrix(data.train_reform, nrow = n_bin)
-  jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
-  kalman.ours <- EM_param(kalman.ours,data.train_reform, Z.matrix, y.daily.matrix,n_bin, n_bin_total,n_day, jump_interval, control)
-  
-  modelSpec$par <- kalman.ours$par
-  modelSpec$fitFlag[] <- TRUE
+  print(kalman.ours$par)
+  #
+  # Z.matrix <- matrix(unlist(Z), nrow = 1)
+  # y.daily.matrix <- matrix(data.train_reform, nrow = n_bin)
+  # jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
+  # kalman.ours <- EM_param(kalman.ours,data.train_reform, Z.matrix, y.daily.matrix,n_bin, n_bin_total,n_day, jump_interval, control)
+  #
+  # modelSpec$par <- kalman.ours$par
+  # modelSpec$fitFlag[] <- TRUE
   
   return (modelSpec)
   
@@ -120,7 +122,43 @@ extract_value <- function(name, modelSpec) {
   }
 }
 
-EM_param <- function(kalman.ours,y_train, Z.matrix, y.daily.matrix,n_bin, nBin_train,nDay_train, jump_interval,control){
+extract_init <- function(init.default, init.pars, fitFlag){
+  all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
+  for (name in all.pars.name){
+    if (!fitFlag[[name]]) {
+      init.default[[name]] <- NULL
+    }
+    if (name %in% names(init.pars)){
+      init.default[[name]] <- init.pars[[name]]
+    }
+  }
+  init.marss <- list()
+  var.init <- c()
+  a.init <- c()
+  for (name in names(init.default)){
+    tmp <- switch(name,
+                  "phi" = {init.marss$A <- init.default$phi},
+                  "V0" = {init.marss$V0 <- init.default$V0},
+                  "x0" = {init.marss$x0 <- init.default$x0},
+                  "r" = {init.marss$R <- init.default$r},
+                  "a_eta" = {a.init <- append(a.init, init.default$a_eta)},
+                  "a_mu" = {a.init <- append(a.init, init.default$a_mu)},
+                  "var_eta" = {var.init <- append(var.init, init.default$var_eta)},
+                  "var_mu" = {var.init <- append(var.init, init.default$var_mu)}
+    )
+  }
+  if (length(a.init) > 0){
+    init.marss$B <- matrix(a.init, length(a.init), 1)
+  }
+  if (length(var.init) > 0){
+    init.marss$Q <- matrix(var.init, length(var.init), 1)
+  }
+  return (init.marss)
+}
+
+EM_param <- function(kalman.ours,y_train, Z.matrix, y.daily.matrix,n_bin, nBin_train,nDay_train, jump_interval,
+                     fix
+                     ,control){
   maxit <- control$maxit
   abstol <- control$abstol
   for (i in 1: maxit) {
