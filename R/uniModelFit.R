@@ -9,7 +9,8 @@
 #' @export
 #'
 #' @examples
-uniModelFit <- function(data, modelSpec, control = list(maxit = 3000, abstol = 1e-4)) {
+uniModelFit <- function(data, modelSpec,
+                        control = list(maxit = 3000, abstol = 1e-4, log.switch = TRUE)) {
   
   # check if fit is necessary
   if (!is.list(modelSpec)) stop("tbd.")
@@ -64,7 +65,6 @@ uniModelFit <- function(data, modelSpec, control = list(maxit = 3000, abstol = 1
   
 }
 
-
 EM_param <- function(...){
   args <- list(...)
   data <- args$data
@@ -88,11 +88,13 @@ EM_param <- function(...){
   
   maxit <- control$maxit
   abstol <- control$abstol
+  log.switch <- control$log.switch
   
   # fixed params
   fix <- modelSpec$fitFlag
   unfixed.names <- names(fix[fix == TRUE])
   
+  par_log <- list(kalman.ours$par)
   for (i in 1: maxit) {
     # Kalman filter & smoother
     Kf <- MARSS::MARSSkfas(kalman)
@@ -162,6 +164,10 @@ EM_param <- function(...){
     if (i %% 25 == 0) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
+    
+    if (log.switch == TRUE) {
+      par_log <- list.append(par_log, curr_par)
+    }
     kalman$par <- curr_par
     
   }
@@ -172,7 +178,7 @@ EM_param <- function(...){
   }
   kalman$par$A <- array(kalman$par$A, dim = c(n_bin,1), dimnames = list(phi_names,NULL))
   if (!convergence) warning("No convergence")
-  result <- list("model" = kalman, "convergence" = convergence)
+  result <- list("model" = kalman, "convergence" = convergence, par_log = par_log)
   return (result)
 }
 
