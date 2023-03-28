@@ -19,8 +19,8 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
   }
   
   # error control
-  if (!is.matrix(data.train) && !is.data.frame(data.train)) stop("data.train must be a matrix or data.frame.")
-  if (anyNA(data.train)) stop("data.train must have no NA.")
+  if (!is.matrix(data.train) && !is.data.frame(data.train)) stop("Input data must be a matrix or data.frame.")
+  if (anyNA(data.train)) stop("Input data must have no NA.")
   
   
   data.train <- as.matrix(data.train)
@@ -62,7 +62,7 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
     if (a_vec != "phi" && length(a_vec) != n_bin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
                                        The values of fixed phi are ignored.")
     for (n in 1:n_bin) {
-      a_vec[n] <- paste("a", n, sep = "")
+      a_vec[n] <- paste("phi", n, sep = "")
     }
     
   }
@@ -106,7 +106,7 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
                         n_day,At,
                         control)
   
-  modelSpec$par <- EM_result$model$par
+  modelSpec$par <- trans_MARSStoIntra(EM_result$model$par, modelSpec$par)
   if (EM_result$convergence) {
     modelSpec$fitFlag[] <- TRUE
   }
@@ -264,4 +264,5 @@ EM_param <- function(kalman.ours,modelSpec,
   result <- list("model" = kalman.ours, "convergence" = convergence)
   return (result)
 }
+
 
