@@ -2,9 +2,9 @@
 # They should be invisible to package users
 
 # transform the parameter form the format of MARSS to IntradayModel
-trans_MARSStoIntra <- function(MARSS.model, intra.par){
+trans_MARSStoIntra <- function(MARSS.par, intra.par){
   all.pars.name.MARSS <- c("A", "R", "B", "Q", "x0", "V0")
-  MARSS.par <- MARSS.model$par[all.pars.name.MARSS]
+  MARSS.par <- MARSS.par[all.pars.name.MARSS]
   for (name in c("B","Q","R")){
     if (length(MARSS.par[[name]]) > 0){
       intra.name <- dimnames(MARSS.par[[name]])[[1]]

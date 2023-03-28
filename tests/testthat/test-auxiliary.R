@@ -1,16 +1,53 @@
-# test_that("trans_MARSStoIntra works", {
-#
-#   fixed.pars <- list()
-#   fixed.pars$"var_eta" <- 4
-#   modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
-#
-#
-#
-#
-#
-#   expect_equal(uniModelSpec(fit = TRUE, fixed.pars = fixed.pars), predefinde_model)
-#
-# })
+test_that("trans_MARSStoIntra works", {
+  data("data_log_volume")
+  
+  fixed.pars <- list()
+  fixed.pars$"var_eta" <- 4
+  modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
+  
+  data <- data_log_volume
+  data <- as.matrix(data)
+  n_bin <- nrow(data)
+  n_day <- ncol(data)
+  n_bin_total <- n_bin * n_day
+  
+  data.reform <- data %>%
+    as.list() %>%
+    unlist()
+  
+  args <- list(data = data, n_bin = n_bin,
+               n_day = n_day, n_bin_total = n_bin_total,
+               modelSpec = modelSpec)
+  
+  
+  result <- do.call(MARSS_spec, args = args)
+  kalman <- result$kalman
+  kalman$par <- kalman$start
+  
+  trans.param <- trans_MARSStoIntra(kalman$par, modelSpec$par)
+  
+  predefinde_params <- list()
+  predefinde_params$"a_eta" <- 1
+  predefinde_params$"a_mu" <- 0.7
+  predefinde_params$"var_eta" <- 4
+  predefinde_params$"var_mu" <- 0.06
+  predefinde_params$"r" <- 0.08
+  predefinde_params$"phi" <- matrix(rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform), nrow = n_bin)
+  phi_names <- c()
+  for (i in 1:n_bin){
+    phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
+  }
+  dimnames(predefinde_params$"phi")[[1]] <- phi_names
+  predefinde_params$"x0" <- matrix(c(10, 0), 2, 1)
+  dimnames(predefinde_params$"x0")[[1]] <- c("x01","x02")
+  predefinde_params$"V0" <- matrix(c(1e-10, 0, 1e-10), 3, 1)
+  dimnames(predefinde_params$"V0")[[1]] <- c("(1,1)","(2,1)","(2,2)")
+  
+  
+  
+  expect_equal(trans.param, predefinde_params)
+  
+})
 
 
 test_that("MARSS_spec works", {
