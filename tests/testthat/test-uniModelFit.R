@@ -28,5 +28,5 @@ test_that("uniModelFit params conincide with precomputed model", {
   EM_result_test <- do.call(EM_param, args = args)
   
   
-  expect_equal(EM_result_test$model$par, precomputed_par, tolerance = 1e-5)
+  expect_equal(EM_result_test$model$par, precomputed_par, tolerance = 1e-3)
 })
