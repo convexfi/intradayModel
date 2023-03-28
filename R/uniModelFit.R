@@ -100,16 +100,19 @@ uniModelFit <- function(data.train, modelSpec, control = list(maxit = 3000, abst
   #              n_day = n_day,
   #              control = control
   #              )
-  kalman.ours <- EM_param(kalman.ours, modelSpec,
-                          data.train_reform, n_bin,
-                          n_bin_total,
-                          n_day,At,
-                          control)
+  EM_result <- EM_param(kalman.ours, modelSpec,
+                        data.train_reform, n_bin,
+                        n_bin_total,
+                        n_day,At,
+                        control)
   
-  # modelSpec$par <- kalman.ours$par
-  # modelSpec$fitFlag[] <- TRUE
+  modelSpec$par <- EM_result$model$par
+  if (EM_result$convergence) {
+    modelSpec$fitFlag[] <- TRUE
+  }
   
-  # return (modelSpec)
+  
+  return (modelSpec)
   
 }
 
@@ -159,11 +162,20 @@ extract_init <- function(init.default, init.pars, fitFlag){
   return (init.marss)
 }
 
+trans_marss2our <- function(marss_model, intra_model){
+  fix <- modelSpec$fitFlag
+  unfixed.names <- names(fix[fix == TRUE])
+  for (name in unfixed.names){
+    modelSpec$par[[name]] <- marss_model
+  }
+}
+
 EM_param <- function(kalman.ours,modelSpec,
                      y_train, n_bin,
                      n_bin_total,
                      n_day,At,
                      control){
+  convergence <- FALSE
   Z.matrix <- matrix(kalman.ours[["model"]][["fixed"]][["Z"]][,,1], nrow = 1) # matrix(unlist(Z), nrow = 1)
   jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
   y.daily.matrix <- matrix(y_train, n_bin)
@@ -174,7 +186,6 @@ EM_param <- function(kalman.ours,modelSpec,
   
   # fixed params
   fix <- modelSpec$fitFlag
-  fixed.names <- names(fix[fix == FALSE])
   unfixed.names <- names(fix[fix == TRUE])
   
   for (i in 1: maxit) {
@@ -240,6 +251,7 @@ EM_param <- function(kalman.ours,modelSpec,
     diff <- norm(as.numeric(unlist(kalman.ours$par)) -
                    as.numeric(unlist(curr_par)), type = "2")
     if (diff < abstol) {
+      convergence <- TRUE
       break
     }
     
@@ -248,6 +260,8 @@ EM_param <- function(kalman.ours,modelSpec,
     }
     kalman.ours$par <- curr_par
   }
-  return (kalman.ours)
+  if (!convergence) warning("No convergence")
+  result <- list("model" = kalman.ours, "convergence" = convergence)
+  return (result)
 }
 
