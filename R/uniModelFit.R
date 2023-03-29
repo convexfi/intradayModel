@@ -94,7 +94,7 @@ EM_param <- function(...){
   fix <- modelSpec$fitFlag
   unfixed.names <- names(fix[fix == TRUE])
   
-  par_log <- list(kalman.ours$par)
+  par_log <- list(kalman$par)
   for (i in 1: maxit) {
     # Kalman filter & smoother
     Kf <- MARSS::MARSSkfas(kalman)
