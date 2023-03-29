@@ -10,7 +10,7 @@ test_that("uniModelFit params conincide with precomputed model", {
   n_bin <- nrow(data)
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
-  control = list(maxit = 3000, abstol = 1e-4)
+  control = list(maxit = 3000, abstol = 1e-4, log.switch = TRUE)
   
   args <- list(data = data, n_bin = n_bin,
                n_day = n_day, n_bin_total = n_bin_total,
