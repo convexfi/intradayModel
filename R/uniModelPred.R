@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-uniModelPred <- function(data, modelSpec, out_of_sample, init_state) {
+uniModelPred <- function(data, modelSpec, out_of_sample, init_state = list()) {
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   # check if fit is necessary
   if (!is.list(modelSpec)) stop("tbd.")
@@ -33,11 +33,13 @@ uniModelPred <- function(data, modelSpec, out_of_sample, init_state) {
     }
   }
   if (modelSpec$fitFlag[["x0"]] || modelSpec$fitFlag[["V0"]]){
-    modelSpec <- uniModelFit(data.p1, modelSpec)
+    if(out_of_sample == ncol(data)) stop("Need data for estimating the initial state.")
+    modelSpec <- uniModelFit(data[,1:(ncol(data) - out_of_sample)], modelSpec)
   }
   
-  KfList.all <- Filter(data.p2, modelSpec)
-  return (KfList.all)
+  y.pred <- Pred(data, modelSpec)
+  
+  return (y.pred)
   
 }
 
@@ -54,6 +56,10 @@ Pred <- function(data, modelSpec){
   kalman <- result$kalman
   
   KfList.all <- MARSS::MARSSkfas(kalman)
+  x.pred <- KfList.all[["xtt1"]]
+  seasonal <- modelSpec$par$phi[,1]
+  names(seasonal) <- NULL
+  y.pred <- x.pred[1,] + x.pred[2,] + rep(seasonal, ncol(data))
   
-  return (KfList.all)
+  return (y.pred)
 }
