@@ -10,7 +10,7 @@
 #'
 #' @examples
 uniModelFit <- function(data, modelSpec,
-                        control = list(maxit = 3000, abstol = 1e-4, log.switch = TRUE)) {
+                        maxit = 3000, abstol = 1e-4, log.switch = TRUE) {
   
   # check if fit is necessary
   if (!is.list(modelSpec)) stop("tbd.")
@@ -33,7 +33,7 @@ uniModelFit <- function(data, modelSpec,
   # data.train_reform <- data %>%
   #                      as.list() %>%
   #                      unlist()
-  
+  control <- list(maxit = maxit, abstol = abstol, log.switch = log.switch)
   args <- list(data = data, n_bin = n_bin,
                n_day = n_day, n_bin_total = n_bin_total,
                modelSpec = modelSpec,
@@ -57,7 +57,7 @@ uniModelFit <- function(data, modelSpec,
   
   modelSpec$par <- trans_MARSStoIntra(EM_result$model$par, modelSpec$par)
   if (EM_result$convergence) {
-    modelSpec$fitFlag[] <- TRUE
+    modelSpec$fitFlag[] <- FALSE
   }
   
   
@@ -177,6 +177,8 @@ EM_param <- function(...){
     phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
   }
   kalman$par$A <- array(kalman$par$A, dim = c(n_bin,1), dimnames = list(phi_names,NULL))
+  # add name for R
+  kalman$par$R <- array(kalman$par$R, dim = c(1,1), dimnames = list("r",NULL))
   if (!convergence) warning("No convergence")
   result <- list("model" = kalman, "convergence" = convergence, par_log = par_log)
   return (result)

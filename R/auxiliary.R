@@ -88,6 +88,9 @@ MARSS_spec <- function(...){
   x0 <- extract_value("x0", modelSpec) %>%
     matrix(2, 1)
   V0 <- extract_value("V0", modelSpec)
+  if (!identical(V0 ,"unconstrained")){
+    V0 <- matrix(c(as.numeric(V0[1,1]),as.numeric(V0[2,1]),as.numeric(V0[2,1]),as.numeric(V0[3,1]) ), nrow = 2)
+  }
   
   ## predefined init value
   init.default <- list("x0" = matrix(c(10, 0), 2, 1),
