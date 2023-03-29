@@ -26,11 +26,11 @@ uniModelFilter <- function(data, modelSpec) {
   # if (modelSpec$fitFlag[["x0"]] || modelSpec$fitFlag[["V0"]]){
   #   modelSpec <- uniModelFit(data.p1, modelSpec)
   # }
-  KfList.all <- Filter(data.p2, modelSpec)
+  Filter.result <- Filter(data, modelSpec)
   
   
   
-  return (KfList.all)
+  return (Filter.result)
   
 }
 
@@ -45,8 +45,10 @@ Filter <- function(data, modelSpec){
                modelSpec = modelSpec)
   result <- do.call(MARSS_spec, args = args)
   kalman <- result$kalman
-  
   KfList.all <- MARSS::MARSSkfas(kalman)
+  result <- list("daily" = KfList.all$xtT[1,],
+                 "dynamic" = KfList.all$xtT[2,],
+                 "seasonal" = as.vector(kalman$model$fixed[["A"]]))
   
-  return (KfList.all)
+  return (result)
 }
