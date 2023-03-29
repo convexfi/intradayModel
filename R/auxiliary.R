@@ -69,8 +69,8 @@ MARSS_spec <- function(...){
   
   At = array(list(0), dim = c(1, 1, n_bin_total))
   a_vec = extract_value("phi", modelSpec)
-  if (a_vec == "phi" || length(a_vec) != n_bin){
-    if (a_vec != "phi" && length(a_vec) != n_bin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
+  if (identical(a_vec, "phi") || (length(a_vec) != n_bin)){
+    if (!identical(a_vec, "phi") && length(a_vec) != n_bin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
                                        The values of fixed phi are ignored.")
     for (n in 1:n_bin) {
       a_vec[n] <- paste("phi", n, sep = "")
