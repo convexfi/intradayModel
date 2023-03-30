@@ -1,73 +1,62 @@
-#
-# example:
-#   fitted_Tyler <- fit_Tyler(X, return_iterates = TRUE)
-#   p <- fitHeavyTail:::plot_convergence(fitted_Tyler)
-#   p$nu
-#   p$nu_div_nu_2
-#   p
-#' @importFrom stats median
-plot_convergence <- function(res_fit) {
-  if (is.null(res_fit$iterates_record))
-    stop("Fitting result does not contain iteration converge. Make sure to use \"return_iterates = TRUE\" when doing the fitting.")
-
-  if (!requireNamespace("ggplot2", quietly = TRUE))
-    stop("Please install package \"ggplot2\"", call. = FALSE)
-
-  if (!requireNamespace("reshape2", quietly = TRUE))
-    stop("Please install package \"reshape2\"", call. = FALSE)
-
-  iteration <- nu <- nu_div_nu_2 <- value <- variable <- log_likelihood <- NULL  # hack to avoid problems with checks
-
-  p_all <- list()
-  data <- data.frame(iteration = 0:(length(res_fit$iterates_record)-1))
-  if (!is.null(res_fit$iterates_record[[1]]$nu)) {
-    data$nu <- sapply(res_fit$iterates_record, `[[`, "nu")
-    data$nu_div_nu_2 <- fnu(data$nu)
-    p_nu <- ggplot2::ggplot(data, ggplot2::aes(x = iteration, y = nu)) +
-      ggplot2::geom_line() + ggplot2::geom_point() +
-      ggplot2::ggtitle("Convergence of nu")
-    #print(p_nu)
-    p_all <- c(p_all, "nu" = list(p_nu))
-
-    p_nu_div_nu_2 <- ggplot2::ggplot(data, ggplot2::aes(x = iteration, y = nu_div_nu_2)) +
-      ggplot2::geom_line() + ggplot2::geom_point() +
-      ggplot2::ggtitle("Convergence of nu/(nu-2)") + ggplot2::ylab(nu/(nu-2))
-    #print(p_nu_div_nu_2)
-    p_all <- c(p_all, "nu_div_nu_2" = list(p_nu_div_nu_2))
-  }
-
-  if (!is.null(res_fit$iterates_record[[1]]$mu)) {
-    mu_matrix <- sapply(res_fit$iterates_record, `[[`, "mu")
-    rownames(mu_matrix) <- paste0("mu", 1:nrow(mu_matrix))
-    data <- cbind(data, as.data.frame(t(mu_matrix)))
-    # ggplot(data, aes(x = iteration, y = mu2)) +
-    #   geom_line() + geom_point()
-    p_mu <- ggplot2::ggplot(reshape2::melt(data, measure.vars = rownames(mu_matrix)), ggplot2::aes(x = iteration, y = value, col = variable)) +
-      ggplot2::geom_line() + ggplot2::geom_point() +
-      ggplot2::ggtitle("Convergence of mu")
-    #print(p_mu)
-    p_all <- c(p_all, "mu" = list(p_mu))
-  }
-
-  if (!is.null(res_fit$iterates_record[[1]]$scatter)) {
-    diag_scatter_matrix <- sapply(res_fit$iterates_record, function(x) diag(x$scatter))
-    rownames(diag_scatter_matrix) <- paste0("diag_scatter", 1:nrow(diag_scatter_matrix))
-    data <- cbind(data, as.data.frame(t(diag_scatter_matrix)))
-    p_scatter <- ggplot2::ggplot(reshape2::melt(data, measure.vars = rownames(diag_scatter_matrix)), ggplot2::aes(x = iteration, y = value, col = variable)) +
-      ggplot2::geom_line() + ggplot2::geom_point() +
-      ggplot2::ggtitle("Convergence of scatter matrix")
-    #print(p_scatter)
-    p_all <- c(p_all, "scatter" = list(p_scatter))
-  }
-
-  if (!is.null(res_fit$iterates_record[[1]]$log_likelihood)) {
-    data$log_likelihood <- sapply(res_fit$iterates_record, `[[`, "log_likelihood")
-    p_log_likelihood <- ggplot2::ggplot(data, ggplot2::aes(x = iteration, y = log_likelihood)) +
-      ggplot2::geom_line() + ggplot2::geom_point() +
-      ggplot2::ggtitle("Convergence of log_likelihood")
-    #print(p_log_likelihood)
-    p_all <- c(p_all, "log_likelihood" = list(p_log_likelihood))
-  }
-
-  return(invisible(p_all))
+#' Title
+#'
+#' @param data
+#' @param filter.result
+#'
+#' @return
+#' @export
+#' @import wesanderson
+#' @import patchwork
+#' @importFrom magrittr %>%
+#' @importFrom dplyr !!
+#' @importFrom ggplot2 ggplot geom_line xlab ylab theme_bw theme
+#'
+#' @examples
+uniModelPlot <- function(data, filter.result, type){
+  data.reform <- data %>%
+    as.list() %>%
+    unlist()
+  plt.data.log <-
+    data.frame(
+      volume = as.vector(data.reform),
+      daily = filter.result[["daily"]],
+      seasonal = filter.result[["seasonal"]],
+      dynamic = filter.result[["dynamic"]],
+      i = 1:(nrow(data_log_volume) * ncol(data_log_volume))
+    )
+  
+  text_size = 10
+  y.value <- y.lab <- NULL
+  switch (type,
+          "volume" = {y.value = quote(volume)
+          y.lab = "Intraday\nVolume"},
+          "daily" = {y.value = quote(daily)
+          y.lab = "Daily"},
+          "seasonal" = {y.value = quote(seasonal)
+          y.lab = "seasonal"},
+          "dynamic" = {y.value = quote(dynamic)
+          y.lab = "Intraday\nDynamic"}
+  )
+  p1 <- plt.data.log %>%
+    ggplot() +
+    geom_line(aes(x = i, y= !!y.value), alpha = 0.8, color = "steelblue", size = 0.4) +
+    xlab(expression(tau)) +
+    ylab(y.lab) +
+    theme_bw() +
+    theme(
+      axis.title = element_text(size = text_size, face = "bold"),
+      legend.position = "right",
+      legend.justification = c(0, 1),
+      legend.box.just = "left",
+      legend.margin = margin(8, 8, 8, 8),
+      legend.text = element_text(size = text_size, face = "bold"),
+      # legend.title = element_blank(),
+      legend.key.size = unit(1, "cm"),
+      plot.title = element_text(size=18, face = "bold", hjust = 0.5),
+      axis.title.x=element_blank(),
+      axis.text.x=element_blank()
+    )
+  p1
 }
+
+# p1/p2/p3/p4
