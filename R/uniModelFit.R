@@ -166,7 +166,7 @@ EM_param <- function(...){
     }
     
     if (log.switch == TRUE) {
-      par_log <- list.append(par_log, curr_par)
+      par_log <- rlist::list.append(par_log, curr_par)
     }
     kalman$par <- curr_par
     
@@ -184,10 +184,10 @@ EM_param <- function(...){
   return (result)
 }
 
-fetch_par_log <- function(par_log, index) {
-  par_list <- list()
-  for (i in 1:length(par_log)) {
-    par_list <- list.append(par_list, par_log[[i]][[index]])
-  }
-  return(do.call(cbind, par_list))
-}
+# fetch_par_log <- function(par_log, index) {
+#   par_list <- list()
+#   for (i in 1:length(par_log)) {
+#     par_list <- list.append(par_list, par_log[[i]][[index]])
+#   }
+#   return(do.call(cbind, par_list))
+# }

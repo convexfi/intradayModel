@@ -2,8 +2,9 @@
 # They should be invisible to package users
 
 # transform the parameter form the format of MARSS to IntradayModel
-trans_MARSStoIntra <- function(MARSS.par, intra.par){
+trans_MARSStoIntra <- function(MARSS.par, intra.par = NULL){
   all.pars.name.MARSS <- c("A", "R", "B", "Q", "x0", "V0")
+  all.pars.name.intra <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   MARSS.par <- MARSS.par[all.pars.name.MARSS]
   for (name in c("B","Q","R")){
     if (length(MARSS.par[[name]]) > 0){
@@ -21,7 +22,10 @@ trans_MARSStoIntra <- function(MARSS.par, intra.par){
   if (length(MARSS.par[["A"]]) > 0 ){
     MARSS.par[["phi"]] <- MARSS.par[["A"]]
   }
-  
+  # if (is.null(intra.par)){
+  #   return(MARSS.par[all.pars.name.intra])
+  # }
+  # else{
   for (name in names(intra.par)){
     if (anyNA(intra.par[[name]])){
       intra.par[[name]] <- MARSS.par[[name]]
@@ -29,9 +33,10 @@ trans_MARSStoIntra <- function(MARSS.par, intra.par){
   }
   dimnames(intra.par[["x0"]]) <- list(c("x01", "x02"), NULL)
   return (intra.par)
+  # }
 }
 
-#
+
 MARSS_spec <- function(...){
   args <- list(...)
   data <- args$data
@@ -70,6 +75,8 @@ MARSS_spec <- function(...){
   
   At = array(list(0), dim = c(1, 1, n_bin_total))
   a_vec = extract_value("phi", modelSpec)
+  
+  # need check
   if (identical(a_vec, "phi") || (length(a_vec) != n_bin)){
     if (!identical(a_vec, "phi") && length(a_vec) != n_bin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
                                        The values of fixed phi are ignored.")
@@ -84,14 +91,16 @@ MARSS_spec <- function(...){
   R <- extract_value("r", modelSpec) %>%
     list() %>%
     matrix(1,1)
-  
   ## Initial State
   x0 <- extract_value("x0", modelSpec) %>%
+    as.list()%>%
     matrix(2, 1)
+  # need check
   V0 <- extract_value("V0", modelSpec)
   if (!identical(V0 ,"unconstrained")){
     V0 <- matrix(c(as.numeric(V0[1,1]),as.numeric(V0[2,1]),as.numeric(V0[2,1]),as.numeric(V0[3,1]) ), nrow = 2)
   }
+  
   
   ## predefined init value
   init.default <- list("x0" = matrix(c(10, 0), 2, 1),
@@ -107,9 +116,11 @@ MARSS_spec <- function(...){
   ## MARSS model
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
   kalman <- MARSS::MARSS(data.reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
-  return (kalman)
+  
+  result <- list(kalman = kalman, At = At)
+  
+  return (result)
 }
-
 
 extract_value <- function(name, modelSpec) {
   if (modelSpec$fitFlag[[name]]) {
@@ -155,5 +166,23 @@ extract_init <- function(init.default, init.pars, fitFlag){
     init.marss$Q <- matrix(var.init, length(var.init), 1)
   }
   return (init.marss)
+}
+
+IntraFormat <- function(modelSpec){
+  if (!modelSpec$fitFlag[["phi"]]){
+    phi_names <- c()
+    for (i in 1:length(modelSpec$par[["phi"]])){
+      phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
+    }
+    modelSpec$par[["phi"]] <- array(modelSpec$par[["phi"]], dim = c(length(modelSpec$par[["phi"]]),1), dimnames = list(phi_names,NULL))
+  }
+  if (!modelSpec$fitFlag[["x0"]]){
+    modelSpec$par[["x0"]] <- array(modelSpec$par[["x0"]], dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
+  }
+  if (!modelSpec$fitFlag[["V0"]]){
+    modelSpec$par[["V0"]] <- array(modelSpec$par[["V0"]], dim = c(3,1), dimnames = list(c("(1,1)","(2,1)","(2,2)"),NULL))
+  }
+  
+  return (modelSpec)
 }
 
