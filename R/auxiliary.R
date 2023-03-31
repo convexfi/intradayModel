@@ -27,6 +27,7 @@ trans_MARSStoIntra <- function(MARSS.par, intra.par){
       intra.par[[name]] <- MARSS.par[[name]]
     }
   }
+  dimnames(intra.par[["x0"]]) <- list(c("x01", "x02"), NULL)
   return (intra.par)
 }
 
