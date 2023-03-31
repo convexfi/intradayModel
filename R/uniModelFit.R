@@ -29,10 +29,6 @@ uniModelFit <- function(data, modelSpec,
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
   
-  ## reform data
-  # data.train_reform <- data %>%
-  #                      as.list() %>%
-  #                      unlist()
   control <- list(maxit = maxit, abstol = abstol, log.switch = log.switch)
   args <- list(data = data, n_bin = n_bin,
                n_day = n_day, n_bin_total = n_bin_total,
@@ -48,12 +44,6 @@ uniModelFit <- function(data, modelSpec,
   args <- append(args, list(kalman = kalman, At = At))
   
   EM_result <- do.call(EM_param, args = args)
-  
-  # EM_result <- EM_param(kalman, modelSpec,
-  #                         data.train_reform, n_bin,
-  #                         n_bin_total,
-  #                         n_day,At,
-  #                         control)
   
   modelSpec$par <- trans_MARSStoIntra(EM_result$model$par, modelSpec$par)
   if (EM_result$convergence) {

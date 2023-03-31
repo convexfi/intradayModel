@@ -186,3 +186,59 @@ IntraFormat <- function(modelSpec){
   return (modelSpec)
 }
 
+
+isIntraModel <- function(modelSpec){
+  # msg <- NULL
+  ## Check for required components
+  el <- c("fitFlag", "par", "init")
+  if (!all(el %in% names(modelSpec))) {
+    stop("Element ", el[!(el %in% names(modelSpec))], " is missing from the model object.\n")
+  }
+  
+  msg <- NULL
+  all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
+  if (!all(all.pars.name %in% names(modelSpec$par))) {
+    msg <- c(msg, "Element ", all.pars.name[!(all.pars.name %in% names(modelSpec$par))], " is missing from the model$par.\n")
+  }
+  if (!all(all.pars.name %in% names(modelSpec$fitFlag))) {
+    msg <- c(msg, "Element ", all.pars.name[!(all.pars.name %in% names(modelSpec$fitFlag))], " is missing from the model$fitFlag.\n")
+  }
+  if (!is.null(msg)) { # rest of the tests won't work so stop now
+    stop(msg)
+  }
+  
+  # Check no additional names in fitFlag, par, init
+  for (mat in el){
+    if (!all(names(modelSpec[[mat]]) %in% all.pars.name)) {
+      msg <- c(msg, "Element\n")
+    }
+  }
+  
+  # Check no NA inf and dimension check
+  for (name in names(modelSpec)){
+    if (mode(modelSpec[["init"]][[name]]) != "numeric" || any(is.na(modelSpec[["init"]][[name]])) || any(is.infinite(modelSpec[["init"]][[name]]))){
+      stop("no")
+    }
+  }
+  
+  unifxed <- names(modelSpec$fitFlag[modelSpec$fitFlag == TRUE])
+  fixed <- names(modelSpec$fitFlag[modelSpec$fitFlag == FALSE])
+  for (name in fixed){
+    if (mode(modelSpec[["par"]][[name]]) != "numeric" || any(is.na(modelSpec[["par"]][[name]])) || any(is.infinite(modelSpec[["par"]][[name]]))){
+      stop("no")
+    }
+    # dimension check
+    # switch(name,
+    #        "a_eta" = {},
+    #        "a_mu" = {},
+    #        "var_eta" = {},
+    #        "var_mu" = {},
+    #        "x0" = {})
+  }
+  
+  for (name in unfixed){
+    if (!all(is.na(modelSpec[["par"]][[name]]))){
+      stop("no")
+    }
+  }
+}
