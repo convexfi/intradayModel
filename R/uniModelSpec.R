@@ -71,7 +71,7 @@ uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
     }
   }
   
-  
+  modelSpec <- IntraFormat(modelSpec)
   return(modelSpec)
   
 }
