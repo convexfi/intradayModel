@@ -286,3 +286,21 @@ test_that("extract_init works", {
   
   expect_equal(init.test, init.ori)
 })
+
+
+test_that("isIntraModel works", {
+  fixed.pars <- list()
+  fixed.pars$"a_mu" <- 1
+  fixed.pars$"var_eta" <- 4
+  fixed.pars$"x0" <- matrix(0,2)
+  fixed.pars$"phi" <- matrix(2, n_bin)
+  modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
+  
+  modelSpec_check1 <- modelSpec[c("par", "init")]
+  modelSpec_check2 <- modelSpec
+  modelSpec_check2$par[["x0"]] <- NULL
+  modelSpec_check2$par[["a_eta"]] <- NULL
+  
+  expect_error(isIntraModel(modelSpec_check1), "Element fitFlag is missing from the model object.\n")
+  # expect_error(isIntraModel(modelSpec_check2), c("Element a_etax0 is missing from the model$par.\n"))
+})
