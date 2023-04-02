@@ -12,16 +12,14 @@
 uniModelPred <- function(data, modelSpec, out_of_sample, init_state = list()) {
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   # check if fit is necessary
-  if (!is.list(modelSpec)) stop("tbd.")
-  # todo
+  if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
+  if (anyNA(data)) stop("data must have no NA.")
+  isIntraModel(modelSpec, data)
+  # todo gai
   # if (Reduce("+", modelSpec$fitFlag) != 0) {
   #   stop("All parameters must be fixed.\n")
   # }
   
-  # error control
-  # if (!is.matrix(data.filter) && !is.data.frame(data.filter)) stop("data must be a matrix or data.frame.")
-  # if (anyNA(data.filter) ||) stop("data must have no NA.")
-  #
   
   
   if (modelSpec$fitFlag[["x0"]] || modelSpec$fitFlag[["V0"]]){

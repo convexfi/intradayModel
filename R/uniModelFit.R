@@ -13,11 +13,14 @@ uniModelFit <- function(data, modelSpec,
                         maxit = 3000, abstol = 1e-4, log.switch = TRUE) {
   
   # check if fit is necessary
-  if (!is.list(modelSpec)) stop("tbd.")
+  if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
+  if (anyNA(data)) stop("data must have no NA.")
+  isIntraModel(modelSpec, data)
   if (Reduce("+", modelSpec$fitFlag) == 0) {
     cat("All parameters are fixed. No need to fit.\n")
     break
   }
+  # add maxit...
   
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("Input data must be a matrix or data.frame.")
@@ -29,6 +32,10 @@ uniModelFit <- function(data, modelSpec,
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
   
+  ## reform data
+  # data.train_reform <- data %>%
+  #                      as.list() %>%
+  #                      unlist()
   control <- list(maxit = maxit, abstol = abstol, log.switch = log.switch)
   args <- list(data = data, n_bin = n_bin,
                n_day = n_day, n_bin_total = n_bin_total,
@@ -45,6 +52,12 @@ uniModelFit <- function(data, modelSpec,
   
   EM_result <- do.call(EM_param, args = args)
   
+  # EM_result <- EM_param(kalman, modelSpec,
+  #                         data.train_reform, n_bin,
+  #                         n_bin_total,
+  #                         n_day,At,
+  #                         control)
+  
   modelSpec$par <- trans_MARSStoIntra(EM_result$model$par, modelSpec$par)
   if (EM_result$convergence) {
     modelSpec$fitFlag[] <- FALSE
@@ -54,6 +67,53 @@ uniModelFit <- function(data, modelSpec,
   return (modelSpec)
   
 }
+
+# extract_value <- function(name, modelSpec) {
+#   if (modelSpec$fitFlag[[name]]) {
+#     name <- switch(name,
+#                    "x0"= list("x01","x02"),
+#                    "V0" = "unconstrained",
+#                    name)
+#     return(name)
+#   } else {
+#     return(modelSpec$par[[name]])
+#   }
+# }
+
+# extract_init <- function(init.default, init.pars, fitFlag){
+#   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
+#   for (name in all.pars.name){
+#     if (!fitFlag[[name]]) {
+#       init.default[[name]] <- NULL
+#     }
+#     if (name %in% names(init.pars)){
+#       init.default[[name]] <- init.pars[[name]]
+#     }
+#   }
+#   init.marss <- list()
+#   var.init <- c()
+#   a.init <- c()
+#   for (name in names(init.default)){
+#     tmp <- switch(name,
+#                   "phi" = {init.marss$A <- init.default$phi},
+#                   "V0" = {init.marss$V0 <- init.default$V0},
+#                   "x0" = {init.marss$x0 <- init.default$x0},
+#                   "r" = {init.marss$R <- init.default$r},
+#                   "a_eta" = {a.init <- append(a.init, init.default$a_eta)},
+#                   "a_mu" = {a.init <- append(a.init, init.default$a_mu)},
+#                   "var_eta" = {var.init <- append(var.init, init.default$var_eta)},
+#                   "var_mu" = {var.init <- append(var.init, init.default$var_mu)}
+#     )
+#   }
+#   if (length(a.init) > 0){
+#     init.marss$B <- matrix(a.init, length(a.init), 1)
+#   }
+#   if (length(var.init) > 0){
+#     init.marss$Q <- matrix(var.init, length(var.init), 1)
+#   }
+#   return (init.marss)
+# }
+
 
 EM_param <- function(...){
   args <- list(...)
@@ -161,14 +221,17 @@ EM_param <- function(...){
     kalman$par <- curr_par
     
   }
-  # reshape phi
+  # reshape phi and add name for phi
   phi_names <- c()
   for (i in 1:n_bin){
     phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
   }
   kalman$par$A <- array(kalman$par$A, dim = c(n_bin,1), dimnames = list(phi_names,NULL))
-  # add name for R
+  
+  # add name for R and x0
   kalman$par$R <- array(kalman$par$R, dim = c(1,1), dimnames = list("r",NULL))
+  # kalman$par$x0 <- array(kalman$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
+  
   if (!convergence) warning("No convergence")
   result <- list("model" = kalman, "convergence" = convergence, par_log = par_log)
   return (result)
