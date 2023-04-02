@@ -36,7 +36,6 @@ trans_MARSStoIntra <- function(MARSS.par, intra.par = NULL){
   # }
 }
 
-
 MARSS_spec <- function(...){
   args <- list(...)
   data <- args$data
@@ -168,26 +167,106 @@ extract_init <- function(init.default, init.pars, fitFlag){
   return (init.marss)
 }
 
+# add init
+# IntraFormat <- function(modelSpec){
+#   if (!modelSpec$fitFlag[["phi"]]){
+#     phi_names <- c()
+#     for (i in 1:length(modelSpec$par[["phi"]])){
+#       phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
+#     }
+#     modelSpec$par[["phi"]] <- array(modelSpec$par[["phi"]], dim = c(length(modelSpec$par[["phi"]]),1), dimnames = list(phi_names,NULL))
+#   }
+#   if (!modelSpec$fitFlag[["x0"]]){
+#     modelSpec$par[["x0"]] <- array(modelSpec$par[["x0"]], dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
+#   }
+#   if (!modelSpec$fitFlag[["V0"]]){
+#     modelSpec$par[["V0"]] <- array(modelSpec$par[["V0"]], dim = c(3,1), dimnames = list(c("(1,1)","(2,1)","(2,2)"),NULL))
+#   }
+#
+#   return (modelSpec)
+# }
+
 IntraFormat <- function(modelSpec){
-  if (!modelSpec$fitFlag[["phi"]]){
-    phi_names <- c()
-    for (i in 1:length(modelSpec$par[["phi"]])){
-      phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
+  phi_names <- c()
+  for (i in 1:length(modelSpec$par[["phi"]])){
+    phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
+  }
+  for (name in c("x0", "V0", "phi")){
+    v.dim <- v.name <- NULL
+    switch (name,
+            "x0" = { v.dim <- c(2,1)
+            v.name <-list(c("x01","x02"),NULL)},
+            "V0" = {v.dim <- c(3,1)
+            v.name <-list(c("(1,1)","(2,1)","(2,2)"),NULL)
+            },
+            "phi" = {v.dim <- c(length(modelSpec$par[["phi"]]),1)
+            v.name <-list(phi_names,NULL)
+            }
+    )
+    if (!modelSpec$fitFlag[[name]]){
+      modelSpec$par[[name]] <- array(modelSpec$par[[name]], dim = v.dim, dimnames = v.name)
     }
-    modelSpec$par[["phi"]] <- array(modelSpec$par[["phi"]], dim = c(length(modelSpec$par[["phi"]]),1), dimnames = list(phi_names,NULL))
-  }
-  if (!modelSpec$fitFlag[["x0"]]){
-    modelSpec$par[["x0"]] <- array(modelSpec$par[["x0"]], dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
-  }
-  if (!modelSpec$fitFlag[["V0"]]){
-    modelSpec$par[["V0"]] <- array(modelSpec$par[["V0"]], dim = c(3,1), dimnames = list(c("(1,1)","(2,1)","(2,2)"),NULL))
+    else if(name %in% names(modelSpec$init)){
+      modelSpec$init[[name]] <- array(modelSpec$init[[name]], dim = v.dim, dimnames = v.name)
+    }
   }
   
   return (modelSpec)
 }
+# add warning
+transList <- function(check.list, type){
+  all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0", "phi")
+  len.expect <- list("a_eta" = 1, "a_mu"  = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
+  # no more
+  for (name in all.pars.name){
+    if (!(name %in% names(check.list))) next
+    
+    if (length(check.list$name) > 1 && !is.list(check.list$name)) {
+      check.list$name <- unlist(as.list(check.list$name))
+    }
+    if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))){
+      check.list$name <- NULL
+    }
+    if (name == "phi") next
+    if (!identical(len.expect$name, length(check.list$name))){
+      check.list$name <- NULL
+    }
+  }
+  return (check.list)
+}
 
+# dimension / no NA inf
+# add dimension check, delete length check
+checkList <- function(check.list, type){
+  pars.name.1 <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0")
+  len.expect <- list("a_eta" = 1, "a_mu"  = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
+  # no more
+  for (name in pars.name.1){
+    if (!(name %in% names(check.list))) next
+    # maybe no need
+    if (!(is.list(check.list$name) || is.numeric(check.list$name))) {
+      stop
+    }
+    if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))){
+      stop("no")
+    }
+    if (!identical(len.expect$name, length(check.list$name))){
+      stop("no")
+    }
+  }
+  
+  if ("phi" %in% names(check.list)){
+    if (!is.list(check.list$phi)) {
+      stop
+    }
+    if (mode(check.list[["phi"]]) != "numeric" || any(is.na(check.list[["phi"]])) || any(is.infinite(check.list[["phi"]]))){
+      stop("no")
+    }
+  }
+}
 
-isIntraModel <- function(modelSpec){
+# add phi check
+isIntraModel <- function(modelSpec, data = NULL){
   # msg <- NULL
   ## Check for required components
   el <- c("fitFlag", "par", "init")
@@ -215,30 +294,27 @@ isIntraModel <- function(modelSpec){
   }
   
   # Check no NA inf and dimension check
-  for (name in names(modelSpec)){
-    if (mode(modelSpec[["init"]][[name]]) != "numeric" || any(is.na(modelSpec[["init"]][[name]])) || any(is.infinite(modelSpec[["init"]][[name]]))){
-      stop("no")
-    }
-  }
+  checkList(modelSpec$par)
+  checkList(modelSpec$init)
   
   unifxed <- names(modelSpec$fitFlag[modelSpec$fitFlag == TRUE])
   fixed <- names(modelSpec$fitFlag[modelSpec$fitFlag == FALSE])
   for (name in fixed){
-    if (mode(modelSpec[["par"]][[name]]) != "numeric" || any(is.na(modelSpec[["par"]][[name]])) || any(is.infinite(modelSpec[["par"]][[name]]))){
+    if (any(is.na(modelSpec[["par"]][[name]]))){
       stop("no")
     }
-    # dimension check
-    # switch(name,
-    #        "a_eta" = {},
-    #        "a_mu" = {},
-    #        "var_eta" = {},
-    #        "var_mu" = {},
-    #        "x0" = {})
   }
   
   for (name in unfixed){
     if (!all(is.na(modelSpec[["par"]][[name]]))){
       stop("no")
     }
+  }
+  
+  if (!is.null(data)){
+    n_bin <- nrow(data)
+    # dim
+    if(!modelSpec$fitFlag[["phi"]] && !identical(length(modelSpec$par[["phi"]]), n_bin)) stop("no")
+    # if(modelSpec$fitFlag[["phi"]] && (!identical(length(modelSpec$init[["phi"]]), n_bin))) stop("no")
   }
 }
