@@ -287,8 +287,27 @@ test_that("extract_init works", {
   expect_equal(init.test, init.ori)
 })
 
+test_that("transList works", {
+  test.pars <- list()
+  test.pars$"a_eta" <- "a"
+  test.pars$"a_mu" <- 1
+  test.pars$"var_eta" <- Inf
+  test.pars$"x0" <- matrix(c(NA,0),2)
+  test.pars$"V0" <- matrix(0,3)
+  test.pars$"yyy" <- 6
+  
+  test.pars <- transList(test.pars)
+  
+  predefined.pars <- list()
+  predefined.pars$"a_mu" <- 1
+  predefined.pars$"V0" <- c(0,0,0)
+  
+  expect_equal(test.pars, predefined.pars)
+})
 
+# unfinished
 test_that("isIntraModel works", {
+  n_bin <- 26
   fixed.pars <- list()
   fixed.pars$"a_mu" <- 1
   fixed.pars$"var_eta" <- 4

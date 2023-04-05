@@ -30,6 +30,7 @@ uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
   modelSpec$init <- list()# modelSpec$par
   
   fixed.pars <- transList(fixed.pars)
+  # print(fixed.pars)
   init.pars <- transList(init.pars)
   for (name in all.pars.name) {
     if (name %in% names(fixed.pars)) {
@@ -37,9 +38,12 @@ uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
       ## <requires no NA check>
       modelSpec$par[[name]] <- fixed.pars[[name]]
     }
+    else if (name %in% names(init.pars)){
+      modelSpec$init[[name]] <- init.pars[[name]]
+    }
     
     # if (name %in% names(init.pars)) {
-    modelSpec$init[[name]] <- init.pars[[name]]
+    
     #}
   }
   
