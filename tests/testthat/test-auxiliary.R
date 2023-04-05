@@ -323,3 +323,17 @@ test_that("isIntraModel works", {
   expect_error(isIntraModel(modelSpec_check1), "Element fitFlag is missing from the model object.\n")
   # expect_error(isIntraModel(modelSpec_check2), c("Element a_etax0 is missing from the model$par.\n"))
 })
+
+test_that("isIntraModel test 1", {
+  data("data_log_volume")
+  data <- data_log_volume
+  data <- as.matrix(data)
+  
+  modelSpec <- uniModelSpec(fit = TRUE)
+  modelSpec$par <- NULL
+  modelSpec$init <- NULL
+  
+  # expect_error(uniModelFit(data, modelSpec), c("Element par & init is missing from the model object."))
+  expect_error(uniModelFit(data, modelSpec), regexp = "Element par & init is missing from the model")
+})
+
