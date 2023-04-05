@@ -214,7 +214,8 @@ transList <- function(check.list){
       next
     }
     
-    if (length(check.list[[name]]) > 1 && !is.list(check.list[[name]])) {
+    # if (length(check.list[[name]]) > 1 && !is.list(check.list[[name]])) {
+    if (length(check.list[[name]]) > 1) {
       check.list[[name]] <- unlist(as.list(check.list[[name]]))
     }
     if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))){
