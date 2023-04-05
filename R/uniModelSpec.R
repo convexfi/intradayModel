@@ -30,7 +30,7 @@ uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
   modelSpec$init <- list()# modelSpec$par
   
   fixed.pars <- transList(fixed.pars)
-  init.pars <- transList(fixed.pars)
+  init.pars <- transList(init.pars)
   for (name in all.pars.name) {
     if (name %in% names(fixed.pars)) {
       ## <requires dimension check>
