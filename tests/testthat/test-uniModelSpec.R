@@ -49,7 +49,7 @@ test_that("unimodel specification return coincide with the predefined ones versi
   #                                "var_eta" = NA, "var_mu" = NA,
   #                                "r" = NA, "phi" = NA,
   #                                "x0" = matrix(0, 2), "V0" = matrix(NA,3))
-  predefinde_model$init <- list("a_eta" =  1,"x0" = matrix(0, 2))
+  predefinde_model$init <- list("a_eta" =  1)
   predefinde_model$fitFlag <- list("a_eta" =  TRUE, "a_mu" = TRUE,
                                    "var_eta" = FALSE, "var_mu" = TRUE,
                                    "r" = TRUE, "phi" = TRUE,
