@@ -234,7 +234,7 @@ checkList <- function(check.list, type){
     if (!(name %in% names(check.list))) next
     # maybe no need
     if (!(is.list(check.list$name) || is.numeric(check.list$name))) {
-      stop
+      stop("no")
     }
     if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))){
       stop("no")
