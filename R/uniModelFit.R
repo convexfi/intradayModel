@@ -42,15 +42,14 @@ uniModelFit <- function(data, modelSpec,
                modelSpec = modelSpec,
                control = control)
   
-  
-  result <- MARSS_spec(args)
+  result <- do.call(MARSS_spec, args)
   kalman <- result$kalman
   At <- result$At
   
   kalman$par <- kalman$start
   args <- append(args, list(kalman = kalman, At = At))
   
-  EM_result <- EM_param(args)
+  EM_result <- do.call(EM_param, args)
   
   # EM_result <- EM_param(kalman, modelSpec,
   #                         data.train_reform, n_bin,
