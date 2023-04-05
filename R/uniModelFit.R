@@ -15,8 +15,8 @@ uniModelFit <- function(data, modelSpec,
   # check if fit is necessary
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
-  isIntraModel(modelSpec, data)
-  if (sum(modelSpec$fitFlag) == 0) {
+  # isIntraModel(modelSpec, data)
+  if (Reduce("+", modelSpec$fitFlag) == 0) {
     cat("All parameters are fixed. No need to fit.\n")
     break
   }
