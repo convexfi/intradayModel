@@ -36,6 +36,7 @@ trans_MARSStoIntra <- function(MARSS.par, intra.par = NULL){
   # }
 }
 
+# define the MARSS model
 MARSS_spec <- function(...){
   args <- list(...)
   data <- args$data
@@ -121,6 +122,7 @@ MARSS_spec <- function(...){
   return (result)
 }
 
+# extract fixed pars value from modelSpec for MARSS
 extract_value <- function(name, modelSpec) {
   if (modelSpec$fitFlag[[name]]) {
     name <- switch(name,
@@ -133,6 +135,7 @@ extract_value <- function(name, modelSpec) {
   }
 }
 
+# extract init pars value from modelSpec for MARSS
 extract_init <- function(init.default, init.pars, fitFlag){
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   for (name in all.pars.name){
@@ -167,25 +170,7 @@ extract_init <- function(init.default, init.pars, fitFlag){
   return (init.marss)
 }
 
-# add init
-# IntraFormat <- function(modelSpec){
-#   if (!modelSpec$fitFlag[["phi"]]){
-#     phi_names <- c()
-#     for (i in 1:length(modelSpec$par[["phi"]])){
-#       phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
-#     }
-#     modelSpec$par[["phi"]] <- array(modelSpec$par[["phi"]], dim = c(length(modelSpec$par[["phi"]]),1), dimnames = list(phi_names,NULL))
-#   }
-#   if (!modelSpec$fitFlag[["x0"]]){
-#     modelSpec$par[["x0"]] <- array(modelSpec$par[["x0"]], dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
-#   }
-#   if (!modelSpec$fitFlag[["V0"]]){
-#     modelSpec$par[["V0"]] <- array(modelSpec$par[["V0"]], dim = c(3,1), dimnames = list(c("(1,1)","(2,1)","(2,2)"),NULL))
-#   }
-#
-#   return (modelSpec)
-# }
-
+# unify the output of uniModelSpec()
 IntraFormat <- function(modelSpec){
   phi_names <- c()
   for (i in 1:length(modelSpec$par[["phi"]])){
@@ -213,7 +198,8 @@ IntraFormat <- function(modelSpec){
   
   return (modelSpec)
 }
-# add warning
+
+# clean the uniModelSpec()'s input args
 transList <- function(check.list, type){
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0", "phi")
   len.expect <- list("a_eta" = 1, "a_mu"  = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
@@ -235,8 +221,7 @@ transList <- function(check.list, type){
   return (check.list)
 }
 
-# dimension / no NA inf
-# add dimension check, delete length check
+# part of error check for init.pars/fixed.pars
 checkList <- function(check.list, type){
   pars.name.1 <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0")
   len.expect <- list("a_eta" = 1, "a_mu"  = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
@@ -265,7 +250,7 @@ checkList <- function(check.list, type){
   }
 }
 
-# add phi check
+# check whether the modelSpec is correct
 isIntraModel <- function(modelSpec, data = NULL){
   # msg <- NULL
   ## Check for required components
@@ -318,3 +303,4 @@ isIntraModel <- function(modelSpec, data = NULL){
     # if(modelSpec$fitFlag[["phi"]] && (!identical(length(modelSpec$init[["phi"]]), n_bin))) stop("no")
   }
 }
+
