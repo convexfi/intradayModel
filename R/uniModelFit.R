@@ -16,7 +16,7 @@ uniModelFit <- function(data, modelSpec,
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
   isIntraModel(modelSpec, data)
-  if (Reduce("+", modelSpec$fitFlag) == 0) {
+  if (sum(modelSpec$fitFlag) == 0) {
     cat("All parameters are fixed. No need to fit.\n")
     break
   }
@@ -224,7 +224,7 @@ EM_param <- function(...){
   # reshape phi and add name for phi
   phi_names <- c()
   for (i in 1:n_bin){
-    phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
+    phi_names <- append(phi_names, paste("phi", i, sep = ""))
   }
   kalman$par$A <- array(kalman$par$A, dim = c(n_bin,1), dimnames = list(phi_names,NULL))
   
