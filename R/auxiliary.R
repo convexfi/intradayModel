@@ -200,26 +200,30 @@ IntraFormat <- function(modelSpec){
 }
 
 # clean the uniModelSpec()'s input args
-transList <- function(check.list, type){
+transList <- function(check.list){
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0", "phi")
   len.expect <- list("a_eta" = 1, "a_mu"  = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
   # no more
-  for (name in all.pars.name){
-    if (!(name %in% names(check.list))) next
+  for (name in names(check.list)){
+    if (!(name %in% all.pars.name)){
+      check.list[[name]] <- NULL
+      next
+    }
     
-    if (length(check.list$name) > 1 && !is.list(check.list$name)) {
-      check.list$name <- unlist(as.list(check.list$name))
+    if (length(check.list[[name]]) > 1 && !is.list(check.list[[name]])) {
+      check.list[[name]] <- unlist(as.list(check.list[[name]]))
     }
     if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))){
-      check.list$name <- NULL
+      check.list[[name]] <- NULL
     }
     if (name == "phi") next
-    if (!identical(len.expect$name, length(check.list$name))){
-      check.list$name <- NULL
+    if (len.expect[[name]]!= length(check.list[[name]])){
+      check.list[[name]] <- NULL
     }
   }
   return (check.list)
 }
+
 
 # part of error check for init.pars/fixed.pars
 checkList <- function(check.list, type){
