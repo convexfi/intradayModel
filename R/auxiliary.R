@@ -1,7 +1,7 @@
 # This is a library of auxiliary functions, which might be useful for other exported functions of this package.
 # They should be invisible to package users
 
-# transform the parameter form the format of MARSS to IntradayModel
+# transform the parameter from the format of MARSS to IntradayModel
 trans_MARSStoIntra <- function(MARSS.par, intra.par = NULL){
   all.pars.name.MARSS <- c("A", "R", "B", "Q", "x0", "V0")
   all.pars.name.intra <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
@@ -170,7 +170,8 @@ extract_init <- function(init.default, init.pars, fitFlag){
   return (init.marss)
 }
 
-# unify the output of uniModelSpec()
+# unify the output of uniModelSpec(). 
+# modify the variable dimension and add variable names
 IntraFormat <- function(modelSpec){
   phi_names <- c()
   for (i in 1:length(modelSpec$par[["phi"]])){
@@ -199,7 +200,10 @@ IntraFormat <- function(modelSpec){
   return (modelSpec)
 }
 
-# clean the uniModelSpec()'s input args
+# clean the uniModelSpec()'s input args (init.pars/fixed.pars)
+# remove any variable containing NA/inf/non-numeric
+# remove any variable that won't appear in model
+# flatten the variable if user input a high dimension one
 transList <- function(check.list){
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0", "phi")
   len.expect <- list("a_eta" = 1, "a_mu"  = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
