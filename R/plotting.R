@@ -8,7 +8,6 @@
 #' @import wesanderson
 #' @import patchwork
 #' @importFrom magrittr %>%
-#' @importFrom dplyr !!
 #' @importFrom ggplot2 ggplot geom_line xlab ylab theme_bw theme
 #'
 #' @examples
