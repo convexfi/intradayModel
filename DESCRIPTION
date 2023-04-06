@@ -27,6 +27,7 @@ License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.1
 Depends:
+    R (>= 2.10)
 Imports:
     ICSNP,
     mvtnorm,
@@ -40,8 +41,10 @@ Suggests:
     reshape2,
     rmarkdown,
     R.rsp,
-    testthat
+    testthat (>= 3.0.0)
 VignetteBuilder:
     knitr,
     rmarkdown,
     R.rsp
+LazyData: true
+Config/testthat/edition: 3
