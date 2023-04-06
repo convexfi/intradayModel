@@ -107,7 +107,7 @@ MARSS_spec <- function(...){
                        "a_eta" = 1, "a_mu" = 0.7,
                        "r" = 0.08,
                        "var_eta" = 0.07, "var_mu" = 0.06,
-                       "V0" = matrix(c(1e-10, 0, 1e-10), 3, 1),
+                       "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
                        "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
   )
   ## Init param
