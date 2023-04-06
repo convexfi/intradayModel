@@ -62,6 +62,7 @@ uniModelFit <- function(data, modelSpec,
     modelSpec$fitFlag[] <- FALSE
   }
   
+  modelSpec$par_log <- EM_result$par_log
   
   return (modelSpec)
   
