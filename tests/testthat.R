@@ -1,4 +1,4 @@
 library(testthat)
-library(fitHeavyTail)
+library(intradayModel)
 
-test_check("fitHeavyTail")
+test_check("intradayModel")
