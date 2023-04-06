@@ -9,7 +9,7 @@ test_that("uniModelFilter, batch = 5", {
   
   
   filter_result2 <- uniModelFilter(data[, 51:100], modelSpec.fit)
-  plot_decomposition(data, filter_result2)
+  plot_decomposition(data[, 51:100], filter_result2)
   
 })
 
