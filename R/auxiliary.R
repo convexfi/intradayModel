@@ -315,3 +315,10 @@ isIntraModel <- function(modelSpec, data = NULL){
   }
 }
 
+fetch_par_log <- function(par_log, index) {
+  par_list <- list()
+  for (i in 1:length(par_log)) {
+    par_list <- list.append(par_list, par_log[[i]][[index]])
+  }
+  return(do.call(cbind, par_list))
+}
