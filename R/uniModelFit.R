@@ -191,7 +191,8 @@ EM_param <- function(...){
              curr_par$V0[2] <- Kf$V0T[2, 1]
              curr_par$V0[3] <- Kf$V0T[2, 2]
              },
-             "phi" = {curr_par$A <- rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))},
+             "phi" = {curr_par$A <- rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))
+                      curr_par$A <- curr_par$A - mean(curr_par$A)},
              "r" = {update_r()},
              "a_eta" = {curr_par$B["a_eta",1] <- sum(Ptt1[1, 1, jump_interval]) /
                sum(Pt[1, 1, jump_interval - 1])},
