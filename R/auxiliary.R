@@ -107,7 +107,7 @@ MARSS_spec <- function(...){
                        "a_eta" = 1, "a_mu" = 0.7,
                        "r" = 0.08,
                        "var_eta" = 0.07, "var_mu" = 0.06,
-                       "V0" = matrix(c(1e-10, 0, 1e-10), 3, 1),
+                       "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
                        "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
   )
   ## Init param
@@ -177,6 +177,8 @@ IntraFormat <- function(modelSpec){
   for (i in 1:length(modelSpec$par[["phi"]])){
     phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
   }
+  
+  # assign names to variables whose dimension > 1
   for (name in c("x0", "V0", "phi")){
     v.dim <- v.name <- NULL
     switch (name,
@@ -265,16 +267,16 @@ isIntraModel <- function(modelSpec, data = NULL){
   ## Check for required components
   el <- c("fitFlag", "par", "init")
   if (!all(el %in% names(modelSpec))) {
-    stop("Element ", el[!(el %in% names(modelSpec))], " is missing from the model object.\n")
+    stop("Element ", paste(el[!(el %in% names(modelSpec))], collapse = " & "), " is missing from the model object.\n")
   }
   
   msg <- NULL
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   if (!all(all.pars.name %in% names(modelSpec$par))) {
-    msg <- c(msg, "Element ", all.pars.name[!(all.pars.name %in% names(modelSpec$par))], " is missing from the model$par.\n")
+    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(modelSpec$par))], collapse = " & "), " is missing from the model$par.\n")
   }
   if (!all(all.pars.name %in% names(modelSpec$fitFlag))) {
-    msg <- c(msg, "Element ", all.pars.name[!(all.pars.name %in% names(modelSpec$fitFlag))], " is missing from the model$fitFlag.\n")
+    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(modelSpec$fitFlag))], collapse = " & "), " is missing from the model$fitFlag.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
@@ -313,3 +315,10 @@ isIntraModel <- function(modelSpec, data = NULL){
   }
 }
 
+fetch_par_log <- function(par_log, index) {
+  par_list <- list()
+  for (i in 1:length(par_log)) {
+    par_list <- list.append(par_list, par_log[[i]][[index]])
+  }
+  return(do.call(cbind, par_list))
+}
