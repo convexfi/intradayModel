@@ -15,7 +15,7 @@ uniModelFit <- function(data, modelSpec,
   # check if fit is necessary
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
-  isIntraModel(modelSpec, data)
+  # isIntraModel(modelSpec, data)
   if (Reduce("+", modelSpec$fitFlag) == 0) {
     cat("All parameters are fixed. No need to fit.\n")
     break
@@ -42,15 +42,14 @@ uniModelFit <- function(data, modelSpec,
                modelSpec = modelSpec,
                control = control)
   
-  
-  result <- do.call(MARSS_spec, args = args)
+  result <- do.call(MARSS_spec, args)
   kalman <- result$kalman
   At <- result$At
   
   kalman$par <- kalman$start
   args <- append(args, list(kalman = kalman, At = At))
   
-  EM_result <- do.call(EM_param, args = args)
+  EM_result <- do.call(EM_param, args)
   
   # EM_result <- EM_param(kalman, modelSpec,
   #                         data.train_reform, n_bin,
@@ -63,6 +62,7 @@ uniModelFit <- function(data, modelSpec,
     modelSpec$fitFlag[] <- FALSE
   }
   
+  modelSpec$par_log <- EM_result$par_log
   
   return (modelSpec)
   
@@ -191,7 +191,8 @@ EM_param <- function(...){
              curr_par$V0[2] <- Kf$V0T[2, 1]
              curr_par$V0[3] <- Kf$V0T[2, 2]
              },
-             "phi" = {curr_par$A <- rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))},
+             "phi" = {curr_par$A <- rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))
+                      curr_par$A <- curr_par$A - mean(curr_par$A)},
              "r" = {update_r()},
              "a_eta" = {curr_par$B["a_eta",1] <- sum(Ptt1[1, 1, jump_interval]) /
                sum(Pt[1, 1, jump_interval - 1])},
@@ -224,7 +225,7 @@ EM_param <- function(...){
   # reshape phi and add name for phi
   phi_names <- c()
   for (i in 1:n_bin){
-    phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
+    phi_names <- append(phi_names, paste("phi", i, sep = ""))
   }
   kalman$par$A <- array(kalman$par$A, dim = c(n_bin,1), dimnames = list(phi_names,NULL))
   
