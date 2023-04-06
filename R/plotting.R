@@ -8,7 +8,6 @@
 #' @import wesanderson
 #' @import patchwork ggplot2
 #' @importFrom magrittr %>%
-#' @importFrom dplyr !!
 #'
 #' @examples
 uniModelPlot <- function(data, filter.result, type){

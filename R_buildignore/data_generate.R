@@ -2,7 +2,7 @@ library(reshape2)
 library(xts)
 
 dataset_list <- readRDS("D:\\OneDrive - HKUST Connect\\HKUST\\Kalman\\dataset_SP500_100_batch1")
-data <- dataset_list[[1]]
+data <- dataset_list[[8]]
 data$log_volume = log(data$Volume)
 n_bin <- 26
 data.train <- data['2019-01-01/2019-05-31']
