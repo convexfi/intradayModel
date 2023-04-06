@@ -2,42 +2,44 @@
 #'
 #' @param data.pre
 #' @param model
-#' @param n.ahead
-#' @param out_of_sample
+#' @param out.sample  the number of days before the last to keep for out of sample forecasting
 #'
 #' @return
 #' @export
 #'
 #' @examples
-uniModelPred <- function(data, modelSpec, out_of_sample, init_state = list()) {
+uniModelPred <- function(data, modelSpec, out.sample) {
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   # check if fit is necessary
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
-  isIntraModel(modelSpec, data)
+  # isIntraModel(modelSpec, data)
   # todo gai
   # if (Reduce("+", modelSpec$fitFlag) != 0) {
   #   stop("All parameters must be fixed.\n")
   # }
   
-  
-  
-  if (modelSpec$fitFlag[["x0"]] || modelSpec$fitFlag[["V0"]]){
-    for (name in c("x0", "V0")){
-      if (modelSpec$fitFlag[[name]] && name %in% names(init_state)) {
-        modelSpec$par[[name]] <- init_state[[name]]
-        modelSpec$fitFlag[[name]] <- FALSE
-      }
-    }
+  if (Reduce("+", modelSpec$fitFlag) != 0) {
+    stop("All parameters must be fixed.\n")
   }
-  if (modelSpec$fitFlag[["x0"]] || modelSpec$fitFlag[["V0"]]){
-    if(out_of_sample == ncol(data)) stop("Need data for estimating the initial state.")
-    modelSpec <- uniModelFit(data[,1:(ncol(data) - out_of_sample)], modelSpec)
-  }
+  
+  # if (modelSpec$fitFlag[["x0"]] || modelSpec$fitFlag[["V0"]]){
+  #   for (name in c("x0", "V0")){
+  #     if (modelSpec$fitFlag[[name]] && name %in% names(init_state)) {
+  #       modelSpec$par[[name]] <- init_state[[name]]
+  #       modelSpec$fitFlag[[name]] <- FALSE
+  #     }
+  #   }
+  # }
+  # if (modelSpec$fitFlag[["x0"]] || modelSpec$fitFlag[["V0"]]){
+  #   if(out_of_sample == ncol(data)) stop("Need data for estimating the initial state.")
+  #   modelSpec <- uniModelFit(data[,1:(ncol(data) - out_of_sample)], modelSpec)
+  # }
   
   y.pred <- Pred(data, modelSpec)
+  y.pred.out.sample <- tail(y.pred, nrow(data) * out.sample)
   
-  return (y.pred)
+  return (y.pred.out.sample)
   
 }
 

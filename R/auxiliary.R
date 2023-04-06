@@ -322,3 +322,21 @@ fetch_par_log <- function(par_log, index) {
   }
   return(do.call(cbind, par_list))
 }
+
+calculate_mape <- function(referenced_data, predicted_data) {
+  referenced_data <- as.vector(referenced_data)
+  predicted_data <- as.vector(predicted_data)
+  return(mean(abs(predicted_data - referenced_data) / referenced_data))
+}
+
+calculate_mae <- function(referenced_data, predicted_data) {
+  referenced_data <- as.vector(referenced_data)
+  predicted_data <- as.vector(predicted_data)
+  return(mean(abs(predicted_data - referenced_data)))
+}
+
+calculate_rmse <- function(referenced_data, predicted_data) {
+  referenced_data <- as.vector(referenced_data)
+  predicted_data <- as.vector(predicted_data)
+  return(sqrt(mean((predicted_data - referenced_data)^2)))
+}
