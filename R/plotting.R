@@ -58,14 +58,14 @@ uniModelPlot <- function(data, filter.result, type){
   p1
 }
 
-plot_decomposition <- function(log_volume, daily, seasonal, dynamic) {
+plot_decomposition <- function(data, filter_result) {
   plt.data.log <- 
     data.frame(
-      volume = as.vector(log_volume),
-      daily = daily,
-      seasonal = seasonal,
-      dynamic = dynamic,
-      i = 1:length(log_volume)
+      volume = as.vector(data),
+      daily = filter_result$daily,
+      seasonal = filter_result$seasonal,
+      dynamic = filter_result$dynamic,
+      i = 1:length(data)
     )
   
   text_size = 10
