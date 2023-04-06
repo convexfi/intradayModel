@@ -13,7 +13,7 @@ uniModelFilter <- function(data, modelSpec) {
   # check if fit is necessary
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
-  isIntraModel(modelSpec, data)
+  # isIntraModel(modelSpec, data)
   # if (!is.list(modelSpec)) stop("tbd.")
   # todo
   if (Reduce("+", modelSpec$fitFlag) != 0) {
