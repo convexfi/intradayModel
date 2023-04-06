@@ -5,7 +5,11 @@ test_that("uniModelFilter, batch = 5", {
   filter_result <- uniModelFilter(data, modelSpec.fit)
   
   uniModelPlot(data, filter_result, "daily")
+  plot_decomposition(data, filter_result)
   
-  plot_decomposition(data, filter_result$daily, filter_result$seasonal, filter_result$dynamic)
+  
+  filter_result2 <- uniModelFilter(data[, 51:100], modelSpec.fit)
+  plot_decomposition(data, filter_result2)
+  
 })
 
