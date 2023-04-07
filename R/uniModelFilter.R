@@ -27,10 +27,6 @@ uniModelFilter <- function(data, uniModel) {
 
 marss_filter <- function(data, uniModel) {
   data <- as.matrix(data)
-  n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
-
   args <- list(
     data = data,
     uniModel = uniModel
