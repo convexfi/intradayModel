@@ -1,2 +1,1 @@
-vignettes/* linguist-vendored
-data/* linguist-vendored
+vignettes/** linguist-vendored
