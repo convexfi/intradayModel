@@ -40,7 +40,7 @@ uniModelFit <- function(data, modelSpec,
   modelSpec$par_log <- em_result$par_log
   
   # change parameters in MARSS format to uniModel format
-  modelSpec$par <- marss_to_uniModel(em_result$model$par, modelSpec$par)
+  modelSpec$par <- marss_to_uniModel(em_result$marss_obj$par, modelSpec$par)
   if (em_result$convergence) {
     modelSpec$fit_request[] <- FALSE
   }
@@ -73,7 +73,7 @@ em_update <- function(...){
   
   # decide unfitted parameters
   unfitted_pars <- names(modelSpec$fit_request[modelSpec$fit_request == TRUE])
-  
+
   # EM iteration
   for (i in 1: maxit) {
     # Kalman filter & smoother
@@ -88,32 +88,6 @@ em_update <- function(...){
     for (n in 2: n_bin_total) {
       Ptt1[, , n] <- Kf$Vtt1T[, , n] + Kf$xtT[, n] %*% t(Kf$xtT[, n - 1])
     }
-    
-    update_r <- function(){
-      if("phi" %in% unfitted_pars) {phi.matrix <- rep(matrix(curr_par$A, nrow = 1), n_day) }
-      else {phi.matrix <- unlist(modelSpec$par[["phi"]])} # need input
-      curr_par$R <<- mean(data_reform^2 + apply(Pt, 3, function(p) Z_matrix %*% p %*% t(Z_matrix)) -
-                            2 * data_reform * as.numeric(Z_matrix %*% Kf$xtT) +
-                            phi.matrix^2 -
-                            2 * data_reform * phi.matrix +
-                            2 * phi.matrix * as.numeric(Z_matrix %*% Kf$xtT))
-    }
-    update_var_eta <- function(){
-      if("a_eta" %in% unfitted_pars) {curr_a_eta <- curr_par$B["a_eta",1] }
-      else {curr_a_eta <- modelSpec$par[["a_eta"]]} # need input
-      curr_par$Q["var_eta",1] <<- mean(Pt[1, 1, jump_interval] +
-                                         curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
-                                         2 * curr_a_eta * Ptt1[1, 1, jump_interval])
-    }
-    update_var_mu <- function(){
-      if("a_mu" %in% unfitted_pars) {curr_a_mu <- curr_par$B["a_mu",1] }
-      else {curr_a_mu <- modelSpec$par[["a_mu"]]} # need input
-      curr_par$Q["var_mu",1] <<- mean(Pt[2, 2, 2: n_bin_total] +
-                                        curr_a_mu^2 * Pt[2, 2, 1: (n_bin_total - 1)] -
-                                        2 * curr_a_mu * Ptt1[2, 2, 2: n_bin_total])
-    }
-    
-    
     for (name in unfitted_pars){
       switch(name,
              "x0" = {curr_par$x0 <- Kf$x0T},
@@ -123,15 +97,37 @@ em_update <- function(...){
              },
              "phi" = {curr_par$A <- rowMeans(y_daily_matrix - matrix(Z_matrix %*% Kf$xtT, nrow = n_bin))
                       curr_par$A <- curr_par$A - mean(curr_par$A)},
-             "r" = {update_r()},
+             "r" = {    if("phi" %in% unfitted_pars) {phi.matrix <- rep(matrix(curr_par$A, nrow = 1), n_day) }
+               else {phi.matrix <- unlist(modelSpec$par[["phi"]])} # need input
+               curr_par$R <- mean(data_reform^2 + apply(Pt, 3, function(p) Z_matrix %*% p %*% t(Z_matrix)) -
+                               2 * data_reform * as.numeric(Z_matrix %*% Kf$xtT) +
+                               phi.matrix^2 -
+                               2 * data_reform * phi.matrix +
+                               2 * phi.matrix * as.numeric(Z_matrix %*% Kf$xtT))},
              "a_eta" = {curr_par$B["a_eta",1] <- sum(Ptt1[1, 1, jump_interval]) /
                sum(Pt[1, 1, jump_interval - 1])},
              "a_mu" = {curr_par$B["a_mu",1] <- sum(Ptt1[2, 2, 2: n_bin_total]) /
                sum(Pt[2, 2, 1: (n_bin_total - 1)])},
-             "var_eta" = {update_var_eta()},
-             "var_mu" = {update_var_mu()}
+             "var_eta" = {if("a_eta" %in% unfitted_pars) {curr_a_eta <- curr_par$B["a_eta",1] }
+               else {curr_a_eta <- modelSpec$par[["a_eta"]]} # need input
+               curr_par$Q["var_eta",1] <- mean(Pt[1, 1, jump_interval] +
+                                     curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
+                                     2 * curr_a_eta * Ptt1[1, 1, jump_interval])},
+             "var_mu" = {if("a_mu" %in% unfitted_pars) {curr_a_mu <- curr_par$B["a_mu",1] }
+               else {curr_a_mu <- modelSpec$par[["a_mu"]]} # need input
+               curr_par$Q["var_mu",1] <- mean(Pt[2, 2, 2: n_bin_total] +
+                                    curr_a_mu^2 * Pt[2, 2, 1: (n_bin_total - 1)] -
+                                    2 * curr_a_mu * Ptt1[2, 2, 2: n_bin_total])}
              
       )
+    }
+
+    # verbose and logging
+    if (i %% 25 == 0) {
+      cat("iter:", i, " diff:", diff, "\n", sep = "")
+    }
+    if (log.switch == TRUE) {
+      par_log <- rlist::list.append(par_log, curr_par)
     }
     
     # stopping criteria
@@ -141,17 +137,9 @@ em_update <- function(...){
       convergence <- TRUE
       break
     }
-    
-    if (i %% 25 == 0) {
-      cat("iter:", i, " diff:", diff, "\n", sep = "")
-    }
-    
-    if (log.switch == TRUE) {
-      par_log <- rlist::list.append(par_log, curr_par)
-    }
     marss_obj$par <- curr_par
-    
   }
+  
   # reshape phi and add name for phi
   phi_names <- c()
   for (i in 1:n_bin){
@@ -164,6 +152,6 @@ em_update <- function(...){
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
   if (!convergence) warning("No convergence")
-  result <- list("model" = marss_obj, "convergence" = convergence, par_log = par_log)
+  result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
   return (result)
 }
