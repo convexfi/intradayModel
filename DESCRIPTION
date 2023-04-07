@@ -25,7 +25,7 @@ URL: https://CRAN.R-project.org/package=fitHeavyTail,
 BugReports: https://github.com/dppalomar/fitHeavyTail/issues
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Depends:
     R (>= 2.10)
 Imports:
