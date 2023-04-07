@@ -2,37 +2,34 @@
 # They should be invisible to package users
 
 # transform the parameter from the format of MARSS to IntradayModel
-trans_MARSStoIntra <- function(MARSS.par, intra.par = NULL) {
-  all.pars.name.MARSS <- c("A", "R", "B", "Q", "x0", "V0")
-  all.pars.name.intra <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
-  MARSS.par <- MARSS.par[all.pars.name.MARSS]
+marss_to_uniModel <- function(marss_par, uniModel_par = NULL) {
+  marss_all_pars_name <- c("A", "R", "B", "Q", "x0", "V0")
+  uniModel_all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
+  marss_par <- marss_par[marss_all_pars_name]
   for (name in c("B", "Q", "R")) {
-    if (length(MARSS.par[[name]]) > 0) {
-      intra.name <- dimnames(MARSS.par[[name]])[[1]]
-      fix_par <- as.list(MARSS.par[[name]])
-      names(fix_par) <- intra.name
-      MARSS.par[[name]] <- NULL
-      MARSS.par <- append(MARSS.par, fix_par)
+    if (length(marss_par[[name]]) > 0) {
+      intra_name <- dimnames(marss_par[[name]])[[1]]
+      fix_par <- as.list(marss_par[[name]])
+      names(fix_par) <- intra_name
+      marss_par[[name]] <- NULL
+      marss_par <- append(marss_par, fix_par)
     } else {
-      MARSS.par[[name]] <- NULL
+      marss_par[[name]] <- NULL
     }
   }
 
-  if (length(MARSS.par[["A"]]) > 0) {
-    MARSS.par[["phi"]] <- MARSS.par[["A"]]
+  if (length(marss_par[["A"]]) > 0) {
+    marss_par[["phi"]] <- marss_par[["A"]]
   }
-  # if (is.null(intra.par)){
-  #   return(MARSS.par[all.pars.name.intra])
-  # }
-  # else{
-  for (name in names(intra.par)) {
-    if (anyNA(intra.par[[name]])) {
-      intra.par[[name]] <- MARSS.par[[name]]
+
+  for (name in names(uniModel_par)) {
+    if (anyNA(uniModel_par[[name]])) {
+      uniModel_par[[name]] <- marss_par[[name]]
     }
   }
-  dimnames(intra.par[["x0"]]) <- list(c("x01", "x02"), NULL)
-  return(intra.par)
-  # }
+  dimnames(uniModel_par[["x0"]]) <- list(c("x01", "x02"), NULL)
+  
+  return(uniModel_par)
 }
 
 # define the MARSS model
@@ -41,9 +38,7 @@ specify_marss <- function(...) {
   args <- list(...)
   data <- args$data
   modelSpec <- args$modelSpec
-  data.reform <- data %>%
-    as.list() %>%
-    unlist()
+  data.reform <- unlist(as.list(data))
   
   n_bin <- nrow(data)
   n_day <- ncol(data)
