@@ -36,18 +36,16 @@ uniModelFit <- function(data, modelSpec,
     marss_obj = marss_obj,
     control = list(maxit = maxit, abstol = abstol, log.switch = log.switch)
   ))
-  EM_result <- do.call(em_update, args)
+  em_result <- do.call(em_update, args)
+  modelSpec$par_log <- em_result$par_log
   
-  # 
-  modelSpec$par <- trans_MARSStoIntra(EM_result$model$par, modelSpec$par)
-  if (EM_result$convergence) {
+  # change parameters in MARSS format to uniModel format
+  modelSpec$par <- marss_to_uniModel(em_result$model$par, modelSpec$par)
+  if (em_result$convergence) {
     modelSpec$fit_request[] <- FALSE
   }
   
-  modelSpec$par_log <- EM_result$par_log
-  
   return (modelSpec)
-  
 }
 
 em_update <- function(...){
