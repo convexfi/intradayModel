@@ -1,0 +1,50 @@
+Package: intradayModel
+Title: State-Space Modeling of Intraday Volume and Volatility
+Version: 0.0.1
+Date: 2022-5-11
+Description: Robust estimation methods for the mean vector, scatter matrix,
+    and covariance matrix (if it exists) from data (possibly containing NAs) 
+    under multivariate heavy-tailed distributions such as angular Gaussian 
+    (via Tyler's method), Cauchy, and Student's t distributions. Additionally, 
+    a factor model structure can be specified for the covariance matrix. The
+    latest revision also includes the multivariate skewed t distribution.
+    The package is based on the papers: Sun, Babu, and Palomar (2014),
+    Sun, Babu, and Palomar (2015), Liu and Rubin (1995), and 
+    Zhou, Liu, Kumar, and Palomar (2019).
+Authors@R: c(
+  person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com"),
+  person("Rui", "Zhou", role =  "aut", email = "rzhouae@connect.ust.hk"),
+  person("Xiwen", "Wang", role =  "aut", email = "xwangew@connect.ust.hk")
+  )
+Maintainer: Daniel P. Palomar <daniel.p.palomar@gmail.com>
+URL: https://CRAN.R-project.org/package=fitHeavyTail,
+     https://github.com/dppalomar/fitHeavyTail,
+     https://www.danielppalomar.com,
+     https://doi.org/10.1109/TSP.2014.2348944,
+     https://doi.org/10.1109/TSP.2015.2417513
+BugReports: https://github.com/dppalomar/fitHeavyTail/issues
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+Depends:
+    R (>= 2.10)
+Imports:
+    ICSNP,
+    mvtnorm,
+    ghyp,
+    numDeriv,
+    stats
+Suggests:
+    knitr,
+    ggplot2,
+    prettydoc,
+    reshape2,
+    rmarkdown,
+    R.rsp,
+    testthat (>= 3.0.0)
+VignetteBuilder:
+    knitr,
+    rmarkdown,
+    R.rsp
+LazyData: true
+Config/testthat/edition: 3
