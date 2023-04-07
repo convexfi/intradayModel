@@ -36,25 +36,25 @@ trans_MARSStoIntra <- function(MARSS.par, intra.par = NULL) {
 }
 
 # define the MARSS model
-MARSS_spec <- function(...) {
+specify_marss <- function(...) {
+  # read input information
   args <- list(...)
   data <- args$data
-  n_bin <- args$n_bin
-  n_bin_total <- args$n_bin_total
-  n_day <- args$n_day
   modelSpec <- args$modelSpec
-
   data.reform <- data %>%
     as.list() %>%
     unlist()
-
-  ## MARSS parameters
-  MARSS_model <- list()
-  MARSS_model$model.gen <- list()
-  MARSS_model$init.gen <- list()
+  
+  n_bin <- nrow(data)
+  n_day <- ncol(data)
+  n_bin_total <- n_bin * n_day
+  
+  # MARSS parameters
+  marss_model <- list()
+  marss_model$model.gen <- list()
+  marss_model$init.gen <- list()
 
   ## State Equation
-
   Bt <- array(list(0), c(2, 2, n_bin_total))
   b1 <- matrix(list(1), n_bin)
   b1[1] <- extract_value("a_eta", modelSpec)
@@ -83,16 +83,17 @@ MARSS_spec <- function(...) {
       a_vec[n] <- paste("phi", n, sep = "")
     }
   }
-
   At[1, 1, ] <- rep(a_vec, n_day)
 
   R <- extract_value("r", modelSpec) %>%
     list() %>%
     matrix(1, 1)
+
   ## Initial State
   x0 <- extract_value("x0", modelSpec) %>%
     as.list() %>%
     matrix(2, 1)
+
   # need check
   V0 <- extract_value("V0", modelSpec)
   if (!identical(V0, "unconstrained")) {
@@ -110,20 +111,18 @@ MARSS_spec <- function(...) {
     "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
   )
   ## Init param
-  MARSS_model$init.gen <- extract_init(init.default, modelSpec$init, modelSpec$fitFlag)
+  marss_model$init.gen <- extract_init(init.default, modelSpec$init, modelSpec$fit_request)
 
   ## MARSS model
-  MARSS_model$model.gen <- list(Z = Z, R = R, A = At, B = Bt, Q = Qt, U = U, x0 = x0, V0 = V0, tinitx = 1)
-  kalman <- MARSS::MARSS(data.reform, model = MARSS_model$model.gen, inits = MARSS_model$init.gen, fit = FALSE)
+  marss_model$model.gen <- list(Z = Z, R = R, A = At, B = Bt, Q = Qt, U = U, x0 = x0, V0 = V0, tinitx = 1)
+  marss_obj <- MARSS::MARSS(data.reform, model = marss_model$model.gen, inits = marss_model$init.gen, fit = FALSE)
 
-  result <- list(kalman = kalman, At = At)
-
-  return(result)
+  return(marss_obj)
 }
 
 # extract fixed pars value from modelSpec for MARSS
 extract_value <- function(name, modelSpec) {
-  if (modelSpec$fitFlag[[name]]) {
+  if (modelSpec$fit_request[[name]]) {
     name <- switch(name,
       "x0" = list("x01", "x02"),
       "V0" = "unconstrained",
@@ -136,10 +135,10 @@ extract_value <- function(name, modelSpec) {
 }
 
 # extract init pars value from modelSpec for MARSS
-extract_init <- function(init.default, init.pars, fitFlag) {
+extract_init <- function(init.default, init.pars, fit_request) {
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   for (name in all.pars.name) {
-    if (!fitFlag[[name]]) {
+    if (!fit_request[[name]]) {
       init.default[[name]] <- NULL
     }
     if (name %in% names(init.pars)) {
@@ -291,7 +290,7 @@ checkList <- function(check.list, type) {
 isIntraModel <- function(modelSpec, data = NULL) {
   # msg <- NULL
   ## Check for required components
-  el <- c("fitFlag", "par", "init")
+  el <- c("fit_request", "par", "init")
   if (!all(el %in% names(modelSpec))) {
     stop("Element ", paste(el[!(el %in% names(modelSpec))], collapse = " & "), " is missing from the model object.\n")
   }
@@ -301,14 +300,14 @@ isIntraModel <- function(modelSpec, data = NULL) {
   if (!all(all.pars.name %in% names(modelSpec$par))) {
     msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(modelSpec$par))], collapse = " & "), " is missing from the model$par.\n")
   }
-  if (!all(all.pars.name %in% names(modelSpec$fitFlag))) {
-    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(modelSpec$fitFlag))], collapse = " & "), " is missing from the model$fitFlag.\n")
+  if (!all(all.pars.name %in% names(modelSpec$fit_request))) {
+    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(modelSpec$fit_request))], collapse = " & "), " is missing from the model$fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
   }
 
-  # Check no additional names in fitFlag, par, init
+  # Check no additional names in fit_request, par, init
   for (mat in el) {
     if (!all(names(modelSpec[[mat]]) %in% all.pars.name)) {
       msg <- c(msg, "Element\n")
@@ -319,8 +318,8 @@ isIntraModel <- function(modelSpec, data = NULL) {
   checkList(modelSpec$par)
   checkList(modelSpec$init)
 
-  unifxed <- names(modelSpec$fitFlag[modelSpec$fitFlag == TRUE])
-  fixed <- names(modelSpec$fitFlag[modelSpec$fitFlag == FALSE])
+  unifxed <- names(modelSpec$fit_request[modelSpec$fit_request == TRUE])
+  fixed <- names(modelSpec$fit_request[modelSpec$fit_request == FALSE])
   for (name in fixed) {
     if (any(is.na(modelSpec[["par"]][[name]]))) {
       stop("no")
@@ -336,8 +335,8 @@ isIntraModel <- function(modelSpec, data = NULL) {
   if (!is.null(data)) {
     n_bin <- nrow(data)
     # dim
-    if (!modelSpec$fitFlag[["phi"]] && !identical(length(modelSpec$par[["phi"]]), n_bin)) stop("no")
-    # if(modelSpec$fitFlag[["phi"]] && (!identical(length(modelSpec$init[["phi"]]), n_bin))) stop("no")
+    if (!modelSpec$fit_request[["phi"]] && !identical(length(modelSpec$par[["phi"]]), n_bin)) stop("no")
+    # if(modelSpec$fit_request[["phi"]] && (!identical(length(modelSpec$init[["phi"]]), n_bin))) stop("no")
   }
 }
 

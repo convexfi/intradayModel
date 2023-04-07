@@ -12,54 +12,36 @@
 uniModelFit <- function(data, modelSpec,
                         maxit = 3000, abstol = 1e-4, log.switch = TRUE) {
   
-  # check if fit is necessary
+  # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
   # isIntraModel(modelSpec, data)
-  if (Reduce("+", modelSpec$fitFlag) == 0) {
+  
+  # check if fit is required
+  if (Reduce("+", modelSpec$fit_request) == 0) {
     cat("All parameters are fixed. No need to fit.\n")
-    break
+    return(modelSpec)
   }
-  # add maxit...
   
-  # error control
-  if (!is.matrix(data) && !is.data.frame(data)) stop("Input data must be a matrix or data.frame.")
-  if (anyNA(data)) stop("Input data must have no NA.")
+  # specify MARSS-format model
+  args <- list(
+    data = data,
+    modelSpec = modelSpec
+  )
+  marss_obj <- do.call(specify_marss, args)
+  marss_obj$par <- marss_obj$start
   
+  # fit parameters with EM algorithm
+  args <- append(args, list(
+    marss_obj = marss_obj,
+    control = list(maxit = maxit, abstol = abstol, log.switch = log.switch)
+  ))
+  EM_result <- do.call(em_update, args)
   
-  data <- as.matrix(data)
-  n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
-  
-  ## reform data
-  # data.train_reform <- data %>%
-  #                      as.list() %>%
-  #                      unlist()
-  control <- list(maxit = maxit, abstol = abstol, log.switch = log.switch)
-  args <- list(data = data, n_bin = n_bin,
-               n_day = n_day, n_bin_total = n_bin_total,
-               modelSpec = modelSpec,
-               control = control)
-  
-  result <- do.call(MARSS_spec, args)
-  kalman <- result$kalman
-  At <- result$At
-  
-  kalman$par <- kalman$start
-  args <- append(args, list(kalman = kalman, At = At))
-  
-  EM_result <- do.call(EM_param, args)
-  
-  # EM_result <- EM_param(kalman, modelSpec,
-  #                         data.train_reform, n_bin,
-  #                         n_bin_total,
-  #                         n_day,At,
-  #                         control)
-  
+  # 
   modelSpec$par <- trans_MARSStoIntra(EM_result$model$par, modelSpec$par)
   if (EM_result$convergence) {
-    modelSpec$fitFlag[] <- FALSE
+    modelSpec$fit_request[] <- FALSE
   }
   
   modelSpec$par_log <- EM_result$par_log
@@ -68,87 +50,37 @@ uniModelFit <- function(data, modelSpec,
   
 }
 
-# extract_value <- function(name, modelSpec) {
-#   if (modelSpec$fitFlag[[name]]) {
-#     name <- switch(name,
-#                    "x0"= list("x01","x02"),
-#                    "V0" = "unconstrained",
-#                    name)
-#     return(name)
-#   } else {
-#     return(modelSpec$par[[name]])
-#   }
-# }
-
-# extract_init <- function(init.default, init.pars, fitFlag){
-#   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
-#   for (name in all.pars.name){
-#     if (!fitFlag[[name]]) {
-#       init.default[[name]] <- NULL
-#     }
-#     if (name %in% names(init.pars)){
-#       init.default[[name]] <- init.pars[[name]]
-#     }
-#   }
-#   init.marss <- list()
-#   var.init <- c()
-#   a.init <- c()
-#   for (name in names(init.default)){
-#     tmp <- switch(name,
-#                   "phi" = {init.marss$A <- init.default$phi},
-#                   "V0" = {init.marss$V0 <- init.default$V0},
-#                   "x0" = {init.marss$x0 <- init.default$x0},
-#                   "r" = {init.marss$R <- init.default$r},
-#                   "a_eta" = {a.init <- append(a.init, init.default$a_eta)},
-#                   "a_mu" = {a.init <- append(a.init, init.default$a_mu)},
-#                   "var_eta" = {var.init <- append(var.init, init.default$var_eta)},
-#                   "var_mu" = {var.init <- append(var.init, init.default$var_mu)}
-#     )
-#   }
-#   if (length(a.init) > 0){
-#     init.marss$B <- matrix(a.init, length(a.init), 1)
-#   }
-#   if (length(var.init) > 0){
-#     init.marss$Q <- matrix(var.init, length(var.init), 1)
-#   }
-#   return (init.marss)
-# }
-
-
-EM_param <- function(...){
+em_update <- function(...){
+  # read input information
   args <- list(...)
   data <- args$data
-  n_bin <- args$n_bin
-  n_bin_total <- args$n_bin_total
-  n_day <- args$n_day
   modelSpec <- args$modelSpec
-  kalman <- args$kalman
+  marss_obj <- args$marss_obj
   control <- args$control
-  At <- args$At
-  
-  data.reform <- data %>%
-    as.list() %>%
-    unlist()
-  
-  convergence <- FALSE
-  Z.matrix <- matrix(kalman[["model"]][["fixed"]][["Z"]][,,1], nrow = 1) # matrix(unlist(Z), nrow = 1)
-  jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
-  y.daily.matrix <- matrix(data.reform, n_bin)
-  
-  
   maxit <- control$maxit
   abstol <- control$abstol
   log.switch <- control$log.switch
   
-  # fixed params
-  fix <- modelSpec$fitFlag
-  unfixed.names <- names(fix[fix == TRUE])
+  n_bin <- nrow(data)
+  n_day <- ncol(data)
+  n_bin_total <- n_bin * n_day
+
+  # required settings
+  convergence <- FALSE
+  Z_matrix <- matrix(marss_obj[["model"]][["fixed"]][["Z"]][,,1], nrow = 1)
+  jump_interval <- seq(n_bin + 1, n_bin_total, n_bin)
+  data_reform <- unlist(as.list(data))
+  y_daily_matrix <- matrix(data_reform, n_bin)
+  par_log <- list(marss_obj$par)
   
-  par_log <- list(kalman$par)
+  # decide unfitted parameters
+  unfitted_pars <- names(modelSpec$fit_request[modelSpec$fit_request == TRUE])
+  
+  # EM iteration
   for (i in 1: maxit) {
     # Kalman filter & smoother
-    Kf <- MARSS::MARSSkfas(kalman)
-    curr_par <- kalman$par
+    Kf <- MARSS::MARSSkfas(marss_obj)
+    curr_par <- marss_obj$par
     
     # update parameter estimation
     Pt <- Ptt1 <- array(NA, c(2, 2, n_bin_total))
@@ -160,23 +92,23 @@ EM_param <- function(...){
     }
     
     update_r <- function(){
-      if("phi" %in% unfixed.names) {phi.matrix <- rep(matrix(curr_par$A, nrow = 1), n_day) }
-      else {phi.matrix <-unlist(At)} # need input
-      curr_par$R <<- mean(data.reform^2 + apply(Pt, 3, function(p) Z.matrix %*% p %*% t(Z.matrix)) -
-                            2 * data.reform * as.numeric(Z.matrix %*% Kf$xtT) +
+      if("phi" %in% unfitted_pars) {phi.matrix <- rep(matrix(curr_par$A, nrow = 1), n_day) }
+      else {phi.matrix <- unlist(modelSpec$par[["phi"]])} # need input
+      curr_par$R <<- mean(data_reform^2 + apply(Pt, 3, function(p) Z_matrix %*% p %*% t(Z_matrix)) -
+                            2 * data_reform * as.numeric(Z_matrix %*% Kf$xtT) +
                             phi.matrix^2 -
-                            2 * data.reform * phi.matrix +
-                            2 * phi.matrix * as.numeric(Z.matrix %*% Kf$xtT))
+                            2 * data_reform * phi.matrix +
+                            2 * phi.matrix * as.numeric(Z_matrix %*% Kf$xtT))
     }
     update_var_eta <- function(){
-      if("a_eta" %in% unfixed.names) {curr_a_eta <- curr_par$B["a_eta",1] }
+      if("a_eta" %in% unfitted_pars) {curr_a_eta <- curr_par$B["a_eta",1] }
       else {curr_a_eta <- modelSpec$par[["a_eta"]]} # need input
       curr_par$Q["var_eta",1] <<- mean(Pt[1, 1, jump_interval] +
                                          curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
                                          2 * curr_a_eta * Ptt1[1, 1, jump_interval])
     }
     update_var_mu <- function(){
-      if("a_mu" %in% unfixed.names) {curr_a_mu <- curr_par$B["a_mu",1] }
+      if("a_mu" %in% unfitted_pars) {curr_a_mu <- curr_par$B["a_mu",1] }
       else {curr_a_mu <- modelSpec$par[["a_mu"]]} # need input
       curr_par$Q["var_mu",1] <<- mean(Pt[2, 2, 2: n_bin_total] +
                                         curr_a_mu^2 * Pt[2, 2, 1: (n_bin_total - 1)] -
@@ -184,14 +116,14 @@ EM_param <- function(...){
     }
     
     
-    for (name in unfixed.names){
+    for (name in unfitted_pars){
       switch(name,
              "x0" = {curr_par$x0 <- Kf$x0T},
              "V0" = {curr_par$V0[1] <- Kf$V0T[1, 1]
              curr_par$V0[2] <- Kf$V0T[2, 1]
              curr_par$V0[3] <- Kf$V0T[2, 2]
              },
-             "phi" = {curr_par$A <- rowMeans(y.daily.matrix - matrix(Z.matrix %*% Kf$xtT, nrow = n_bin))
+             "phi" = {curr_par$A <- rowMeans(y_daily_matrix - matrix(Z_matrix %*% Kf$xtT, nrow = n_bin))
                       curr_par$A <- curr_par$A - mean(curr_par$A)},
              "r" = {update_r()},
              "a_eta" = {curr_par$B["a_eta",1] <- sum(Ptt1[1, 1, jump_interval]) /
@@ -205,7 +137,7 @@ EM_param <- function(...){
     }
     
     # stopping criteria
-    diff <- norm(as.numeric(unlist(kalman$par)) -
+    diff <- norm(as.numeric(unlist(marss_obj$par)) -
                    as.numeric(unlist(curr_par)), type = "2")
     if (diff < abstol) {
       convergence <- TRUE
@@ -219,7 +151,7 @@ EM_param <- function(...){
     if (log.switch == TRUE) {
       par_log <- rlist::list.append(par_log, curr_par)
     }
-    kalman$par <- curr_par
+    marss_obj$par <- curr_par
     
   }
   # reshape phi and add name for phi
@@ -227,21 +159,13 @@ EM_param <- function(...){
   for (i in 1:n_bin){
     phi_names <- append(phi_names, paste("phi", i, sep = ""))
   }
-  kalman$par$A <- array(kalman$par$A, dim = c(n_bin,1), dimnames = list(phi_names,NULL))
+  marss_obj$par$A <- array(marss_obj$par$A, dim = c(n_bin,1), dimnames = list(phi_names,NULL))
   
   # add name for R and x0
-  kalman$par$R <- array(kalman$par$R, dim = c(1,1), dimnames = list("r",NULL))
-  # kalman$par$x0 <- array(kalman$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
+  marss_obj$par$R <- array(marss_obj$par$R, dim = c(1,1), dimnames = list("r",NULL))
+  # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
   if (!convergence) warning("No convergence")
-  result <- list("model" = kalman, "convergence" = convergence, par_log = par_log)
+  result <- list("model" = marss_obj, "convergence" = convergence, par_log = par_log)
   return (result)
 }
-
-# fetch_par_log <- function(par_log, index) {
-#   par_list <- list()
-#   for (i in 1:length(par_log)) {
-#     par_list <- list.append(par_list, par_log[[i]][[index]])
-#   }
-#   return(do.call(cbind, par_list))
-# }
