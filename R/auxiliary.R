@@ -2,7 +2,7 @@
 # They should be invisible to package users
 
 # transform the parameter from the format of MARSS to IntradayModel
-marss_to_uniModel <- function(marss_par, uniModel_par = NULL) {
+marss_to_unimodel <- function(marss_par, uniModel_par = NULL) {
   marss_all_pars_name <- c("A", "R", "B", "Q", "x0", "V0")
   uniModel_all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   marss_par <- marss_par[marss_all_pars_name]
@@ -28,7 +28,7 @@ marss_to_uniModel <- function(marss_par, uniModel_par = NULL) {
     }
   }
   dimnames(uniModel_par[["x0"]]) <- list(c("x01", "x02"), NULL)
-  
+
   return(uniModel_par)
 }
 
@@ -37,7 +37,7 @@ specify_marss <- function(...) {
   # read input information
   args <- list(...)
   data <- args$data
-  modelSpec <- args$modelSpec
+  uniModel <- args$uniModel
   data.reform <- unlist(as.list(data))
   
   n_bin <- nrow(data)
@@ -52,15 +52,15 @@ specify_marss <- function(...) {
   ## State Equation
   Bt <- array(list(0), c(2, 2, n_bin_total))
   b1 <- matrix(list(1), n_bin)
-  b1[1] <- extract_value("a_eta", modelSpec)
+  b1[1] <- extract_value("a_eta", uniModel)
   Bt[1, 1, ] <- rep(b1, n_day)
-  Bt[2, 2, ] <- extract_value("a_mu", modelSpec)
+  Bt[2, 2, ] <- extract_value("a_mu", uniModel)
 
   Qt <- array(list(0), c(2, 2, n_bin_total))
   q1 <- matrix(list(1e-10), n_bin)
-  q1[1] <- extract_value("var_eta", modelSpec)
+  q1[1] <- extract_value("var_eta", uniModel)
   Qt[1, 1, ] <- rep(q1, n_day)
-  Qt[2, 2, ] <- extract_value("var_mu", modelSpec)
+  Qt[2, 2, ] <- extract_value("var_mu", uniModel)
 
   U <- "zero"
 
@@ -68,7 +68,7 @@ specify_marss <- function(...) {
   Z <- array(list(1, 1), c(1, 2))
 
   At <- array(list(0), dim = c(1, 1, n_bin_total))
-  a_vec <- extract_value("phi", modelSpec)
+  a_vec <- extract_value("phi", uniModel)
 
   # need check
   if (identical(a_vec, "phi") || (length(a_vec) != n_bin)) {
@@ -80,17 +80,17 @@ specify_marss <- function(...) {
   }
   At[1, 1, ] <- rep(a_vec, n_day)
 
-  R <- extract_value("r", modelSpec) %>%
+  R <- extract_value("r", uniModel) %>%
     list() %>%
     matrix(1, 1)
 
   ## Initial State
-  x0 <- extract_value("x0", modelSpec) %>%
+  x0 <- extract_value("x0", uniModel) %>%
     as.list() %>%
     matrix(2, 1)
 
   # need check
-  V0 <- extract_value("V0", modelSpec)
+  V0 <- extract_value("V0", uniModel)
   if (!identical(V0, "unconstrained")) {
     V0 <- matrix(c(as.numeric(V0[1, 1]), as.numeric(V0[2, 1]), as.numeric(V0[2, 1]), as.numeric(V0[3, 1])), nrow = 2)
   }
@@ -106,7 +106,7 @@ specify_marss <- function(...) {
     "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
   )
   ## Init param
-  marss_model$init.gen <- extract_init(init.default, modelSpec$init, modelSpec$fit_request)
+  marss_model$init.gen <- extract_init(init.default, uniModel$init, uniModel$fit_request)
 
   ## MARSS model
   marss_model$model.gen <- list(Z = Z, R = R, A = At, B = Bt, Q = Qt, U = U, x0 = x0, V0 = V0, tinitx = 1)
@@ -115,9 +115,9 @@ specify_marss <- function(...) {
   return(marss_obj)
 }
 
-# extract fixed pars value from modelSpec for MARSS
-extract_value <- function(name, modelSpec) {
-  if (modelSpec$fit_request[[name]]) {
+# extract fixed pars value from uniModel for MARSS
+extract_value <- function(name, uniModel) {
+  if (uniModel$fit_request[[name]]) {
     name <- switch(name,
       "x0" = list("x01", "x02"),
       "V0" = "unconstrained",
@@ -125,11 +125,11 @@ extract_value <- function(name, modelSpec) {
     )
     return(name)
   } else {
-    return(modelSpec$par[[name]])
+    return(uniModel$par[[name]])
   }
 }
 
-# extract init pars value from modelSpec for MARSS
+# extract init pars value from uniModel for MARSS
 extract_init <- function(init.default, init.pars, fit_request) {
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   for (name in all.pars.name) {
@@ -180,12 +180,12 @@ extract_init <- function(init.default, init.pars, fit_request) {
   return(init.marss)
 }
 
-# unify the output of uniModelSpec().
+# unify the output of uniuniModel().
 # modify the parameter dimension and add names to parameter
-unifyModelFormat <- function(modelSpec) {
+format_unimodel <- function(uniModel) {
   # prepare phi's names
   phi_names <- c()
-  for (i in 1:length(modelSpec$par[["phi"]])) {
+  for (i in 1:length(uniModel$par[["phi"]])) {
     phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
   }
 
@@ -202,21 +202,21 @@ unifyModelFormat <- function(modelSpec) {
         var_name <- list(c("(1,1)", "(2,1)", "(2,2)"), NULL)
       },
       "phi" = {
-        var_dim <- c(length(modelSpec$par[["phi"]]), 1)
+        var_dim <- c(length(uniModel$par[["phi"]]), 1)
         var_name <- list(phi_names, NULL)
       }
     )
-    if (!modelSpec$fit_request[[name]]) {
-      modelSpec$par[[name]] <- array(modelSpec$par[[name]], dim = var_dim, dimnames = var_name)
-    } else if (name %in% names(modelSpec$init)) {
-      modelSpec$init[[name]] <- array(modelSpec$init[[name]], dim = var_dim, dimnames = var_name)
+    if (!uniModel$fit_request[[name]]) {
+      uniModel$par[[name]] <- array(uniModel$par[[name]], dim = var_dim, dimnames = var_name)
+    } else if (name %in% names(uniModel$init)) {
+      uniModel$init[[name]] <- array(uniModel$init[[name]], dim = var_dim, dimnames = var_name)
     }
   }
 
-  return(modelSpec)
+  return(uniModel)
 }
 
-# clean the uniModelSpec()'s input args (init.pars/fixed.pars)
+# clean the uniuniModel()'s input args (init.pars/fixed.pars)
 # remove any variable containing NA/inf/non-numeric
 # remove any variable that won't appear in model
 # flatten the variable if user input a high dimension one
@@ -281,22 +281,22 @@ checkList <- function(check.list, type) {
   }
 }
 
-# check whether the modelSpec is correct
-isIntraModel <- function(modelSpec, data = NULL) {
+# check whether the uniModel is correct
+isIntraModel <- function(uniModel, data = NULL) {
   # msg <- NULL
   ## Check for required components
   el <- c("fit_request", "par", "init")
-  if (!all(el %in% names(modelSpec))) {
-    stop("Element ", paste(el[!(el %in% names(modelSpec))], collapse = " & "), " is missing from the model object.\n")
+  if (!all(el %in% names(uniModel))) {
+    stop("Element ", paste(el[!(el %in% names(uniModel))], collapse = " & "), " is missing from the model object.\n")
   }
 
   msg <- NULL
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
-  if (!all(all.pars.name %in% names(modelSpec$par))) {
-    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(modelSpec$par))], collapse = " & "), " is missing from the model$par.\n")
+  if (!all(all.pars.name %in% names(uniModel$par))) {
+    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(uniModel$par))], collapse = " & "), " is missing from the model$par.\n")
   }
-  if (!all(all.pars.name %in% names(modelSpec$fit_request))) {
-    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(modelSpec$fit_request))], collapse = " & "), " is missing from the model$fit_request.\n")
+  if (!all(all.pars.name %in% names(uniModel$fit_request))) {
+    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(uniModel$fit_request))], collapse = " & "), " is missing from the model$fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
@@ -304,25 +304,25 @@ isIntraModel <- function(modelSpec, data = NULL) {
 
   # Check no additional names in fit_request, par, init
   for (mat in el) {
-    if (!all(names(modelSpec[[mat]]) %in% all.pars.name)) {
+    if (!all(names(uniModel[[mat]]) %in% all.pars.name)) {
       msg <- c(msg, "Element\n")
     }
   }
 
   # Check no NA inf and dimension check
-  checkList(modelSpec$par)
-  checkList(modelSpec$init)
+  checkList(uniModel$par)
+  checkList(uniModel$init)
 
-  unifxed <- names(modelSpec$fit_request[modelSpec$fit_request == TRUE])
-  fixed <- names(modelSpec$fit_request[modelSpec$fit_request == FALSE])
+  unifxed <- names(uniModel$fit_request[uniModel$fit_request == TRUE])
+  fixed <- names(uniModel$fit_request[uniModel$fit_request == FALSE])
   for (name in fixed) {
-    if (any(is.na(modelSpec[["par"]][[name]]))) {
+    if (any(is.na(uniModel[["par"]][[name]]))) {
       stop("no")
     }
   }
 
   for (name in unfixed) {
-    if (!all(is.na(modelSpec[["par"]][[name]]))) {
+    if (!all(is.na(uniModel[["par"]][[name]]))) {
       stop("no")
     }
   }
@@ -330,8 +330,8 @@ isIntraModel <- function(modelSpec, data = NULL) {
   if (!is.null(data)) {
     n_bin <- nrow(data)
     # dim
-    if (!modelSpec$fit_request[["phi"]] && !identical(length(modelSpec$par[["phi"]]), n_bin)) stop("no")
-    # if(modelSpec$fit_request[["phi"]] && (!identical(length(modelSpec$init[["phi"]]), n_bin))) stop("no")
+    if (!uniModel$fit_request[["phi"]] && !identical(length(uniModel$par[["phi"]]), n_bin)) stop("no")
+    # if(uniModel$fit_request[["phi"]] && (!identical(length(uniModel$init[["phi"]]), n_bin))) stop("no")
   }
 }
 

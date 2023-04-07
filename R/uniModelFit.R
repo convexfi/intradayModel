@@ -1,7 +1,7 @@
 #' Title
 #'
 #' @param data.train log volume data matrix of size n_bin * n_day with no NA for fitting
-#' @param modelSpec modelSpec object from function uniModelSpec
+#' @param uniModel uniModel object from function uniModelSpec
 #' @param control List of control variables, e.g., maxit, reltol
 #'
 #' @return
@@ -9,24 +9,24 @@
 #' @export
 #'
 #' @examples
-uniModelFit <- function(data, modelSpec,
+uniModelFit <- function(data, uniModel,
                         maxit = 3000, abstol = 1e-4, log.switch = TRUE) {
 
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
-  # isIntraModel(modelSpec, data)
+  # isIntraModel(uniModel, data)
 
   # check if fit is required
-  if (Reduce("+", modelSpec$fit_request) == 0) {
+  if (Reduce("+", uniModel$fit_request) == 0) {
     cat("All parameters are fixed. No need to fit.\n")
-    return(modelSpec)
+    return(uniModel)
   }
 
   # specify MARSS-format model
   args <- list(
     data = data,
-    modelSpec = modelSpec
+    uniModel = uniModel
   )
   marss_obj <- do.call(specify_marss, args)
   marss_obj$par <- marss_obj$start
@@ -37,22 +37,22 @@ uniModelFit <- function(data, modelSpec,
     control = list(maxit = maxit, abstol = abstol, log.switch = log.switch)
   ))
   em_result <- do.call(em_update, args)
-  modelSpec$par_log <- em_result$par_log
+  uniModel$par_log <- em_result$par_log
 
   # change parameters in MARSS format to uniModel format
-  modelSpec$par <- marss_to_uniModel(em_result$marss_obj$par, modelSpec$par)
+  uniModel$par <- marss_to_unimodel(em_result$marss_obj$par, uniModel$par)
   if (em_result$convergence) {
-    modelSpec$fit_request[] <- FALSE
+    uniModel$fit_request[] <- FALSE
   }
 
-  return(modelSpec)
+  return(uniModel)
 }
 
 em_update <- function(...) {
   # read input information
   args <- list(...)
   data <- args$data
-  modelSpec <- args$modelSpec
+  uniModel <- args$uniModel
   marss_obj <- args$marss_obj
   control <- args$control
   maxit <- control$maxit
@@ -72,7 +72,7 @@ em_update <- function(...) {
   par_log <- list(marss_obj$par)
 
   # decide unfitted parameters
-  unfitted_pars <- names(modelSpec$fit_request[modelSpec$fit_request == TRUE])
+  unfitted_pars <- names(uniModel$fit_request[uniModel$fit_request == TRUE])
 
   # EM iteration
   for (i in 1:maxit) {
@@ -106,7 +106,7 @@ em_update <- function(...) {
           if ("phi" %in% unfitted_pars) {
             phi.matrix <- rep(matrix(curr_par$A, nrow = 1), n_day)
           } else {
-            phi.matrix <- unlist(modelSpec$par[["phi"]])
+            phi.matrix <- unlist(uniModel$par[["phi"]])
           } # need input
           curr_par$R <- mean(data_reform^2 + apply(Pt, 3, function(p) Z_matrix %*% p %*% t(Z_matrix)) -
             2 * data_reform * as.numeric(Z_matrix %*% Kf$xtT) +
@@ -126,7 +126,7 @@ em_update <- function(...) {
           if ("a_eta" %in% unfitted_pars) {
             curr_a_eta <- curr_par$B["a_eta", 1]
           } else {
-            curr_a_eta <- modelSpec$par[["a_eta"]]
+            curr_a_eta <- uniModel$par[["a_eta"]]
           } # need input
           curr_par$Q["var_eta", 1] <- mean(Pt[1, 1, jump_interval] +
             curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
@@ -136,7 +136,7 @@ em_update <- function(...) {
           if ("a_mu" %in% unfitted_pars) {
             curr_a_mu <- curr_par$B["a_mu", 1]
           } else {
-            curr_a_mu <- modelSpec$par[["a_mu"]]
+            curr_a_mu <- uniModel$par[["a_mu"]]
           } # need input
           curr_par$Q["var_mu", 1] <- mean(Pt[2, 2, 2:n_bin_total] +
             curr_a_mu^2 * Pt[2, 2, 1:(n_bin_total - 1)] -
