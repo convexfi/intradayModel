@@ -68,13 +68,13 @@ test_that("uniModelFit with partial fixed params conincide with precomputed mode
   expect_equal(EM_result_test$model$par[c("R","B","Q","V0")], precomputed_par[c("R","B","Q","V0")], tolerance = 1e-1)
 })
 
-test_that("uniModelFit from raw (after zero constraint and initial noise), batch = 5", {
-  data <- readRDS("data/batch5_log_volume")
+test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ADBE", {
+  data <- readRDS("data/ADBE_log_volume")
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   
   # expected output
-  expected_par <- readRDS("data/batch5_expected_par")
+  expected_par <- readRDS("data/ADBE_expected_par")
   expected_modelSpec <- list()
   expected_modelSpec$par$a_eta <- expected_par$B[1]
   expected_modelSpec$par$a_mu <- expected_par$B[2]
