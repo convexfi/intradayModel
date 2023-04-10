@@ -1,15 +1,14 @@
 test_that("uniModelFilter, stock = ADBE", {
   data <- readRDS("data/ADBE_log_volume")
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-  filter_result <- uniModelFilter(data, modelSpec.fit)
+  uniModel <- uniModelSpec(fit = TRUE)
+  uniModel.fit <- uniModelFit(data, uniModel, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+  components <- uniModelFilter(data, uniModel.fit)
   
-  uniModelPlot(data, filter_result, "daily")
-  plot_decomposition(data, filter_result)
+  uniModelPlot(data, components, "daily")
+  plot_decomposition(data, components)
   
-  
-  filter_result2 <- uniModelFilter(data[, 51:100], modelSpec.fit)
-  plot_decomposition(data[, 51:100], filter_result2)
+  components_2 <- uniModelFilter(data[, 51:100], uniModel.fit)
+  plot_decomposition(data[, 51:100], components_2)
   
 })
 
