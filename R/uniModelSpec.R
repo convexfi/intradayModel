@@ -1,13 +1,20 @@
-#' Title
+#' @title Define a uniModel
+#' 
+#' @description Define the state space model for log trading volume.
 #'
-#' @param fit
-#' @param init.pars
-#' @param fixed.pars
+#' @param fit Logical value indicating whether the model need to be fitted. (default is \code{FALSE}).
+#' @param init.pars List of initial values of unfixed parameters
+#' @param fixed.pars List of values of fixed parameters.
 #'
-#' @return
-#' @export
+#' @return A list containing the following elements:
+#' 
+#' @author Shengjie Xiu and Yifan Yu
+#' @references
+#' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+#' @seealso 
 #'
 #' @examples
+#' @export
 uniModelSpec <- function(fit = FALSE, init.pars = NULL, fixed.pars = NULL) {
   uniModel <- list()
 
