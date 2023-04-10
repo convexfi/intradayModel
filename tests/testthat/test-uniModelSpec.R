@@ -19,7 +19,7 @@ test_that("unimodel specification return coincide with the predefined ones", {
   #                                "r" = NA, "phi" = NA,
   #                                "x0" = matrix(0, 2), "V0" = matrix(NA,3))
   predefinde_model$init <- list("a_eta" =  1,"x0" = array(c(0,0), dim = c(2,1), dimnames = list(c("x01","x02"),NULL)))
-  predefinde_model$fitFlag <- list("a_eta" =  TRUE, "a_mu" = TRUE,
+  predefinde_model$fit_request <- list("a_eta" =  TRUE, "a_mu" = TRUE,
                                    "var_eta" = FALSE, "var_mu" = TRUE,
                                    "r" = TRUE, "phi" = TRUE,
                                    "x0" = TRUE, "V0" = TRUE)
@@ -50,7 +50,7 @@ test_that("unimodel specification return coincide with the predefined ones versi
   #                                "r" = NA, "phi" = NA,
   #                                "x0" = matrix(0, 2), "V0" = matrix(NA,3))
   predefinde_model$init <- list("a_eta" =  1)
-  predefinde_model$fitFlag <- list("a_eta" =  TRUE, "a_mu" = TRUE,
+  predefinde_model$fit_request <- list("a_eta" =  TRUE, "a_mu" = TRUE,
                                    "var_eta" = FALSE, "var_mu" = TRUE,
                                    "r" = TRUE, "phi" = TRUE,
                                    "x0" = FALSE, "V0" = TRUE)
@@ -79,7 +79,7 @@ test_that("unimodel specification return coincide with the predefined ones versi
                                "V0" = matrix(NA, 3))
   predefinde_model$init <- list("a_eta" =  1,
                                 "V0" = array(c(1, 1, 1), dim = c(3, 1), dimnames = list(c("(1,1)","(2,1)","(2,2)"),NULL)))
-  predefinde_model$fitFlag <- list("a_eta" =  TRUE, "a_mu" = TRUE,
+  predefinde_model$fit_request <- list("a_eta" =  TRUE, "a_mu" = TRUE,
                                    "var_eta" = FALSE, "var_mu" = TRUE,
                                    "r" = TRUE, "phi" = TRUE,
                                    "x0" = TRUE, "V0" = TRUE)
