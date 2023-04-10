@@ -12,7 +12,7 @@ uniModelFilter <- function(data, uniModel) {
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
-  isIntraModel(uniModel, nrow(data))
+  is_uniModel(uniModel, nrow(data))
 
   # check if fit is necessary
   if (Reduce("+", uniModel$fit_request) != 0) {
