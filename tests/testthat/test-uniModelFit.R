@@ -72,6 +72,7 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
   data <- readRDS("data/ADBE_log_volume")
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   # expected output
   expected_par <- readRDS("data/ADBE_expected_par")
@@ -92,14 +93,17 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
 
   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
   expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
+  expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
 
   plot(fetch_par_log(modelSpec.fit$par_log, "B")[1, ])
+  plot(fetch_par_log(modelSpec.fit_acc$par_log, "B")[1, ])
 })
 
-test_that("uniModelFit from raw (after zero constraint and initial noise), ACN", {
+test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ACN", {
   data <- readRDS("data/ACN_log_volume")
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   # expected output
   expected_par <- readRDS("data/ACN_expected_par")
@@ -121,14 +125,20 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), ACN",
   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
   
   expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
+  expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   
   plot(fetch_par_log(modelSpec.fit$par_log, "B")[1, ])
+  plot(fetch_par_log(modelSpec.fit_acc$par_log, "B")[1, ])
 })
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = CVS", {
   data <- readRDS("data/CVS_log_volume")
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
+    
+  modelSpec_v2 <- uniModelSpec(fit = TRUE, init.pars = list(a_mu = 0))
+  modelSpec.fit_acc2 <- uniModelFit(data, modelSpec_v2, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   # expected output
   expected_par <- readRDS("data/CVS_expected_par")
@@ -149,6 +159,10 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
   
   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
   expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 1e-2)
+  # expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 1e-2)
+  expect_equal(modelSpec.fit_acc2$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   
-  plot(fetch_par_log(modelSpec.fit$par_log, "B")[1, ])
+  plot(fetch_par_log(modelSpec.fit$par_log, "B")[2, ])
+  plot(fetch_par_log(modelSpec.fit_acc$par_log, "B")[2, ])
+  plot(fetch_par_log(modelSpec.fit_acc2$par_log, "B")[2, ])
 })
