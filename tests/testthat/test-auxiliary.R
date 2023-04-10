@@ -281,7 +281,7 @@ test_that("cleanParsList works", {
   expect_equal(test.pars, predefined.pars)
 })
 
-test_that("isIntraModel works", {
+test_that("is_uniModel works", {
   n_bin <- 26
   fixed.pars <- list()
   fixed.pars$"a_mu" <- 1
@@ -293,21 +293,21 @@ test_that("isIntraModel works", {
   data("data_log_volume")
   
   modelSpec_check1 <- modelSpec[c("par", "init")]
-  expect_error(isIntraModel(modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
+  expect_error(is_uniModel(modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
   expect_error(uniModelFit(data_log_volume, modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
   
   modelSpec_check2 <- modelSpec
   modelSpec_check2$par[["x0"]] <- NULL
-  expect_error(isIntraModel(modelSpec_check2),"Element x0 is missing from the uniModel par.\n")
+  expect_error(is_uniModel(modelSpec_check2),"Element x0 is missing from the uniModel par.\n")
   
   modelSpec_check3 <- modelSpec
   modelSpec_check3$fit_request[["var_eta"]] <- TRUE
-  expect_error(isIntraModel(modelSpec_check3), "uniModel par var_eta and uniModel fit_request var_eta are conflicted.\n")
+  expect_error(is_uniModel(modelSpec_check3), "uniModel par var_eta and uniModel fit_request var_eta are conflicted.\n")
 
   modelSpec_check4 <- modelSpec
   modelSpec_check4$par[["x0"]] <- 1
   modelSpec_check4$par[["var_eta"]] <- array(c(1,2))
-  expect_error(isIntraModel(modelSpec_check4, 25), "Dimension of uniModel par var_eta is wrong.\nLength of uniModel par var_eta is wrong.\nDimension of uniModel par phi is wrong.\nDimension of uniModel par x0 is wrong.\n")
+  expect_error(is_uniModel(modelSpec_check4, 25), "Dimension of uniModel par var_eta is wrong.\nLength of uniModel par var_eta is wrong.\nDimension of uniModel par phi is wrong.\nDimension of uniModel par x0 is wrong.\n")
  
   
 })
