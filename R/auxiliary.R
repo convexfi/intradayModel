@@ -254,60 +254,60 @@ cleanParsList <- function(input_list) {
 
 # part of error check for init.pars/fixed.pars
 checkList <- function(uniModel, n_bin = NULL) {
-  # pars_scalar <- c("a_eta", "a_mu", "var_eta", "var_mu", "r")
   fit_request_list <- uniModel$fit_request
   par_list <- uniModel$par
   init_list <- uniModel$init
   
   all_par_list <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0")
+  scalar_par_list <- c("a_eta", "a_mu", "var_eta", "var_mu", "r")
   len_expect <- list("a_eta" = 1L, "a_mu" = 1L, "var_eta" = 1L, "var_mu" = 1L, "r" = 1L, "x0" = 2L, "V0" = 3L)
   dim_expect <- list("a_eta" = NULL, "a_mu" = NULL, "var_eta" = NULL, "var_mu" = NULL, "r" = NULL, "x0" = c(2L,1L), "V0" = c(3L, 1L))
   if (!identical(n_bin, NULL)){
-    all_par_list <- append(pars_list, "phi")
+    all_par_list <- append(all_par_list, "phi")
     len_expect <- rlist::list.append(len_expect, "phi" = as.integer(n_bin))
     dim_expect <- rlist::list.append(dim_expect, "phi" = c(as.integer(n_bin), 1L))
   }
   unfixed <- intersect(names(fit_request_list[fit_request_list == TRUE]), all_par_list)
   fixed <- intersect(names(fit_request_list[fit_request_list == FALSE]), all_par_list)
   
-  # check pars
 
+  msg <- NULL
   for (name in fixed){
     if (mode(par_list[[name]]) != "numeric" || any(is.na(par_list[[name]])) || any(is.infinite(par_list[[name]]))) {
-          stop(name, " must be numeric, have no NAs, and no Infs.")
+        msg <- c(msg, paste(name, "must be numeric, have no NAs, and no Infs.\n"))
       }
       if (!identical(dim_expect[[name]], dim(par_list[[name]]))) {
-        stop("Dimension of ", name, " is wrong.")
+        msg <- c(msg, paste("Dimension of uniModel par ", name, " is wrong.\n", sep = ""))
       }
-      if (!identical(len_expect[[name]], length(par_list[[name]]))) {
-        stop("Length of ", name, " is wrong.")
+      if (name %in% scalar_par_list && !identical(len_expect[[name]], length(par_list[[name]]))) {
+        msg <- c(msg, paste("Length of uniModel par ", name, " is wrong.\n", sep = ""))
       }
     }
     for (name in unfixed){
       if (!all(is.na(par_list[[name]]))) {
-        stop("model$par$", name, " and model$fit_request$", name, " are conflicted.")
+        msg <- c(msg, paste("uniModel par ", name, " and uniModel fit_request ", name, " are conflicted.\n", sep = ""))
       }
     }
   
  
     for (name in fixed){
       if (name %in% names(init_list)){
-        stop(name, "is fixed. No need for init.")
+        msg <- c(msg, paste(name, "is fixed. No need for init.\n"))
       }
     }
     unfixed_init <- intersect(unfixed, names(init_list))
     for (name in unfixed_init){
       if (mode(init_list[[name]]) != "numeric" || any(is.na(init_list[[name]])) || any(is.infinite(init_list[[name]]))) {
-        stop(name, " must be numeric, have no NAs, and no Infs.")
+        msg <- c(msg, paste(name, "must be numeric, have no NAs, and no Infs.\n"))
       }
       if (!identical(dim_expect[[name]], dim(init_list[[name]]))) {
-        stop("Dimension of ", name, " is wrong.")
+        msg <- c(msg, paste("Dimension of uniModel init ", name, " is wrong.\n", sep = ""))
       }
-      if (!identical(len_expect[[name]], length(init_list[[name]]))) {
-        stop("Lenght of ", name, " is wrong.")
+      if (name %in% scalar_par_list && !identical(len_expect[[name]], length(init_list[[name]]))) {
+        msg <- c(msg, paste("Lenght of uniModel init ", name, " is wrong.", sep = ""))
       }
     }
-  
+  return (msg)
   
 }
 
@@ -317,17 +317,17 @@ isIntraModel <- function(uniModel, n_bin = NULL) {
   el <- c("fit_request", "par", "init")
   # if some components are missing from the uniModel, rest of the tests won't work so stop now
   if (!all(el %in% names(uniModel))) {
-    stop("Element ", paste(el[!(el %in% names(uniModel))], collapse = " & "), " is missing from the model object.\n")
+    stop("Element ", paste(el[!(el %in% names(uniModel))], collapse = " & "), " is missing from the uniModel object.\n")
   }
   
   # if some args are missing from the uniModel's components, the code will stop when all missing parts are found.
   msg <- NULL
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   if (!all(all_pars_name %in% names(uniModel$par))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = " & "), " is missing from the model$par.\n")
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = " & "), " is missing from the uniModel par.\n")
   }
   if (!all(all_pars_name %in% names(uniModel$fit_request))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = " & "), " is missing from the model$fit_request.\n")
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = " & "), " is missing from the uniModel fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
@@ -342,8 +342,10 @@ isIntraModel <- function(uniModel, n_bin = NULL) {
 
   
   # Check no NA inf and dimension
-  checkList(uniModel, n_bin)
-
+  msg <- checkList(uniModel, n_bin)
+  if (!is.null(msg)) {
+    stop(msg)
+  }
 }
 
 fetch_par_log <- function(par_log, index) {

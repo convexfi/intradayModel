@@ -12,7 +12,7 @@ uniModelPred <- function(data, uniModel, out.sample) {
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
   if (anyNA(data)) stop("data must have no NA.")
-  # isIntraModel(uniModel, data)
+  isIntraModel(uniModel, nrow(data))
 
   # check if fit is necessary
   if (Reduce("+", uniModel$fit_request) != 0) {
