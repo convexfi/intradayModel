@@ -1,5 +1,9 @@
 test_that("marss_to_unimodel works", {
   data("data_log_volume")
+  data <- as.matrix(data_log_volume)
+  n_bin <- nrow(data)
+  n_day <- ncol(data)
+  n_bin_total <- n_bin * n_day
   
   fixed.pars <- list()
   fixed.pars$"var_eta" <- 4
@@ -8,7 +12,7 @@ test_that("marss_to_unimodel works", {
   data <- data_log_volume
   data <- as.matrix(data)
   
-  data.reform <- data %>%
+  data_reform <- data %>%
     as.list() %>%
     unlist()
   
@@ -27,7 +31,7 @@ test_that("marss_to_unimodel works", {
   predefinde_params$"var_eta" <- 4
   predefinde_params$"var_mu" <- 0.06
   predefinde_params$"r" <- 0.08
-  predefinde_params$"phi" <- matrix(rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform), nrow = n_bin)
+  predefinde_params$"phi" <- matrix(rowMeans(matrix(data_reform, nrow = n_bin)) - mean(data_reform), nrow = n_bin)
   phi_names <- c()
   for (i in 1:n_bin){
     phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
@@ -111,14 +115,14 @@ test_that("specify_marss works without fixed params", {
                        "r" = 0.08,
                        "var_eta" = 0.07, "var_mu" = 0.06,
                        "V0" = matrix(c(1e-03, 1e-07, 1e-5), 3, 1),
-                       "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data_reform)
+                       "phi" = rowMeans(matrix(data_reform, nrow = n_bin)) - mean(data_reform)
   )
   ## Init param
   MARSS_model$init.gen <- extract_init(init_default, modelSpec$init, modelSpec$fit_request)
   
   ## EM
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
-  model_original <- MARSS::MARSS(data.reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  model_original <- MARSS::MARSS(data_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
   
   
   expect_equal(model_test, model_original)
@@ -132,7 +136,7 @@ test_that("specify_marss works with partial fixed params", {
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
   ## reform data
-  data.reform <- data %>%
+  data_reform <- data %>%
     as.list() %>%
     unlist()
   
@@ -188,7 +192,7 @@ test_that("specify_marss works with partial fixed params", {
   )
   ## EM
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
-  model_original <- MARSS::MARSS(data.reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  model_original <- MARSS::MARSS(data_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
   
   
   expect_equal(model_test, model_original)
@@ -203,7 +207,7 @@ test_that("extract_value works", {
   n_bin_total <- n_bin * n_day
   
   ## reform data
-  data.reform <- data %>%
+  data_reform <- data %>%
     as.list() %>%
     unlist()
   
@@ -228,7 +232,7 @@ test_that("extract_init works", {
   n_bin_total <- n_bin * n_day
   
   ## reform data
-  data.reform <- data %>%
+  data_reform <- data %>%
     as.list() %>%
     unlist()
   
@@ -248,7 +252,7 @@ test_that("extract_init works", {
                        "r" = 0.08,
                        "var_eta" = 0.07, "var_mu" = 0.06,
                        "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
-                       "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
+                       "phi" = rowMeans(matrix(data_reform, nrow = n_bin)) - mean(data_reform)
   )
   
   init_test <- extract_init(init_default, modelSpec$init, modelSpec$fit_request)
