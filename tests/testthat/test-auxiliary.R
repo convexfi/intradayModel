@@ -1,4 +1,4 @@
-test_that("trans_MARSStoIntra works", {
+test_that("marss_to_unimodel works", {
   data("data_log_volume")
   
   fixed.pars <- list()
@@ -7,24 +7,19 @@ test_that("trans_MARSStoIntra works", {
   
   data <- data_log_volume
   data <- as.matrix(data)
-  n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
   
   data.reform <- data %>%
     as.list() %>%
     unlist()
   
-  args <- list(data = data, n_bin = n_bin,
-               n_day = n_day, n_bin_total = n_bin_total,
-               modelSpec = modelSpec)
+  args <- list(data = data,
+               uniModel = modelSpec)
   
   
-  result <- do.call(MARSS_spec, args = args)
-  kalman <- result$kalman
+  kalman <- do.call(specify_marss, args = args)
   kalman$par <- kalman$start
   
-  trans.param <- trans_MARSStoIntra(kalman$par, modelSpec$par)
+  trans.param <- marss_to_unimodel(kalman$par, modelSpec$par)
   
   predefinde_params <- list()
   predefinde_params$"a_eta" <- 1
@@ -40,15 +35,14 @@ test_that("trans_MARSStoIntra works", {
   dimnames(predefinde_params$"phi")[[1]] <- phi_names
   predefinde_params$"x0" <- matrix(c(10, 0), 2, 1)
   dimnames(predefinde_params$"x0")[[1]] <- c("x01","x02")
-  predefinde_params$"V0" <- matrix(c(1e-10, 0, 1e-10), 3, 1)
+  predefinde_params$"V0" <- matrix(c(1e-3, 1e-7, 1e-5), 3, 1)
   dimnames(predefinde_params$"V0")[[1]] <- c("(1,1)","(2,1)","(2,2)")
   
   expect_equal(trans.param, predefinde_params)
   
 })
 
-
-test_that("MARSS_spec works without fixed params", {
+test_that("specify_marss works without fixed params", {
   data("data_log_volume")
   data <- as.matrix(data_log_volume)
   n_bin <- nrow(data)
@@ -56,15 +50,15 @@ test_that("MARSS_spec works without fixed params", {
   n_bin_total <- n_bin * n_day
   
   ## reform data
-  data.reform <- data %>%
+  data_reform <- data %>%
     as.list() %>%
     unlist()
   modelSpec <- uniModelSpec(fit = TRUE)
   
-  args <- list(data = data, n_bin = n_bin, n_day = n_day, n_bin_total = n_bin_total,
-               modelSpec = modelSpec)
+  args <- list(data = data,
+               uniModel = modelSpec)
   
-  model.test <- do.call(MARSS_spec, args = args)
+  model_test <- do.call(specify_marss, args = args)
   
   # specify the marss in the original way
   MARSS_model <- list()
@@ -112,33 +106,31 @@ test_that("MARSS_spec works without fixed params", {
   V0 <- extract_value("V0", modelSpec)
   
   ## predefined init value
-  init.default <- list("x0" = matrix(c(10, 0), 2, 1),
+  init_default <- list("x0" = matrix(c(10, 0), 2, 1),
                        "a_eta" = 1, "a_mu" = 0.7,
                        "r" = 0.08,
                        "var_eta" = 0.07, "var_mu" = 0.06,
-                       "V0" = matrix(c(1e-10, 0, 1e-10), 3, 1),
-                       "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
+                       "V0" = matrix(c(1e-03, 1e-07, 1e-5), 3, 1),
+                       "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data_reform)
   )
   ## Init param
-  MARSS_model$init.gen <- extract_init(init.default, modelSpec$init, modelSpec$fitFlag)
+  MARSS_model$init.gen <- extract_init(init_default, modelSpec$init, modelSpec$fit_request)
   
   ## EM
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
-  model.original <- MARSS::MARSS(data.reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  model_original <- MARSS::MARSS(data.reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
   
   
-  expect_equal(model.test$kalman, model.original)
-  expect_equal(model.test$At, At)
+  expect_equal(model_test, model_original)
   
 })
 
-test_that("MARSS_spec works with partial fixed params", {
+test_that("specify_marss works with partial fixed params", {
   data("data_log_volume")
   data <- as.matrix(data_log_volume)
   n_bin <- nrow(data)
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
-  
   ## reform data
   data.reform <- data %>%
     as.list() %>%
@@ -151,10 +143,10 @@ test_that("MARSS_spec works with partial fixed params", {
   fixed.pars$"phi" <- matrix(2, n_bin)
   modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
   
-  args <- list(data = data, n_bin = n_bin, n_day = n_day, n_bin_total = n_bin_total,
-               modelSpec = modelSpec)
+  args <- list(data = data, 
+               uniModel = modelSpec)
   
-  model.test <- do.call(MARSS_spec, args = args)
+  model_test <- do.call(specify_marss, args = args)
   
   # specify the marss in the original way
   MARSS_model <- list()
@@ -188,33 +180,18 @@ test_that("MARSS_spec works with partial fixed params", {
   ## Initial State
   x0 <- matrix(list(0,0), 2, 1)
   V0 <- "unconstrained"
-  
-  ## predefined init value
-  # init.default <- list("x0" = matrix(c(10, 0), 2, 1),
-  #                      "a_eta" = 1, "a_mu" = 0.7,
-  #                      "r" = 0.08,
-  #                      "var_eta" = 0.07, "var_mu" = 0.06,
-  #                      "V0" = matrix(c(1e-10, 0, 1e-10), 3, 1),
-  #                      "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
-  # )
-  ## Init param
-  # MARSS_model$init.gen <- list(B = matrix(c(1), 1, 1),
-  #   R = 0.08,
-  #   Q = matrix(c(0.06), 1, 1),
-  #   V0 = matrix(c(1e-10, 0, 1e-10), 3, 1)
-  # )
+
   MARSS_model$init.gen <-  list(R = 0.08,
-                                V0 = matrix(c(1e-10, 0, 1e-10), 3, 1),
+                                V0 = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
                                 B = matrix(c(1), 1, 1),
                                 Q = matrix(c(0.06), 1, 1)
   )
   ## EM
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
-  model.original <- MARSS::MARSS(data.reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  model_original <- MARSS::MARSS(data.reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
   
   
-  expect_equal(model.test$kalman, model.original)
-  expect_equal(model.test$At, At)
+  expect_equal(model_test, model_original)
   
 })
 
@@ -240,8 +217,7 @@ test_that("extract_value works", {
   expect_equal(extract_value("a_mu", modelSpec), 1)
   expect_equal(extract_value("x0", modelSpec), array(c(0, 0), dim = c(2,1), dimnames = list(c("x01","x02"),NULL)))
   expect_equal(extract_value("V0", modelSpec), "unconstrained")
-  # expect_equal(extract_value("x0", modelSpec), array(c(0, 0), dim = c(2,1)))
-  
+ 
 })
 
 test_that("extract_init works", {
@@ -263,31 +239,31 @@ test_that("extract_init works", {
   fixed.pars$"phi" <- matrix(2, n_bin)
   modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
   
-  args <- list(data = data, n_bin = n_bin, n_day = n_day, n_bin_total = n_bin_total,
-               modelSpec = modelSpec)
+  args <- list(data = data,
+               uniModel = modelSpec)
   
   
-  init.default <- list("x0" = matrix(c(10, 0), 2, 1),
+  init_default <- list("x0" = matrix(c(10, 0), 2, 1),
                        "a_eta" = 1, "a_mu" = 0.7,
                        "r" = 0.08,
                        "var_eta" = 0.07, "var_mu" = 0.06,
-                       "V0" = matrix(c(1e-10, 0, 1e-10), 3, 1),
+                       "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
                        "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
   )
   
-  init.test <- extract_init(init.default, modelSpec$init, modelSpec$fitFlag)
+  init_test <- extract_init(init_default, modelSpec$init, modelSpec$fit_request)
   
   ## Init param
-  init.ori <- list(R = 0.08,
-                   V0 = matrix(c(1e-10, 0, 1e-10), 3, 1),
+  init_ori <- list(R = 0.08,
+                   V0 = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
                    B = matrix(c(1), 1, 1),
                    Q = matrix(c(0.06), 1, 1)
   )
   
-  expect_equal(init.test, init.ori)
+  expect_equal(init_test, init_ori)
 })
 
-test_that("transList works", {
+test_that("cleanParsList works", {
   test.pars <- list()
   test.pars$"a_eta" <- "a"
   test.pars$"a_mu" <- 1
@@ -296,7 +272,7 @@ test_that("transList works", {
   test.pars$"V0" <- matrix(0,3)
   test.pars$"yyy" <- 6
   
-  test.pars <- transList(test.pars)
+  test.pars <- cleanParsList(test.pars)
   
   predefined.pars <- list()
   predefined.pars$"a_mu" <- 1
