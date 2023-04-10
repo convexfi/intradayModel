@@ -305,7 +305,6 @@ test_that("transList works", {
   expect_equal(test.pars, predefined.pars)
 })
 
-# unfinished
 test_that("isIntraModel works", {
   n_bin <- 26
   fixed.pars <- list()
@@ -315,25 +314,24 @@ test_that("isIntraModel works", {
   fixed.pars$"phi" <- matrix(2, n_bin)
   modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
   
+  data("data_log_volume")
+  
   modelSpec_check1 <- modelSpec[c("par", "init")]
+  expect_error(isIntraModel(modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
+  expect_error(uniModelFit(data_log_volume, modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
+  
   modelSpec_check2 <- modelSpec
   modelSpec_check2$par[["x0"]] <- NULL
-  modelSpec_check2$par[["a_eta"]] <- NULL
+  expect_error(isIntraModel(modelSpec_check2),"Element x0 is missing from the uniModel par.\n")
   
-  expect_error(isIntraModel(modelSpec_check1), "Element fitFlag is missing from the model object.\n")
-  # expect_error(isIntraModel(modelSpec_check2), c("Element a_etax0 is missing from the model$par.\n"))
-})
+  modelSpec_check3 <- modelSpec
+  modelSpec_check3$fit_request[["var_eta"]] <- TRUE
+  expect_error(isIntraModel(modelSpec_check3), "uniModel par var_eta and uniModel fit_request var_eta are conflicted.\n")
 
-test_that("isIntraModel test 1", {
-  data("data_log_volume")
-  data <- data_log_volume
-  data <- as.matrix(data)
+  modelSpec_check4 <- modelSpec
+  modelSpec_check4$par[["x0"]] <- 1
+  modelSpec_check4$par[["var_eta"]] <- array(c(1,2))
+  expect_error(isIntraModel(modelSpec_check4, 25), "Dimension of uniModel par var_eta is wrong.\nLength of uniModel par var_eta is wrong.\nDimension of uniModel par phi is wrong.\nDimension of uniModel par x0 is wrong.\n")
+ 
   
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec$par <- NULL
-  modelSpec$init <- NULL
-  
-  # expect_error(uniModelFit(data, modelSpec), c("Element par & init is missing from the model object."))
-  expect_error(uniModelFit(data, modelSpec), regexp = "Element par & init is missing from the model")
 })
-
