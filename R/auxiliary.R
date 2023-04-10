@@ -253,86 +253,95 @@ cleanParsList <- function(input_list) {
 
 
 # part of error check for init.pars/fixed.pars
-checkList <- function(check.list, type) {
-  pars.name.1 <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0")
-  len.expect <- list("a_eta" = 1, "a_mu" = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
-  # no more
-  for (name in pars.name.1) {
-    if (!(name %in% names(check.list))) next
-    # maybe no need
-    if (!(is.list(check.list$name) || is.numeric(check.list$name))) {
-      stop("no")
+checkList <- function(check.list, fit.request.list, type, n_bin = NULL) {
+  # pars_scalar <- c("a_eta", "a_mu", "var_eta", "var_mu", "r")
+  pars_list <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0")
+  
+  len_expect <- list("a_eta" = 1, "a_mu" = 1, "var_eta" = 1, "var_mu" = 1, "r" = 1, "x0" = 2, "V0" = 3)
+  dim_expect <- list("a_eta" = NULL, "a_mu" = NULL, "var_eta" = NULL, "var_mu" = NULL, "r" = NULL, "x0" = c(2L,1L), "V0" = c(3L, 1L))
+  if (!identical(a, NULL)){
+    pars_list <- append(pars_list, "phi")
+    len_expect <- rlist::list.append(len_expect, "phi" = NULL)
+    dim_expect <- rlist::list.append(dim_expect, "phi" = c(as.integer(n_bin), 1L))
+  }
+  
+  unifxed <- intersect(names(fit.request.list[fit.request.list == TRUE]), pars_list)
+  fixed <- intersect(names(fit.request.list[fit.request.list == FALSE]), pars_list)
+  # check pars
+  if (type == "par"){
+    for (name in fixed){
+      if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))) {
+          stop(name, " must be numeric, have no NAs, and no Infs.")
+      }
+      if (!identical(dim_expect[[name]], dim(check.list[[name]]))) {
+        stop("Dimension of ", name, "is wrong.")
+      }
+      if (!identical(len_expect[[name]], length(check.list[[name]]))) {
+        stop("Lenght of", name, "is wrong.")
+      }
     }
-    if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))) {
-      stop("no")
-    }
-    if (!identical(len.expect$name, length(check.list$name))) {
-      stop("no")
+    for (name in unfixed){
+      if (!all(is.na(check.list[[name]]))) {
+        stop("model$par$", name, "and model$fit_request$", name, "are conflicted.")
+      }
     }
   }
-
-  if ("phi" %in% names(check.list)) {
-    if (!is.list(check.list$phi)) {
-      stop("no")
+  else if (type == "init"){
+    for (name in fixed){
+      if (name %in% names(check.list)){
+        stop(name, "is fixed. No need for init.")
+      }
     }
-    if (mode(check.list[["phi"]]) != "numeric" || any(is.na(check.list[["phi"]])) || any(is.infinite(check.list[["phi"]]))) {
-      stop("no")
+    unfixed_init <- intersect(unfixed, names(check.list))
+    for (name in unfixed_init){
+      if (mode(check.list[[name]]) != "numeric" || any(is.na(check.list[[name]])) || any(is.infinite(check.list[[name]]))) {
+        stop(name, " must be numeric, have no NAs, and no Infs.")
+      }
+      if (!identical(dim_expect[[name]], dim(check.list[[name]]))) {
+        stop("Dimension of ", name, "is wrong.")
+      }
+      if (!identical(len_expect[[name]], length(check.list[[name]]))) {
+        stop("Lenght of", name, "is wrong.")
+      }
     }
   }
+  
 }
 
 # check whether the uniModel is correct
 isIntraModel <- function(uniModel, data = NULL) {
   # msg <- NULL
-  ## Check for required components
+  ## Check for required components 
   el <- c("fit_request", "par", "init")
   if (!all(el %in% names(uniModel))) {
     stop("Element ", paste(el[!(el %in% names(uniModel))], collapse = " & "), " is missing from the model object.\n")
   }
 
   msg <- NULL
-  all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
-  if (!all(all.pars.name %in% names(uniModel$par))) {
-    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(uniModel$par))], collapse = " & "), " is missing from the model$par.\n")
+  all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
+  if (!all(all_pars_name %in% names(uniModel$par))) {
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = " & "), " is missing from the model$par.\n")
   }
-  if (!all(all.pars.name %in% names(uniModel$fit_request))) {
-    msg <- c(msg, "Element ", paste(all.pars.name[!(all.pars.name %in% names(uniModel$fit_request))], collapse = " & "), " is missing from the model$fit_request.\n")
+  if (!all(all_pars_name %in% names(uniModel$fit_request))) {
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = " & "), " is missing from the model$fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
   }
 
   # Check no additional names in fit_request, par, init
-  for (mat in el) {
-    if (!all(names(uniModel[[mat]]) %in% all.pars.name)) {
-      msg <- c(msg, "Element\n")
-    }
-  }
+  # for (mat in el) {
+  #   if (!all(names(uniModel[[mat]]) %in% all_pars_name)) {
+  #     msg <- c(msg, "Element\n")
+  #   }
+  # }
 
+  
   # Check no NA inf and dimension check
-  checkList(uniModel$par)
-  checkList(uniModel$init)
+  n_bin <- nrow(data)
+  checkList(uniModel$par, uniModel$fit_request, "par", n_bin)
+  checkList(uniModel$init, uniModel$fit_request, "par", n_bin)
 
-  unifxed <- names(uniModel$fit_request[uniModel$fit_request == TRUE])
-  fixed <- names(uniModel$fit_request[uniModel$fit_request == FALSE])
-  for (name in fixed) {
-    if (any(is.na(uniModel[["par"]][[name]]))) {
-      stop("no")
-    }
-  }
-
-  for (name in unfixed) {
-    if (!all(is.na(uniModel[["par"]][[name]]))) {
-      stop("no")
-    }
-  }
-
-  if (!is.null(data)) {
-    n_bin <- nrow(data)
-    # dim
-    if (!uniModel$fit_request[["phi"]] && !identical(length(uniModel$par[["phi"]]), n_bin)) stop("no")
-    # if(uniModel$fit_request[["phi"]] && (!identical(length(uniModel$init[["phi"]]), n_bin))) stop("no")
-  }
 }
 
 fetch_par_log <- function(par_log, index) {
