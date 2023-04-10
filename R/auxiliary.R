@@ -253,7 +253,7 @@ cleanParsList <- function(input_list) {
 
 
 # part of error check for init.pars/fixed.pars
-checkList <- function(uniModel, n_bin = NULL) {
+checkParsList <- function(uniModel, n_bin = NULL) {
   fit_request_list <- uniModel$fit_request
   par_list <- uniModel$par
   init_list <- uniModel$init
@@ -312,7 +312,7 @@ checkList <- function(uniModel, n_bin = NULL) {
 }
 
 # check whether the uniModel is correct
-isIntraModel <- function(uniModel, n_bin = NULL) {
+is_uniModel <- function(uniModel, n_bin = NULL) {
   ## Check for required components 
   el <- c("fit_request", "par", "init")
   # if some components are missing from the uniModel, rest of the tests won't work so stop now
@@ -342,7 +342,7 @@ isIntraModel <- function(uniModel, n_bin = NULL) {
 
   
   # Check no NA inf and dimension
-  msg <- checkList(uniModel, n_bin)
+  msg <- checkParsList(uniModel, n_bin)
   if (!is.null(msg)) {
     stop(msg)
   }
