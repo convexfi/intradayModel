@@ -1,14 +1,23 @@
-#' Title
+#' @title Fit a uniModel via Maximum-Likelihood Estimation
+#' 
+#' @description 
 #'
-#' @param data.train log volume data matrix of size n_bin * n_day with no NA for fitting
+#' @param data log volume data matrix of size n_bin * n_day with no NA for fitting.
 #' @param uniModel uniModel object from function uniModelSpec
-#' @param control List of control variables, e.g., maxit, reltol
+#' @param maxit
+#' @param abstol
+#' @param log.switch
+#' @param acceleration
 #'
 #' @return
+#' @author Shengjie Xiu and Yifan Yu
+#' @references
+#' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+#' @seealso 
+#' @examples
+#' 
 #' @importFrom magrittr %>%
 #' @export
-#'
-#' @examples
 uniModelFit <- function(data, uniModel,
                         maxit = 3000, abstol = 1e-4, log.switch = TRUE, acceleration = FALSE) {
 

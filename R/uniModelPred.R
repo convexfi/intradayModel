@@ -1,13 +1,18 @@
-#' Title
+#' @title 
 #'
-#' @param data.pre
-#' @param model
+#' @description 
+#'
+#' @param data
+#' @param uniModel
 #' @param out.sample  the number of days before the last to keep for out of sample forecasting
 #'
 #' @return
-#' @export
-#'
+#' @author Shengjie Xiu and Yifan Yu
+#' @references
+#' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+#' @seealso 
 #' @examples
+#' @export
 uniModelPred <- function(data, uniModel, out.sample) {
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")

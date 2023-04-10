@@ -1,13 +1,17 @@
-#' Title
+#' @title 
+#'
+#' @description 
 #'
 #' @param data
 #' @param uniModel
-#' @param control
 #'
 #' @return
-#' @export
-#'
+#' @author Shengjie Xiu and Yifan Yu
+#' @references
+#' 
+#' @seealso 
 #' @examples
+#' @export
 uniModelFilter <- function(data, uniModel) {
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")

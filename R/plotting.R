@@ -1,15 +1,19 @@
-#' Title
+#' @title 
+#' 
+#' @description 
 #'
 #' @param data
 #' @param filter.result
 #'
 #' @return
-#' @export
+#' @author Shengjie Xiu and Yifan Yu
+#' @seealso 
 #' @import wesanderson
 #' @import patchwork ggplot2
 #' @importFrom magrittr %>%
 #'
 #' @examples
+#' @export
 uniModelPlot <- function(data, filter.result, type){
   data.reform <- data %>%
     as.list() %>%
