@@ -105,6 +105,15 @@ specify_marss <- function(...) {
     "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
     "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
   )
+  # init.default <- list(
+  #   "x0" = matrix(c(mean(data.reform), 0), 2, 1),
+  #   "a_eta" = 1, "a_mu" = 0,
+  #   "r" = 1e-4,
+  #   "var_eta" = 1e-4, "var_mu" = 1e-4,
+  #   "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
+  #   "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
+  # )
+
   ## Init param
   marss_model$init.gen <- extract_init(init.default, uniModel$init, uniModel$fit_request)
 
