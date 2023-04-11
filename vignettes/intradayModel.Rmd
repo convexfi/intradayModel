@@ -6,8 +6,9 @@ author: |
 date: "`r Sys.Date()`"
 output: 
   cleanrmd::html_document_clean:
-    theme: NULL
-    #css: style_vignette.css
+    theme: bamboo
+    toc: yes
+    toc_depth: 2
 csl: apalike.csl # springer-socpsych-author-date.csl
 csl-entry-spacing: 1.2em
 bibliography: refs.bib
@@ -32,6 +33,15 @@ opts_chunk$set(
 )
 knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
 options(width=100)
+```
+
+```{css, echo = FALSE}
+/* ensure cleanrmd is centered */
+body {
+  margin: 0 auto;
+  max-width: 750px;
+  padding: 2rem;
+}
 ```
 
 -----------
