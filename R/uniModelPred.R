@@ -1,13 +1,18 @@
-#' Title
+#' @title Predict one-step ahead trading volume via kalman filter
 #'
-#' @param data.pre
-#' @param model
-#' @param out.sample  the number of days before the last to keep for out of sample forecasting
+#' @description This function will return the modeled value of \eqn{y_t} conditioned on the previous data 
+#' (the data during the time \eqn{0} to \eqn{t-1}).
 #'
-#' @return
-#' @export
+#' @param data n_bin * n_day log trading volume data matrix or data.frame with no NA.
+#' @param uniModel uniModel object from function \code{uniModelSpec}.
+#' @param out.sample  Number of days before the last for out of sample prediction.
 #'
+#' @return A numeric vector containing the prediction result.
+#' @author Shengjie Xiu and Yifan Yu
+#' @seealso \code{\link{uniModelSpec}}
 #' @examples
+#' library(intradayModel)
+#' @export
 uniModelPred <- function(data, uniModel, out.sample) {
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
