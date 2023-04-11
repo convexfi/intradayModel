@@ -47,13 +47,45 @@ body {
 -----------
 > This vignette illustrates the usage of the package `intradayModel` for modeling and prediction of intraday trading volume and volatility.
 
-
 # Quick Start
 
-Let's start by loading the package:To construct a reprex, I figured I better install keras. After installing keras, I can successfully call a tensorflow function, but not access anything in keras. The error says the lazy-load database is corrupt. Is that an obscure way to say my operating system (Ubuntu 14.04 LTS) is too old? Rumor has it that keras requires Ubuntu >= 16.04, though I haven't see that dependency stated explicitly, and it istalled without error.
-```{r, echo=TRUE}
-devtools::load_all()
+Let's load our package and the sample data: the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 123 trading days. Each column includes 26 records of intraday volume at a trading day.
+
+```{r}
+library(intradayModel)
+data(AAPL_volume)
+dim(AAPL_volume)
 ```
+
+We define a univariate state-space model for the intraday signal by
+
+```{r}
+modelSpec <- uniModelSpec(fit = TRUE)
+```
+
+Let's use the first 103 trading days to fit the model, and the last 20 days to evaluate the prediction performance. To fit the model using the accelerated EM algorithm, we call
+
+```{r}
+data <- log(AAPL_volume)
+data_train <- log(AAPL_volume[, 1:104])
+modelSpec_fit <- uniModelFit(data_train, modelSpec, acceleration = TRUE)
+```
+
+To evaluate the fitting performance, we use the fitted model to decompose the intraday volume:
+
+```{r}
+components <- uniModelFilter(data_train, modelSpec_fit)
+# fig <- plot_decomposition(data_train, components)
+# print(fig)
+```
+
+With the fitted model, we can do one-bin-ahead prediction and evaluate its accuracy.
+
+```{r}
+log_volume_pred <- uniModelPred(data, modelSpec_fit, out.sample = 20)
+```
+
+<!-- # Details (refer to rugarch vignette) -->
 
 
 # References {-}
