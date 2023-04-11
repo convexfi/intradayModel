@@ -17,3 +17,5 @@
 ^vignettes/ieee\.csl$
 ^vignettes/refs\.bib$
 ^R/PerformanceAnalytics_copy\.R$
+^doc$
+^Meta$

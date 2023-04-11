@@ -1,0 +1,93 @@
+---
+title: "Intraday Volume and Volatility: Modeling and Prediction"
+author: |
+  | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
+  | The Hong Kong University of Science and Technology (HKUST)
+date: "`r Sys.Date()`"
+output: 
+  cleanrmd::html_document_clean:
+    theme: bamboo
+    toc: yes
+    toc_depth: 2
+csl: apalike.csl # springer-socpsych-author-date.csl
+csl-entry-spacing: 1.2em
+bibliography: refs.bib
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Intraday Volume and Volatility: Modeling and Prediction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteKeyword{State-space Model}
+---
+
+```{r, echo=FALSE}
+library(knitr)
+opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.retina = 2,
+  out.width = "85%",
+  dpi = 96,
+  pngquant = "--speed=1"
+)
+knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
+options(width=100)
+```
+
+```{css, echo = FALSE}
+/* ensure cleanrmd is centered */
+body {
+  margin: 0 auto;
+  max-width: 750px;
+  padding: 2rem;
+}
+```
+
+-----------
+> This vignette illustrates the usage of the package `intradayModel` for modeling and prediction of intraday trading volume and volatility.
+
+# Quick Start
+
+Let's load our package and the sample data: the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 123 trading days. Each column includes 26 records of intraday volume at a trading day.
+
+```{r}
+library(intradayModel)
+data(AAPL_volume)
+dim(AAPL_volume)
+```
+
+We define a univariate state-space model for the intraday signal by
+
+```{r}
+modelSpec <- uniModelSpec(fit = TRUE)
+```
+
+Let's use the first 103 trading days to fit the model, and the last 20 days to evaluate the prediction performance. To fit the model using the accelerated EM algorithm, we call
+
+```{r}
+data <- log(AAPL_volume)
+data_train <- log(AAPL_volume[, 1:104])
+modelSpec_fit <- uniModelFit(data_train, modelSpec, acceleration = TRUE)
+```
+
+To evaluate the fitting performance, we use the fitted model to decompose the intraday volume:
+
+```{r}
+components <- uniModelFilter(data_train, modelSpec_fit)
+# fig <- plot_decomposition(data_train, components)
+# print(fig)
+```
+
+With the fitted model, we can do one-bin-ahead prediction and evaluate its accuracy.
+
+```{r}
+log_volume_pred <- uniModelPred(data, modelSpec_fit, out.sample = 20)
+```
+
+<!-- # Details (refer to rugarch vignette) -->
+
+
+# References {-}
+
+
