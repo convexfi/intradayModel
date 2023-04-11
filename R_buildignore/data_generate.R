@@ -40,5 +40,5 @@ dataset <- melt(data_frame, id=c("date","bin"))
 dataset <- dcast(dataset, bin ~ date)
 # delete the bin col
 dataset <- dataset[,-1]
-AAPL_volume <- dataset
-usethis::use_data(AAPL_volume)
+AAPL_volume <- as.matrix(dataset)
+usethis::use_data(AAPL_volume, overwrite = TRUE)
