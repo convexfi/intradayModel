@@ -1,6 +1,7 @@
 #' @title Fit a uniModel via Expectation-Maximization algorithm
 #' 
-#' @description This is the main function for fitting state-space models.
+#' @description The main function for fitting state-space models. 
+#' Two kinds of Expectation-Maximization (EM) algorithms are provided.
 #'
 #' @param data n_bin * n_day log trading volume data matrix or data.frame with no NA for fitting.
 #' @param uniModel uniModel object from function \code{uniModelSpec}.
@@ -11,12 +12,12 @@
 #' @param acceleration Logical value indicating whether to use accelerated Expectation-Maximization (EM) algorithm. 
 #' If \code{TRUE}, accelerated EM algorithm is used (default is \code{FALSE}).  
 #'
-#' @return A list containing the following elements:
+#' @return A list containing the following elements (if the algorithm converges):
 #' \item{\code{par}}{Values of fixed parameters.}
-#' \item{\code{init}}{Initial values of originally unfixed parameters.}
 #' \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not. 
 #'                           If the EM algorithm converges, all components of \code{fit_request} are \code{FALSE}.}
-#' \item{\code{par_log}} {List of parameter values during the convergence.}                          
+#' \item{\code{par_log}}{List of parameter values during the convergence.} 
+#' If the algorithm does not converge, the return is the original input argument uniModel with unfixed parameters.                        
 #' @author Shengjie Xiu and Yifan Yu
 #' @references
 #' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
