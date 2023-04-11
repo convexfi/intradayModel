@@ -1,0 +1,51 @@
+---
+title: "Intraday Volume and Volatility: Modeling and Prediction"
+author: |
+  | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
+  | The Hong Kong University of Science and Technology (HKUST)
+date: "`r Sys.Date()`"
+output: 
+  cleanrmd::html_document_clean:
+    theme: NULL
+    #css: style_vignette.css
+csl: apalike.csl # springer-socpsych-author-date.csl
+csl-entry-spacing: 1.2em
+bibliography: refs.bib
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Intraday Volume and Volatility: Modeling and Prediction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteKeyword{State-space Model}
+---
+
+```{r, echo=FALSE}
+library(knitr)
+opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.retina = 2,
+  out.width = "85%",
+  dpi = 96,
+  pngquant = "--speed=1"
+)
+knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
+options(width=100)
+```
+
+-----------
+> This vignette illustrates the usage of the package `intradayModel` for modeling and prediction of intraday trading volume and volatility.
+
+
+# Quick Start
+
+Let's start by loading the package:To construct a reprex, I figured I better install keras. After installing keras, I can successfully call a tensorflow function, but not access anything in keras. The error says the lazy-load database is corrupt. Is that an obscure way to say my operating system (Ubuntu 14.04 LTS) is too old? Rumor has it that keras requires Ubuntu >= 16.04, though I haven't see that dependency stated explicitly, and it istalled without error.
+```{r, echo=TRUE}
+devtools::load_all()
+```
+
+
+# References {-}
+
+
