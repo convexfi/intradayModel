@@ -47,6 +47,7 @@ uniModelFit <- function(data, uniModel,
   uniModel$par <- marss_to_unimodel(em_result$marss_obj$par, uniModel$par)
   if (em_result$convergence) {
     uniModel$fit_request[] <- FALSE
+    uniModel$init <- list()
   }
 
   return(uniModel)
