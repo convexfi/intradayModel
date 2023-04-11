@@ -2,25 +2,77 @@
 % Please edit documentation in R/uniModelSpec.R
 \name{uniModelSpec}
 \alias{uniModelSpec}
-\title{Define a uniModel}
+\title{Define a uniModel object}
 \usage{
-uniModelSpec(fit = FALSE, init.pars = NULL, fixed.pars = NULL)
+uniModelSpec(fit = FALSE, fixed.pars = NULL, init.pars = NULL)
 }
 \arguments{
-\item{fit}{Logical value indicating whether the model need to be fitted. (default is \code{FALSE}).}
+\item{fit}{Logical value indicating whether the model need to be fitted (default is \code{FALSE}).
+If \code{FLASE}, all unknown parameters should be assigned a fixed value in \code{fixed.pars}.}
 
-\item{init.pars}{List of initial values of unfixed parameters}
+\item{fixed.pars}{List of values of fixed parameters. The elements in the list specify the values for the unknown parameters.
+The list elements should be a subset of following ones:
+\itemize{
+\item a_eta: \eqn{a^{\eta}}, contains a double;
+\item a_mu: \eqn{a^{\mu}},contains a double;
+\item var_eta: \eqn{\sigma^{\eta}},contains a double;
+\item var_mu: \eqn{a\sigma^{\mu}},contains a double;
+\item r: \eqn{r},a scalar;
+\item phi: \eqn{\phi = [\phi_1,\dots, \phi_I]^\top}, contains I doubles;
+\item x0: \eqn{\overline{\mathbf{x}}_0}, contains 2 doubles;
+\item V0: \eqn{\mathbf{V}_0}, contains 3 doubles, corresponding to the \eqn{\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2)}.
+The paramters without a fixed value in \code{uniModelSpec} should be fitted with \code{uniModelFit}.
+}}
 
-\item{fixed.pars}{List of values of fixed parameters.}
+\item{init.pars}{List of initial values of unfixed parameters. The elements are the same with \code{fixed.pars}.
+The unfixed paramters without a specified initial value will be given an default initial value in \code{uniModelFit}.}
 }
 \value{
 A list containing the following elements:
+\item{\code{par}}{Values of fixed parameters.}
+\item{\code{init}}{Initial values of unfixed parameters.}
+\item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not.}
 }
 \description{
-Define the state space model for log trading volume.
+Define the state space model for intraday log trading volume. The model is formulated as:
+\deqn{\mathbf{x}_{t+1} = \mathbf{A}_{t}\mathbf{x}_{t} + \mathbf{w}_{t},}
+\deqn{y_{t} = \mathbf{C}\mathbf{x}_{t} + \phi_{t} + v_t,}
+where:
+\itemize{
+\item \eqn{\mathbf{x}_{t} = [\eta_{t}, \mu_{t}]^\top} is the hidden state vector containing the daily average part and the intraday dynamic part;
+\item \eqn{\mathbf{A}_{t} = \left[\begin{array}{l}a_t^{\eta}&0\\0&a^{\mu}\end{array} \right]}
+is the state transition matrix with \eqn{a_t^{\eta} = \begin{cases}a^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}},
+\eqn{I} is the number of intervals (referred to as bins) within a day;
+\item \eqn{\mathbf{C} = [1, 1]} is the observation matrix;
+\item \eqn{\mathbf{w}_{t} = [\epsilon_t^{\eta},\epsilon_t^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{t})}
+represents the i.i.d. Gaussian noise in the state transition, with diagonal covariance matrix
+\eqn{\mathbf{Q}_{t} = \left[\begin{array}{l}(\sigma_t^{\eta})^2&0\\0&(\sigma_t^{\mu}\end{array} \right]}
+and \eqn{\sigma_t^{\eta} = \begin{cases}\sigma^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}};
+\item \eqn{v_t \sim \mathcal{N}(0, r)} is the i.i.d. Gaussian noise in the observation;
+\item \eqn{\mathbf{x}_0} is the initial state, and it is assumed to follow \eqn{\mathcal{N}(\overline{\mathbf{x}}_0, \mathbf{V}_0)}.
+In the proposed model, \eqn{\overline{\mathbf{x}}_0, \mathbf{V}_0, \mathbf{A}_{t},\mathbf{Q}_{t},r}
+and the seasonality \eqn{\phi = [\phi_1,\dots, \phi_I]^\top} are treated as the unknown parameters.
+}
+}
+\examples{
+library(intradayModel)
+# set initial value 
+init.pars <- list()
+init.pars$"a_eta" <- 1
+
+# set fixed value
+fixed.pars <- list()
+fixed.pars$"var_eta" <- 4
+fixed.pars$"x0" <- matrix(c(10, 0), 2)
+
+# define the uniModel
+uniModelSpec(fit = TRUE, init.pars = init.pars, fixed.pars = fixed.pars)
 }
 \references{
 R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+}
+\seealso{
+\code{\link{uniModelFit}}, \code{\link{uniModelFilter}}, \code{\link{uniModelPred}}
 }
 \author{
 Shengjie Xiu and Yifan Yu
