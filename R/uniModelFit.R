@@ -1,21 +1,36 @@
-#' @title Fit a uniModel via Maximum-Likelihood Estimation
+#' @title Fit a uniModel via Expectation-Maximization algorithm
 #' 
-#' @description 
+#' @description This is the main function for fitting state-space models.
 #'
-#' @param data log volume data matrix of size n_bin * n_day with no NA for fitting.
-#' @param uniModel uniModel object from function uniModelSpec
-#' @param maxit
-#' @param abstol
-#' @param log.switch
-#' @param acceleration
+#' @param data n_bin * n_day log trading volume data matrix or data.frame with no NA for fitting.
+#' @param uniModel uniModel object from function \code{uniModelSpec}.
+#' @param maxit Maximum number of iterations (default is \code{3000}).
+#' @param abstol Absolute tolerance on the objective function to be used as the stopping criteria (default is \code{1e-4}).
+#' @param log.switch Logical value indicating whether to record the history of convergence progress. 
+#' If \code{TRUE}, a \code{uniModel} object with convergence log is returned (default is \code{TRUE}).
+#' @param acceleration Logical value indicating whether to use accelerated Expectation-Maximization (EM) algorithm. 
+#' If \code{TRUE}, accelerated EM algorithm is used (default is \code{FALSE}).  
 #'
-#' @return
+#' @return A list containing the following elements:
+#' \item{\code{par}}{Values of fixed parameters.}
+#' \item{\code{init}}{Initial values of originally unfixed parameters.}
+#' \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not. 
+#'                           If the EM algorithm converges, all components of \code{fit_request} are \code{FALSE}.}
+#' \item{\code{par_log}} {List of parameter values during the convergence.}                          
 #' @author Shengjie Xiu and Yifan Yu
 #' @references
 #' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
-#' @seealso 
+#' @seealso \code{\link{uniModelSpec}}
 #' @examples
+#' library(intradayModel)
+#' # load the data
+#' data("data_log_volume")
 #' 
+#' # define the uniModel
+#' modelSpec <- uniModelSpec(fit = TRUE)
+#' 
+#' # fit the model
+#' modelSpec.fit <- uniModelFit(data_log_volume, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
 #' @importFrom magrittr %>%
 #' @export
 uniModelFit <- function(data, uniModel,
@@ -56,6 +71,7 @@ uniModelFit <- function(data, uniModel,
   uniModel$par <- marss_to_unimodel(em_result$marss_obj$par, uniModel$par)
   if (em_result$convergence) {
     uniModel$fit_request[] <- FALSE
+    uniModel$init <- list()
   }
 
   return(uniModel)
