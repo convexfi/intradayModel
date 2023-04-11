@@ -58,9 +58,10 @@ uniModelPlot <- function(data, filter.result, type){
 }
 
 plot_decomposition <- function(data, filter_result) {
+  data <- as.matrix(data) # convert df to matrix
   plt.data.log <- 
     data.frame(
-      volume = as.vector(data),
+      signal = as.vector(data),
       daily = filter_result$daily,
       seasonal = filter_result$seasonal,
       dynamic = filter_result$dynamic,
@@ -70,9 +71,9 @@ plot_decomposition <- function(data, filter_result) {
   text_size = 10
   p1 <- plt.data.log %>%
     ggplot() +
-    geom_line(aes(x = i, y= volume), alpha = 0.8, color = "steelblue", size = 0.4) +
+    geom_line(aes(x = i, y= signal), alpha = 0.8, color = "steelblue", size = 0.4) +
     xlab(expression(tau)) +
-    ylab("Intraday\nVolume") +
+    ylab("Intraday\nSignal") +
     theme_bw() +
     theme(
       axis.title = element_text(size = text_size, face = "bold"),
@@ -148,5 +149,9 @@ plot_decomposition <- function(data, filter_result) {
       plot.title = element_text(size=18, face = "bold", hjust = 0.5)
     )
   
-  print(p1/p2/p3/p4)
+  fig <- p1/p2/p3/p4 + 
+    plot_annotation(title = "Decomposition of intraday signal (log scale)",
+                    theme =  theme(plot.title = element_text(size=16, face = "bold", hjust = 0.5)))
+                    
+  return(fig)
 }
