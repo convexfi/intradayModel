@@ -3,7 +3,7 @@
 #' @description This function will return the modeled value of \eqn{y_t} conditioned on the previous data 
 #' (the data during the time \eqn{0} to \eqn{t-1}).
 #'
-#' @param data n_bin * n_day log trading volume data matrix or data.frame with no NA.
+#' @param data n_bin * n_day trading volume data matrix or data.frame with no NA.
 #' @param uniModel uniModel object from function \code{uniModelSpec}.
 #' @param out.sample  Number of days before the last for out of sample prediction.
 #'
@@ -25,7 +25,7 @@ uniModelPred <- function(data, uniModel, out.sample) {
   }
 
   # one-step ahead prediction using MARSS
-  y.pred <- marss_predict(data, uniModel)
+  y.pred <- exp(marss_predict(log(data), uniModel))
   y.pred.out.sample <- tail(y.pred, nrow(data) * out.sample)
 
   return(y.pred.out.sample)

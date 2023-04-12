@@ -18,7 +18,7 @@ plot_decomposition <- function(data, filter_result) {
   data <- as.matrix(data) # convert df to matrix
   plt.data.log <- 
     data.frame(
-      signal = as.vector(data),
+      signal = log(as.vector(data)),
       daily = filter_result$daily,
       seasonal = filter_result$seasonal,
       dynamic = filter_result$dynamic,
