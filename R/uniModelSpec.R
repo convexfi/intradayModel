@@ -24,13 +24,13 @@
 #' @param fixed.pars List of values of fixed parameters. The elements in the list specify the values for the unknown parameters. 
 #' The list elements should be a subset of following ones: 
 #' * a_eta: \eqn{a^{\eta}}, contains a double;
-#' * a_mu: \eqn{a^{\mu}},contains a double;
-#' * var_eta: \eqn{\sigma^{\eta}},contains a double;
-#' * var_mu: \eqn{a\sigma^{\mu}},contains a double;
-#' * r: \eqn{r},a scalar;
+#' * a_mu: \eqn{a^{\mu}}, contains a double;
+#' * var_eta: \eqn{\sigma^{\eta}}, contains a double;
+#' * var_mu: \eqn{\sigma^{\mu}}, contains a double;
+#' * r: \eqn{r}, contains a double;
 #' * phi: \eqn{\phi = [\phi_1,\dots, \phi_I]^\top}, contains I doubles;
-#' * x0: \eqn{\overline{\mathbf{x}}_0}, contains 2 doubles;
-#' * V0: \eqn{\mathbf{V}_0}, contains 3 doubles, corresponding to the \eqn{\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2)}.
+#' * x0: \eqn{\overline{\mathbf{x}}_0}, contains two doubles;
+#' * V0: \eqn{\mathbf{V}_0}, contains three doubles, corresponding to the \eqn{\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2)}.
 #' The paramters without a fixed value in \code{uniModelSpec} should be fitted with \code{uniModelFit}.
 #' @param init.pars List of initial values of unfixed parameters. The elements are the same with \code{fixed.pars}. 
 #' The unfixed paramters without a specified initial value will be given an default initial value in \code{uniModelFit}.

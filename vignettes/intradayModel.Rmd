@@ -29,10 +29,10 @@ opts_chunk$set(
   fig.align = "center",
   fig.retina = 2,
   out.width = "85%",
-  dpi = 96#,
-  # pngquant = "--speed=1"
+  dpi = 96,
+  pngquant = "--speed=1"
 )
-# knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
+knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
 options(width=100)
 ```
 
@@ -147,6 +147,23 @@ init.pars$"a_eta" <- 1
 # define the uniModel
 modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
 ```
+The components in `fixed.pars` and `init.pars` have the following corresponding relationship as follows:
+
+- `a_eta`: $a^{\eta}$, contains a double;
+
+- `a_mu`: $a^{\mu}$, contains a double;
+
+- `var_eta`: $\sigma^{\eta}$, contains a double;
+
+- `var_mu`: $\sigma^{\mu}$, contains a double;
+
+- `r`: $r$, contains a double;
+- `phi`: $\phi = [\phi_1,\dots, \phi_I]^\top$, contains I doubles;
+
+- `x0`: $\overline{\mathbf{x}}_0$, contains two doubles;
+
+- `V0`: $\mathbf{V}_0$, contains three doubles, corresponding to the $\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2)$.
+
 If we already know all parameters' values, then we should set the argument `fit = FALSE`:
 
 ## Fit a model
