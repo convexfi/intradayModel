@@ -119,7 +119,8 @@ specify_marss <- function(...) {
 
   ## MARSS model
   marss_model$model.gen <- list(Z = Z, R = R, A = At, B = Bt, Q = Qt, U = U, x0 = x0, V0 = V0, tinitx = 1)
-  marss_obj <- MARSS::MARSS(data.reform, model = marss_model$model.gen, inits = marss_model$init.gen, fit = FALSE)
+  marss_obj <- MARSS::MARSS(data.reform, model = marss_model$model.gen, 
+                            inits = marss_model$init.gen, fit = FALSE, silent = TRUE)
 
   return(marss_obj)
 }
