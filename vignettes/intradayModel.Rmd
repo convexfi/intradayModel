@@ -68,21 +68,23 @@ Let's use the first 104 trading days to fit the model, and the last 20 days to e
 ```{r}
 data <- AAPL_volume
 data_train <- AAPL_volume[, 1:104]
-modelSpec_fit <- uniModelFit(data_train, modelSpec, acceleration = TRUE, verbose = 2)
+modelSpec_fit <- uniModelFit(data_train, modelSpec, 
+                             acceleration = TRUE, verbose = 0)
 ```
 
 To evaluate the fitting performance, we use the fitted model to decompose the intraday volume:
 
 ```{r}
 components <- uniModelFilter(data_train, modelSpec_fit)
-fig <- plot_decomposition(data_train, components)
-print(fig)
+plot_decomposition(data_train, components)
 ```
 
 With the fitted model, we can do one-bin-ahead prediction and evaluate its accuracy.
 
 ```{r}
-volume_pred <- uniModelPred(data, modelSpec_fit, out.sample = 20)
+predict_result <- uniModelPred(data, modelSpec_fit, out.sample = 20)
+predict_result$measure
+predict_result$plot
 ```
 
 <!-- # Details (refer to rugarch vignette) -->
