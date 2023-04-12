@@ -113,6 +113,43 @@ plot_decomposition <- function(data, filter_result) {
   return(fig)
 }
 
+plot_prediction <- function(signal_real, signal_pred) {
+  plt.data.log <- 
+    data.frame(
+      real = log(signal_real),
+      pred = log(signal_pred),
+      i = 1:length(signal_real)
+    ) %>%
+    reshape2::melt(
+      id.vars = c("i"),
+      variable.name = "type", value.name = "signal"
+    ) 
+  
+  text_size = 13
+  p <- plt.data.log %>%
+    ggplot() +
+    geom_line(aes(x = i, y = signal, color = type), alpha = 0.8, size = 0.4) +
+    scale_colour_manual(values = c(real = "steelblue", pred = "#FD6467")) +
+    xlab(expression(tau)) +
+    ylab("Intraday\nSignal") +
+    theme_bw() +
+    theme(
+      axis.title = element_text(size = text_size, face = "bold"),
+      legend.position =  c(.8, .9),
+      legend.justification = c(0, 1),
+      legend.text = element_text(size = text_size, face = "bold"),
+      legend.title = element_blank(),
+      legend.key.size = unit(1, "cm"),
+      plot.title = element_text(size=18, face = "bold", hjust = 0.5),
+      axis.title.x=element_blank(),
+      axis.text.x=element_blank()
+    ) + 
+    plot_annotation(title = "One-bin-ahead prediction (log scale)",
+                    theme =  theme(plot.title = element_text(size=16, face = "bold", hjust = 0.5)))
+  
+  return(p)
+}
+
 
 # uniModelPlot <- function(data, filter.result, type){
 #   data.reform <- data %>%

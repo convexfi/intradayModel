@@ -5,8 +5,8 @@ test_that("uniModelFilter, stock = ADBE", {
   modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   data.pred <- exp(readRDS("data/ADBE_log_volume_pred"))
-  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20))
-  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20))
+  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
+  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -27,8 +27,8 @@ test_that("uniModelFilter, ACN", {
   modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   data.pred <- exp(readRDS("data/ACN_log_volume_pred"))
-  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20))
-  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20))
+  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
+  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
   log_volume_real <- log(tail(as.vector(as.matrix(data.pred)), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -51,8 +51,8 @@ test_that("uniModelFilter, stock = CVS", {
   modelSpec.fit_acc <- uniModelFit(data, modelSpec_v2, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   data.pred <- exp(readRDS("data/CVS_log_volume_pred"))
-  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20))
-  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20))
+  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
+  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)

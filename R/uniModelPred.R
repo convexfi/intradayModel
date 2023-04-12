@@ -25,13 +25,26 @@ uniModelPred <- function(data, uniModel, out.sample) {
   }
 
   # one-step ahead prediction using MARSS
-  y.pred <- exp(marss_predict(log(data), uniModel))
-  y.pred.out.sample <- tail(y.pred, nrow(data) * out.sample)
+  signal_pred <- exp(marss_predict(log(data), uniModel, out.sample))
+  
+  # error measures
+  signal_real <- tail(as.vector(as.matrix(data)), nrow(data) * out.sample)
+  measure <- data.frame(mae = calculate_mae(signal_real, signal_pred),
+                        mape = calculate_mape(signal_real, signal_pred),
+                        rmse = calculate_rmse(signal_real, signal_pred))
+  
+  # plot
+  plot <- plot_prediction(signal_real, signal_pred)
 
-  return(y.pred.out.sample)
+  res <- list(signal_pred = signal_pred,
+              signal_real = signal_real,
+              measure = measure,
+              plot = plot)
+  
+  return(res)
 }
 
-marss_predict <- function(data, uniModel) {
+marss_predict <- function(data, uniModel, out.sample) {
   data <- as.matrix(data)
   args <- list(
     data = data,
@@ -43,7 +56,8 @@ marss_predict <- function(data, uniModel) {
   x_pred <- Kf[["xtt1"]]
   seasonal <- uniModel$par$phi[, 1]
   names(seasonal) <- NULL
-  y.pred <- x_pred[1, ] + x_pred[2, ] + rep(seasonal, ncol(data))
-
-  return(y.pred)
+  y_pred <- x_pred[1, ] + x_pred[2, ] + rep(seasonal, ncol(data))
+  y_pred <- tail(y_pred, nrow(data) * out.sample)
+  
+  return(y_pred)
 }
