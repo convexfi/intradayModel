@@ -3,7 +3,7 @@
 #' @description The main function for fitting state-space models. 
 #' Two kinds of Expectation-Maximization (EM) algorithms are provided.
 #'
-#' @param data n_bin * n_day log trading volume data matrix or data.frame with no NA for fitting.
+#' @param data n_bin * n_day trading volume data matrix or data.frame with no NA for fitting.
 #' @param uniModel uniModel object from function \code{uniModelSpec}.
 #' @param maxit Maximum number of iterations (default is \code{3000}).
 #' @param abstol Absolute tolerance on the objective function to be used as the stopping criteria (default is \code{1e-4}).
@@ -50,7 +50,7 @@ uniModelFit <- function(data, uniModel,
 
   # specify MARSS-format model
   args <- list(
-    data = data,
+    data = log(data),
     uniModel = uniModel
   )
   marss_obj <- do.call(specify_marss, args)
