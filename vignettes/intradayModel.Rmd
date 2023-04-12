@@ -6,7 +6,8 @@ author: |
 date: "`r Sys.Date()`"
 output: 
   cleanrmd::html_document_clean:
-    theme: bamboo
+    theme: "bamboo"
+    mathjax: local
     toc: yes
     toc_depth: 2
 csl: apalike.csl # springer-socpsych-author-date.csl
@@ -28,10 +29,10 @@ opts_chunk$set(
   fig.align = "center",
   fig.retina = 2,
   out.width = "85%",
-  dpi = 96,
-  pngquant = "--speed=1"
+  dpi = 96#,
+  # pngquant = "--speed=1"
 )
-knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
+# knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
 options(width=100)
 ```
 
@@ -44,7 +45,8 @@ body {
 }
 ```
 
------------
+------------------------------------------------------------------------
+
 > This vignette illustrates the usage of the package `intradayModel` for modeling and prediction of intraday trading volume and volatility.
 
 # Quick Start
@@ -87,7 +89,75 @@ log_volume_pred <- uniModelPred(data, modelSpec_fit, out.sample = 20)
 
 <!-- # Details (refer to rugarch vignette) -->
 
+# Usage of the package
 
-# References {-}
+This package can be used to fit a univariate state-space model for intraday trading volume. Besides, it can be used to predict the one-bin-ahead prediction and decomposition of the intraday volume.
 
+## Datasets
+
+To use this package, the time series object without missing values should be a n_bin \* n_day numeric matrix. For convenience, the package contains a time series object:
+
+intraday trading volume: `AAPL_volume` is a matrix containing the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 123 trading days. Each column includes 26 records of intraday volume at a trading day.
+
+```{r}
+library(intradayModel)
+data(AAPL_volume)
+```
+
+## Define a model
+
+This section discusses the specification of model via a call to the `uniModelSpec` function.
+$$
+\begin{aligned}
+\mathbf{x}_{t+1} &= \mathbf{A}_{t}\mathbf{x}_{t} + \mathbf{w}_{t},\\
+y_{t} &= \mathbf{C}\mathbf{x}_{t} + \phi_{t} + v_t,
+\end{aligned}
+$$
+where:
+
+- $\mathbf{x}_{t} = [\eta_{t}, \mu_{t}]^\top$ is the hidden state vector containing the daily average part and the intraday dynamic part;
+
+- $\mathbf{A}_{t} = \left[\begin{array}{l}a_t^{\eta}&0\\0&a^{\mu}\end{array} \right]$ is the state transition matrix with $a_t^{\eta} = \begin{cases}a^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}$, $I$ is the number of intervals (referred to as bins) within a day;
+
+- $\mathbf{C} = [1, 1]$ is the observation matrix;
+
+- $\mathbf{w}_{t} = [\epsilon_t^{\eta},\epsilon_t^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{t})$ represents the i.i.d. Gaussian noise in the state transition, with diagonal covariance matrix $\mathbf{Q}_{t} = \left[\begin{array}{l}(\sigma_t^{\eta})^2&0\\0&(\sigma_t^{\mu})\end{array} \right]$ and $\sigma_t^{\eta} = \begin{cases}\sigma^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}$;
+
+- $v_t \sim \mathcal{N}(0, r)$ is the i.i.d. Gaussian noise in the observation;
+
+- $\mathbf{x}_0$ is the initial state, and it is assumed to follow $\mathcal{N}(\overline{\mathbf{x}}_0, \mathbf{V}_0)$.
+
+In the proposed model, $\overline{\mathbf{x}}_0, \mathbf{V}_0, \mathbf{A}_{t},\mathbf{Q}_{t},r$ and the seasonality $\phi = [\phi_1,\dots, \phi_I]^\top$ are treated as the unknown parameters.
+
+We start with the function `uniModelSpec` to define a state-space model without any fixed parameters or given initial value:
+```{r}
+modelSpec <- uniModelSpec(fit = TRUE)
+```
+If we already know the values for some parameters or want to specify the initial guess for certain parameters, then we can set the argument `fixed.par` and `init.par`:
+```{r}
+# set fixed value
+fixed.pars <- list()
+fixed.pars$"var_eta" <- 4
+fixed.pars$"x0" <- matrix(c(10, 0), 2)
+
+# set initial value 
+init.pars <- list()
+init.pars$"a_eta" <- 1
+
+# define the uniModel
+modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
+```
+If we already know all parameters' values, then we should set the argument `fit = FALSE`:
+
+## Fit a model
+Once a `uniModelSpec` has been defined, the `uniModelFit` function can be applied:
+
+It is important to note the argument `acceleration`, which indicates whether a fast method is to be used to estimate the parameters (by default, it is `FALSE`).
+
+## Predict
+
+
+## Decomposition
+
+# References {.unnumbered}
 
