@@ -49,10 +49,10 @@ body {
 
 # Quick Start
 
-Let's load our package and the sample data: the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 123 trading days. Each column includes 26 records of intraday volume at a trading day.
+Let's load our package and the sample data: the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 124 trading days. Each column contains 26 records of intraday volume at a trading day.
 
 ```{r}
-library(intradayModel)
+devtools::load_all() # why here cannot use library(intradayModel)
 data(AAPL_volume)
 dim(AAPL_volume)
 ```
@@ -63,26 +63,26 @@ We define a univariate state-space model for the intraday signal by
 modelSpec <- uniModelSpec(fit = TRUE)
 ```
 
-Let's use the first 103 trading days to fit the model, and the last 20 days to evaluate the prediction performance. To fit the model using the accelerated EM algorithm, we call
+Let's use the first 104 trading days to fit the model, and the last 20 days to evaluate the prediction performance. To fit the model using the accelerated EM algorithm, we call
 
 ```{r}
-data <- log(AAPL_volume)
-data_train <- log(AAPL_volume[, 1:104])
-modelSpec_fit <- uniModelFit(data_train, modelSpec, acceleration = TRUE)
+data <- AAPL_volume
+data_train <- AAPL_volume[, 1:104]
+modelSpec_fit <- uniModelFit(data_train, modelSpec, acceleration = TRUE, verbose = 2)
 ```
 
 To evaluate the fitting performance, we use the fitted model to decompose the intraday volume:
 
 ```{r}
 components <- uniModelFilter(data_train, modelSpec_fit)
-# fig <- plot_decomposition(data_train, components)
-# print(fig)
+fig <- plot_decomposition(data_train, components)
+print(fig)
 ```
 
 With the fitted model, we can do one-bin-ahead prediction and evaluate its accuracy.
 
 ```{r}
-log_volume_pred <- uniModelPred(data, modelSpec_fit, out.sample = 20)
+volume_pred <- uniModelPred(data, modelSpec_fit, out.sample = 20)
 ```
 
 <!-- # Details (refer to rugarch vignette) -->

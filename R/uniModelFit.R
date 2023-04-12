@@ -11,6 +11,7 @@
 #' If \code{TRUE}, a \code{uniModel} object with convergence log is returned (default is \code{TRUE}).
 #' @param acceleration Logical value indicating whether to use accelerated Expectation-Maximization (EM) algorithm. 
 #' If \code{TRUE}, accelerated EM algorithm is used (default is \code{FALSE}).  
+#' @param verbose
 #'
 #' @return A list containing the following elements (if the algorithm converges):
 #' \item{\code{par}}{Values of fixed parameters.}
@@ -35,7 +36,8 @@
 #' @importFrom magrittr %>%
 #' @export
 uniModelFit <- function(data, uniModel,
-                        maxit = 3000, abstol = 1e-4, log.switch = TRUE, acceleration = FALSE) {
+                        maxit = 3000, abstol = 1e-4, log.switch = TRUE, acceleration = FALSE,
+                        verbose = 1) {
 
   # error control
   if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
@@ -59,7 +61,9 @@ uniModelFit <- function(data, uniModel,
   # fit parameters with EM algorithm
   args <- append(args, list(
     marss_obj = marss_obj,
-    control = list(maxit = maxit, abstol = abstol, log.switch = log.switch, acceleration = acceleration)
+    control = list(maxit = maxit, abstol = abstol, 
+                   log.switch = log.switch, acceleration = acceleration,
+                   verbose = verbose)
   ))
   if (acceleration == FALSE) {
     em_result <- do.call(em_update, args)
@@ -73,6 +77,11 @@ uniModelFit <- function(data, uniModel,
   if (em_result$convergence) {
     uniModel$fit_request[] <- FALSE
     uniModel$init <- list()
+  }
+  
+  # verbose
+  if (verbose >= 2) {
+    str(uniModel$par)
   }
 
   return(uniModel)
@@ -88,6 +97,7 @@ em_update <- function(...) {
   maxit <- control$maxit
   abstol <- control$abstol
   log.switch <- control$log.switch
+  verbose <- control$verbose
 
   n_bin <- nrow(data)
   n_day <- ncol(data)
@@ -119,7 +129,7 @@ em_update <- function(...) {
     # verbose & stopping criteria
     diff <- norm(as.numeric(unlist(curr_par)) -
       as.numeric(unlist(new_par)), type = "2")
-    if (i %% 25 == 0) {
+    if (verbose >= 1 & i %% 25 == 0) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
     if (diff < abstol) {
@@ -142,7 +152,11 @@ em_update <- function(...) {
   marss_obj$par$R <- array(marss_obj$par$R, dim = c(1, 1), dimnames = list("r", NULL))
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
 
-  if (!convergence) warning("No convergence")
+  if (convergence) {
+    cat("EM algorithm converges.\n")
+  } else {
+    warning("No convergence")
+  }
   result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
   return(result)
 }
@@ -157,6 +171,7 @@ em_update_acc <- function(...) {
   maxit <- control$maxit
   abstol <- control$abstol
   log.switch <- control$log.switch
+  verbose <- control$verbose
   
   n_bin <- nrow(data)
   n_day <- ncol(data)
@@ -228,7 +243,7 @@ em_update_acc <- function(...) {
     # verbose & stopping criteria
     diff <- norm(as.numeric(unlist(new_par_1)) -
                    as.numeric(unlist(new_par_2)), type = "2")
-    if (i %% 1 == 0) {
+    if (verbose >= 1 & i %% 1 == 0) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
     if (diff < abstol) {
@@ -251,7 +266,11 @@ em_update_acc <- function(...) {
   marss_obj$par$R <- array(marss_obj$par$R, dim = c(1, 1), dimnames = list("r", NULL))
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
-  if (!convergence) warning("No convergence")
+  if (convergence) {
+    cat("EM algorithm converges.\n")
+  } else {
+    warning("No convergence")
+  }
   result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
   return(result)
 }
