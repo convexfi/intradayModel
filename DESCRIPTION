@@ -23,16 +23,17 @@ Imports:
     magrittr,
     MARSS,
     patchwork,
+    reshape2,
     rlist,
     wesanderson
 Suggests:
     knitr,
     prettydoc,
-    reshape2,
     rmarkdown,
     R.rsp,
     testthat (>= 3.0.0),
-    xts
+    xts,
+    cleanrmd
 VignetteBuilder:
     knitr,
     rmarkdown,
