@@ -20,29 +20,32 @@
 #' @md
 #'
 #' @param fit Logical value indicating whether the model need to be fitted (default is \code{FALSE}). 
-#' If \code{FLASE}, all unknown parameters should be assigned a fixed value in \code{fixed.pars}.
+#'            If \code{FLASE}, all unknown parameters should be assigned a fixed value in \code{fixed.pars}.
 #' @param fixed.pars List of values of fixed parameters. The elements in the list specify the values for the unknown parameters. 
-#' The list elements should be a subset of following ones: 
-#' * a_eta: \eqn{a^{\eta}}, contains a double;
-#' * a_mu: \eqn{a^{\mu}}, contains a double;
-#' * var_eta: \eqn{\sigma^{\eta}}, contains a double;
-#' * var_mu: \eqn{\sigma^{\mu}}, contains a double;
-#' * r: \eqn{r}, contains a double;
-#' * phi: \eqn{\phi = [\phi_1,\dots, \phi_I]^\top}, contains I doubles;
-#' * x0: \eqn{\overline{\mathbf{x}}_0}, contains two doubles;
-#' * V0: \eqn{\mathbf{V}_0}, contains three doubles, corresponding to the \eqn{\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2)}.
-#' The paramters without a fixed value in \code{uniModelSpec} should be fitted with \code{uniModelFit}.
+#'                   The list elements should be a subset of following ones: 
+#'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}, contains a double;}
+#'                           \item{\code{"a_mu"}: \eqn{a^{\mu}}, contains a double;}
+#'                           \item{\code{"var_eta"}: \eqn{\sigma^{\eta}}, contains a double;}
+#'                           \item{\code{"var_mu"}: \eqn{\sigma^{\mu}}, contains a double;}
+#'                           \item{\code{"r"}: \eqn{r}, contains a double;}
+#'                           \item{\code{"phi"}: \eqn{\phi = [\phi_1,\dots, \phi_I]^\top}, contains I doubles;}
+#'                           \item{\code{"x0"}: \eqn{\overline{\mathbf{x}}_0}, contains two doubles;}
+#'                           \item{\code{"V0"}: \eqn{\mathbf{V}_0}, contains three doubles, corresponding to the 
+#'                                              \eqn{\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2).}}
+#'                   The parameters without a fixed value in \code{uniModelSpec} should be fitted with \code{uniModelFit}.
 #' @param init.pars List of initial values of unfixed parameters. The elements are the same with \code{fixed.pars}. 
-#' The unfixed paramters without a specified initial value will be given an default initial value in \code{uniModelFit}.
+#'                  The unfixed parameters without specified initial values will be given default initial values in \code{uniModelFit}.
 #'
 #' @return A list containing the following elements:
-#' \item{\code{par}}{Values of fixed parameters.}
-#' \item{\code{init}}{Initial values of unfixed parameters.}
-#' \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not.}
+#'         \item{\code{par}}{Values of fixed parameters.}
+#'         \item{\code{init}}{Initial values of unfixed parameters.}
+#'         \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not.}
 #' 
 #' @author Shengjie Xiu and Yifan Yu
+#' 
 #' @references
 #' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+#' 
 #' @seealso \code{\link{uniModelFit}}, \code{\link{uniModelFilter}}, \code{\link{uniModelPred}}
 #'
 #' @examples
