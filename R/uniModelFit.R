@@ -1,46 +1,55 @@
 #' @title Fit a uniModel via Expectation-Maximization algorithm
 #' 
 #' @description The main function for fitting state-space models. 
-#' Two kinds of Expectation-Maximization (EM) algorithms are provided.
+#'              Two kinds of Expectation-Maximization (EM) algorithms are provided.
 #'
-#' @param data n_bin * n_day trading volume data matrix or data.frame with no NA for fitting.
+#' @param data n_bin * n_day trading volume data matrix with no NA.
 #' @param uniModel uniModel object from function \code{uniModelSpec}.
 #' @param maxit Maximum number of iterations (default is \code{3000}).
 #' @param abstol Absolute tolerance on the objective function to be used as the stopping criteria (default is \code{1e-4}).
 #' @param log.switch Logical value indicating whether to record the history of convergence progress. 
-#' If \code{TRUE}, a \code{uniModel} object with convergence log is returned (default is \code{TRUE}).
+#'                   If \code{TRUE}, a \code{uniModel} object with convergence log is returned (default is \code{TRUE}).
 #' @param acceleration Logical value indicating whether to use accelerated Expectation-Maximization (EM) algorithm. 
-#' If \code{TRUE}, accelerated EM algorithm is used (default is \code{FALSE}).  
-#' @param verbose
-#'
+#'                     If \code{TRUE}, accelerated EM algorithm is used (default is \code{FALSE}).  
+#' @param verbose An integer specifying the level of information output during the algorithm iterations.
+#'                \itemize{\item{\code{"0"}: output nothing;}
+#'                    \item{\code{"1"}: output the iteration precision;}
+#'                    \item{\code{"2"}: output the iteration precision and the final model object;}}
+#'                (default is \code{1}).
 #' @return A list containing the following elements (if the algorithm converges):
-#' \item{\code{par}}{Values of fixed parameters.}
-#' \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not. 
-#'                           If the EM algorithm converges, all components of \code{fit_request} are \code{FALSE}.}
-#' \item{\code{par_log}}{List of parameter values during the convergence.} 
-#' If the algorithm does not converge, the return is the original input argument uniModel with unfixed parameters.                        
+#'         \item{\code{par}}{Values of fixed parameters.}
+#'         \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not. 
+#'                                   If the EM algorithm converges, all components of \code{fit_request} are \code{FALSE}.}
+#'         \item{\code{par_log}}{List of parameter values during the convergence if \code{log.switch = TRUE}.} 
+#'         If the algorithm does not converge, the original input uniModel with unfixed parameters is returned. 
+#'                                
 #' @author Shengjie Xiu and Yifan Yu
+#' 
 #' @references
 #' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+#' 
 #' @seealso \code{\link{uniModelSpec}}
+#' 
 #' @examples
 #' library(intradayModel)
 #' # load the data
-#' data("data_log_volume")
+#' data("AAPL_volume")
 #' 
 #' # define the uniModel
 #' modelSpec <- uniModelSpec(fit = TRUE)
 #' 
 #' # fit the model
 #' modelSpec.fit <- uniModelFit(data_log_volume, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' 
 #' @importFrom magrittr %>%
+#' 
 #' @export
 uniModelFit <- function(data, uniModel,
                         maxit = 3000, abstol = 1e-4, log.switch = TRUE, acceleration = FALSE,
                         verbose = 1) {
 
   # error control
-  if (!is.matrix(data) && !is.data.frame(data)) stop("data must be a matrix or data.frame.")
+  if (!is.matrix(data)) stop("data must be a matrix.")
   if (anyNA(data)) stop("data must have no NA.")
   is_uniModel(uniModel, nrow(data))
 
