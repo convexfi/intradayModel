@@ -43,6 +43,11 @@ body {
   max-width: 750px;
   padding: 2rem;
 }
+
+/* math is smaller */
+.math {
+  font-size: small;
+}
 ```
 
 ------------------------------------------------------------------------
