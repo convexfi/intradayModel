@@ -1,19 +1,7 @@
-#' @title Create plot from `uniModelfilter` result
-#' 
-#' @description After performing a filtering step with \code{\link{uniModelfilter}} 
-#' this function creates four plots (daily average part, intraday dynamic part, seasonality and intraday volume) 
-#' from the input data and decomposition result. 
-#' @param data The same data used in the \code{\link{uniModelfilter}}. 
-#' @param filter.result Decomposition result as obtained from the function \code{uniModelfilter}.
-#'
-#' @author Shengjie Xiu and Yifan Yu
-#' @seealso \code{\link{uniModelfilter}}
 #' @import wesanderson
 #' @import patchwork 
 #' @import ggplot2
 #' @importFrom magrittr %>%
-#'
-#' @examples
 plot_decomposition <- function(data, filter_result) {
   data <- as.matrix(data) # convert df to matrix
   plt.data.log <- 
@@ -113,6 +101,9 @@ plot_decomposition <- function(data, filter_result) {
   return(fig)
 }
 
+#' @import wesanderson
+#' @import ggplot2
+#' @importFrom magrittr %>%
 plot_prediction <- function(signal_real, signal_pred) {
   plt.data.log <- 
     data.frame(
