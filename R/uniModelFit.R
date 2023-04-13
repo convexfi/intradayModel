@@ -336,15 +336,15 @@ em_one_loop <- function(input_par, info) {
            },
            "r" = {
              if ("phi" %in% info$unfitted_pars) {
-               phi.matrix <- rep(matrix(new_par$A, nrow = 1), info$n_day)
+               phi_matrix <- rep(matrix(new_par$A, nrow = 1), info$n_day)
              } else {
-               phi.matrix <- unlist(uniModel$par[["phi"]])
+               phi_matrix <- unlist(uniModel$par[["phi"]])
              } # need input
              new_par$R <- mean(info$data_reform^2 + apply(Pt, 3, function(p) info$Z_matrix %*% p %*% t(info$Z_matrix)) -
                                   2 * info$data_reform * as.numeric(info$Z_matrix %*% Kf$xtT) +
-                                  phi.matrix^2 -
-                                  2 * info$data_reform * phi.matrix +
-                                  2 * phi.matrix * as.numeric(info$Z_matrix %*% Kf$xtT))
+                                  phi_matrix^2 -
+                                  2 * info$data_reform * phi_matrix +
+                                  2 * phi_matrix * as.numeric(info$Z_matrix %*% Kf$xtT))
            },
            "a_eta" = {
              new_par$B["a_eta", 1] <- sum(Ptt1[1, 1, info$jump_interval]) /
