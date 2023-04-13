@@ -81,8 +81,8 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   uniModel$init <- list()
 
   # read in input parameters
-  fixed.pars <- cleanParsList(fixed.pars)
-  init.pars <- cleanParsList(init.pars)
+  fixed.pars <- clean_pars_list(fixed.pars)
+  init.pars <- clean_pars_list(init.pars)
   for (name in all_pars_name) {
     if (name %in% names(fixed.pars)) {
       uniModel$par[[name]] <- fixed.pars[[name]]

@@ -124,11 +124,21 @@ em_update <- function(...) {
   unfitted_pars <- names(uniModel$fit_request[uniModel$fit_request == TRUE])
 
   # EM algorithm
-  environment(em_one_loop) <- environment() # pass current environment to nested fcn
+  info <- list()
+  info$marss_obj <- marss_obj
+  info$n_bin <- n_bin
+  info$n_day <- n_day
+  info$n_bin_total <- n_bin_total
+  info$Z_matrix <- Z_matrix
+  info$jump_interval <- jump_interval
+  info$data_reform <- data_reform
+  info$y_daily_matrix <- y_daily_matrix
+  info$unfitted_pars <- unfitted_pars
+  
   curr_par <- marss_obj$par
   for (i in 1:maxit) {
     # EM parameter updates
-    new_par <- em_one_loop(curr_par)
+    new_par <- em_one_loop(curr_par, info)
     
     # logging
     if (log.switch == TRUE) {
@@ -198,12 +208,22 @@ em_update_acc <- function(...) {
   unfitted_pars <- names(uniModel$fit_request[uniModel$fit_request == TRUE])
   
   # EM algorithm
-  environment(em_one_loop) <- environment() # pass current environment to nested fcn
+  info <- list()
+  info$marss_obj <- marss_obj
+  info$n_bin <- n_bin
+  info$n_day <- n_day
+  info$n_bin_total <- n_bin_total
+  info$Z_matrix <- Z_matrix
+  info$jump_interval <- jump_interval
+  info$data_reform <- data_reform
+  info$y_daily_matrix <- y_daily_matrix
+  info$unfitted_pars <- unfitted_pars
+
   curr_par <- marss_obj$par
   for (i in 1:maxit) {
     # EM parameter updates
-    new_par_1 <- em_one_loop(input_par = curr_par)
-    new_par_2 <- em_one_loop(input_par = new_par_1)
+    new_par_1 <- em_one_loop(input_par = curr_par, info)
+    new_par_2 <- em_one_loop(input_par = new_par_1, info)
     new_par <- curr_par
     
     # vector-wise acceleration for intraday periodic
@@ -285,22 +305,22 @@ em_update_acc <- function(...) {
 }
 
 # A single em iteration
-em_one_loop <- function(input_par) {
-  marss_obj$par <- input_par
+em_one_loop <- function(input_par, info) {
+  info$marss_obj$par <- input_par
   
   # Kalman filter & smoother
-  Kf <- MARSS::MARSSkfas(marss_obj)
-  new_par <- marss_obj$par
+  Kf <- MARSS::MARSSkfas(info$marss_obj)
+  new_par <- info$marss_obj$par
   
   # update parameter estimation
-  Pt <- Ptt1 <- array(NA, c(2, 2, n_bin_total))
-  for (n in 1:n_bin_total) {
+  Pt <- Ptt1 <- array(NA, c(2, 2, info$n_bin_total))
+  for (n in 1:info$n_bin_total) {
     Pt[, , n] <- Kf$VtT[, , n] + Kf$xtT[, n] %*% t(Kf$xtT[, n])
   }
-  for (n in 2:n_bin_total) {
+  for (n in 2:info$n_bin_total) {
     Ptt1[, , n] <- Kf$Vtt1T[, , n] + Kf$xtT[, n] %*% t(Kf$xtT[, n - 1])
   }
-  for (name in unfitted_pars) {
+  for (name in info$unfitted_pars) {
     switch(name,
            "x0" = {
              new_par$x0 <- Kf$x0T
@@ -311,54 +331,51 @@ em_one_loop <- function(input_par) {
              new_par$V0[3] <- Kf$V0T[2, 2]
            },
            "phi" = {
-             new_par$A <- rowMeans(y_daily_matrix - matrix(Z_matrix %*% Kf$xtT, nrow = n_bin))
+             new_par$A <- rowMeans(info$y_daily_matrix - matrix(info$Z_matrix %*% Kf$xtT, nrow = info$n_bin))
              new_par$A <- new_par$A - mean(new_par$A)
            },
            "r" = {
-             if ("phi" %in% unfitted_pars) {
-               phi.matrix <- rep(matrix(new_par$A, nrow = 1), n_day)
+             if ("phi" %in% info$unfitted_pars) {
+               phi_matrix <- rep(matrix(new_par$A, nrow = 1), info$n_day)
              } else {
-               phi.matrix <- unlist(uniModel$par[["phi"]])
+               phi_matrix <- unlist(uniModel$par[["phi"]])
              } # need input
-             new_par$R <- mean(data_reform^2 + apply(Pt, 3, function(p) Z_matrix %*% p %*% t(Z_matrix)) -
-                                  2 * data_reform * as.numeric(Z_matrix %*% Kf$xtT) +
-                                  phi.matrix^2 -
-                                  2 * data_reform * phi.matrix +
-                                  2 * phi.matrix * as.numeric(Z_matrix %*% Kf$xtT))
+             new_par$R <- mean(info$data_reform^2 + apply(Pt, 3, function(p) info$Z_matrix %*% p %*% t(info$Z_matrix)) -
+                                  2 * info$data_reform * as.numeric(info$Z_matrix %*% Kf$xtT) +
+                                  phi_matrix^2 -
+                                  2 * info$data_reform * phi_matrix +
+                                  2 * phi_matrix * as.numeric(info$Z_matrix %*% Kf$xtT))
            },
            "a_eta" = {
-             new_par$B["a_eta", 1] <- sum(Ptt1[1, 1, jump_interval]) /
-               sum(Pt[1, 1, jump_interval - 1])
+             new_par$B["a_eta", 1] <- sum(Ptt1[1, 1, info$jump_interval]) /
+               sum(Pt[1, 1, info$jump_interval - 1])
            },
            "a_mu" = {
-             new_par$B["a_mu", 1] <- sum(Ptt1[2, 2, 2:n_bin_total]) /
-               sum(Pt[2, 2, 1:(n_bin_total - 1)])
+             new_par$B["a_mu", 1] <- sum(Ptt1[2, 2, 2:info$n_bin_total]) /
+               sum(Pt[2, 2, 1:(info$n_bin_total - 1)])
            },
            "var_eta" = {
-             if ("a_eta" %in% unfitted_pars) {
+             if ("a_eta" %in% info$unfitted_pars) {
                curr_a_eta <- new_par$B["a_eta", 1]
              } else {
                curr_a_eta <- uniModel$par[["a_eta"]]
              } # need input
-             new_par$Q["var_eta", 1] <- mean(Pt[1, 1, jump_interval] +
-                                                curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
-                                                2 * curr_a_eta * Ptt1[1, 1, jump_interval])
+             new_par$Q["var_eta", 1] <- mean(Pt[1, 1, info$jump_interval] +
+                                                curr_a_eta^2 * Pt[1, 1, info$jump_interval - 1] -
+                                                2 * curr_a_eta * Ptt1[1, 1, info$jump_interval])
            },
            "var_mu" = {
-             if ("a_mu" %in% unfitted_pars) {
+             if ("a_mu" %in% info$unfitted_pars) {
                curr_a_mu <- new_par$B["a_mu", 1]
              } else {
                curr_a_mu <- uniModel$par[["a_mu"]]
              } # need input
-             new_par$Q["var_mu", 1] <- mean(Pt[2, 2, 2:n_bin_total] +
-                                               curr_a_mu^2 * Pt[2, 2, 1:(n_bin_total - 1)] -
-                                               2 * curr_a_mu * Ptt1[2, 2, 2:n_bin_total])
+             new_par$Q["var_mu", 1] <- mean(Pt[2, 2, 2:info$n_bin_total] +
+                                               curr_a_mu^2 * Pt[2, 2, 1:(info$n_bin_total - 1)] -
+                                               2 * curr_a_mu * Ptt1[2, 2, 2:info$n_bin_total])
            }
     )
   }
   
   return(new_par)
 }
-
-
-
