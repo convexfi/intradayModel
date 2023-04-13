@@ -42,8 +42,13 @@ uniModelFilter <- function(data, uniModel) {
 
   # filter using MARSS
   components <- marss_filter(log(data), uniModel)
-
-  return(components)
+  
+  # add decomposition plot
+  plot <- plot_decomposition(data, components)
+  res <- list(components = components,
+              plot = plot)
+  
+  return(res)
 }
 
 marss_filter <- function(data, uniModel) {
