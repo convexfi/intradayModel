@@ -7,7 +7,7 @@ date: "`r Sys.Date()`"
 output: 
   cleanrmd::html_document_clean:
     theme: "bamboo"
-    mathjax: local
+    mathjax: default
     toc: yes
     toc_depth: 2
 csl: apalike.csl # springer-socpsych-author-date.csl
