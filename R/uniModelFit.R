@@ -243,7 +243,7 @@ em_update_acc <- function(...) {
     # verbose & stopping criteria
     diff <- norm(as.numeric(unlist(new_par_1)) -
                    as.numeric(unlist(new_par_2)), type = "2")
-    if (verbose >= 1 & i %% 1 == 0) {
+    if (verbose >= 1 & i %% 5 == 0) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
     if (diff < abstol) {
