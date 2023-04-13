@@ -1,13 +1,13 @@
-test_that("uniModelFilter, stock = ADBE", {
-  data <- readRDS("data/ADBE_log_volume")
+test_that("uniModelPred, stock = ADBE", {
+  data <- exp(readRDS("data/ADBE_log_volume"))
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
-  data.pred <- readRDS("data/ADBE_log_volume_pred")
-  log_volume_pred <- uniModelPred(data.pred, modelSpec.fit, out.sample = 20)
-  log_volume_pred_acc <- uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)
-  log_volume_real <- tail(as.vector(data.pred), 26 * 20)
+  data.pred <- exp(readRDS("data/ADBE_log_volume_pred"))
+  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
+  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
+  log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
   mape <- calculate_mape(log_volume_real, log_volume_pred)
@@ -20,16 +20,16 @@ test_that("uniModelFilter, stock = ADBE", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
-test_that("uniModelFilter, ACN", {
-  data <- readRDS("data/ACN_log_volume")
+test_that("uniModelPred, ACN", {
+  data <- exp(readRDS("data/ACN_log_volume"))
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
-  data.pred <- readRDS("data/ACN_log_volume_pred")
-  log_volume_pred <- uniModelPred(data.pred, modelSpec.fit, out.sample = 20)
-  log_volume_pred_acc <- uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)
-  log_volume_real <- tail(as.vector(as.matrix(data.pred)), 26 * 20)
+  data.pred <- exp(readRDS("data/ACN_log_volume_pred"))
+  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
+  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
+  log_volume_real <- log(tail(as.vector(as.matrix(data.pred)), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
   mape <- calculate_mape(log_volume_real, log_volume_pred)
@@ -42,18 +42,18 @@ test_that("uniModelFilter, ACN", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
-test_that("uniModelFilter, stock = CVS", {
-  data <- readRDS("data/CVS_log_volume")
+test_that("uniModelPred, stock = CVS", {
+  data <- exp(readRDS("data/CVS_log_volume"))
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   
   modelSpec_v2 <- uniModelSpec(fit = TRUE, init.pars = list(a_mu = 0))
   modelSpec.fit_acc <- uniModelFit(data, modelSpec_v2, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
-  data.pred <- readRDS("data/CVS_log_volume_pred")
-  log_volume_pred <- uniModelPred(data.pred, modelSpec.fit, out.sample = 20)
-  log_volume_pred_acc <- uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)
-  log_volume_real <- tail(as.vector(data.pred), 26 * 20)
+  data.pred <- exp(readRDS("data/CVS_log_volume_pred"))
+  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
+  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
+  log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
   mape <- calculate_mape(log_volume_real, log_volume_pred)

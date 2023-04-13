@@ -4,7 +4,7 @@
 #' The seasonality is the value of \eqn{\phi} fitted by the \code{uniModeFit}. Daily average and intraday dynamic are 
 #' the smoothed state estimate at time \eqn{t} conditioned on all the data, i.e., \eqn{\mathbf{x}_t^T}.
 #'
-#' @param data n_bin * n_day log trading volume data matrix or data.frame with no NA.
+#' @param data n_bin * n_day trading volume data matrix or data.frame with no NA.
 #' @param uniModel uniModel object from function \code{uniModelSpec}.
 #'
 #' @return A list containing the following elements:
@@ -41,9 +41,14 @@ uniModelFilter <- function(data, uniModel) {
   }
 
   # filter using MARSS
-  components <- marss_filter(data, uniModel)
-
-  return(components)
+  components <- marss_filter(log(data), uniModel)
+  
+  # add decomposition plot
+  plot <- plot_decomposition(data, components)
+  res <- list(components = components,
+              plot = plot)
+  
+  return(res)
 }
 
 marss_filter <- function(data, uniModel) {
