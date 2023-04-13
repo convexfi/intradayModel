@@ -4,7 +4,7 @@
 #' @importFrom magrittr %>%
 plot_decomposition <- function(data, filter_result) {
   data <- as.matrix(data) # convert df to matrix
-  plt.data.log <- 
+  plt_data_log <- 
     data.frame(
       signal = log(as.vector(data)),
       daily = filter_result$daily,
@@ -14,7 +14,7 @@ plot_decomposition <- function(data, filter_result) {
     )
   
   text_size = 10
-  p1 <- plt.data.log %>%
+  p1 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y= signal), alpha = 0.8, color = "steelblue", size = 0.4) +
     xlab(expression(tau)) +
@@ -34,7 +34,7 @@ plot_decomposition <- function(data, filter_result) {
       axis.text.x=element_blank()
     )
   
-  p2 <- plt.data.log %>%
+  p2 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y= daily), alpha = 0.8, color = "steelblue", size = 0.6) +
     xlab(expression(tau)) +
@@ -54,7 +54,7 @@ plot_decomposition <- function(data, filter_result) {
       axis.text.x=element_blank()
     )
   
-  p3 <- plt.data.log %>%
+  p3 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y= seasonal), alpha = 0.8, color = "steelblue", size = 0.4) +
     xlab(expression(tau)) +
@@ -74,7 +74,7 @@ plot_decomposition <- function(data, filter_result) {
       axis.text.x=element_blank()
     )
   
-  p4 <- plt.data.log %>%
+  p4 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y= dynamic), alpha = 0.8, color = "steelblue", size = 0.4) +
     xlab(expression(tau)) +
@@ -105,7 +105,7 @@ plot_decomposition <- function(data, filter_result) {
 #' @import ggplot2
 #' @importFrom magrittr %>%
 plot_prediction <- function(signal_real, signal_pred) {
-  plt.data.log <- 
+  plt_data_log <- 
     data.frame(
       real = log(signal_real),
       pred = log(signal_pred),
@@ -117,7 +117,7 @@ plot_prediction <- function(signal_real, signal_pred) {
     ) 
   
   text_size = 14
-  p <- plt.data.log %>%
+  p <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y = signal, color = type), alpha = 0.8, size = 0.4) +
     scale_colour_manual(values = c(real = "steelblue", pred = "#FD6467")) +
@@ -146,7 +146,7 @@ plot_prediction <- function(signal_real, signal_pred) {
 #   data.reform <- data %>%
 #     as.list() %>%
 #     unlist()
-#   plt.data.log <-
+#   plt_data_log <-
 #     data.frame(
 #       volume = as.vector(data.reform),
 #       daily = filter.result[["daily"]],
@@ -167,7 +167,7 @@ plot_prediction <- function(signal_real, signal_pred) {
 #           "dynamic" = {y.value = quote(dynamic)
 #           y.lab = "Intraday\nDynamic"}
 #   )
-#   p1 <- plt.data.log %>%
+#   p1 <- plt_data_log %>%
 #     ggplot() +
 #     geom_line(aes(x = i, y= !!y.value), alpha = 0.8, color = "steelblue", size = 0.4) +
 #     xlab(expression(tau)) +
