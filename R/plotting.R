@@ -116,13 +116,13 @@ plot_prediction <- function(signal_real, signal_pred) {
       variable.name = "type", value.name = "signal"
     ) 
   
-  text_size = 13
+  text_size = 14
   p <- plt.data.log %>%
     ggplot() +
     geom_line(aes(x = i, y = signal, color = type), alpha = 0.8, size = 0.4) +
     scale_colour_manual(values = c(real = "steelblue", pred = "#FD6467")) +
     xlab(expression(tau)) +
-    ylab("Intraday\nSignal") +
+    ylab("Intraday Signal") +
     theme_bw() +
     theme(
       axis.title = element_text(size = text_size, face = "bold"),
