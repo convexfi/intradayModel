@@ -103,9 +103,9 @@ This package can be used to fit a univariate state-space model for intraday trad
 
 To use this package, the time series object without missing values should be a n_bin \* n_day numeric matrix. For convenience, the package contains two time series objects:
 
-- `AAPL_volume` is a matrix containing the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 123 trading days. Each column includes 26 records of intraday volume at a trading day.
+- `AAPL_volume` is a matrix containing the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 124 trading days. Each column includes 26 records of intraday volume at a trading day.
 
-- `GE_volume` is a matrix containing the 15-min intraday volume of GE from 2019-01-02 to 2019-06-28, including 123 trading days. Each column includes 26 records of intraday volume at a trading day.
+- `GE_volume` is a matrix containing the 15-min intraday volume of GE from 2019-01-02 to 2019-06-28, including 124 trading days. Each column includes 26 records of intraday volume at a trading day.
 
 ```{r}
 library(intradayModel)
