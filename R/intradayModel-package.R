@@ -8,11 +8,10 @@
 #' \code{\link{uniModelSpec}},
 #' \code{\link{uniModelFit}}, 
 #' \code{\link{uniModelPred}}, 
-#' \code{\link{uniModelFilter}}, 
-#' \code{\link{plot_decomposition}}
+#' \code{\link{uniModelFilter}}
 #'
 #' @section Data:
-#' \code{\link{data_log_volume}}
+#' \code{\link{AAPL_volume}}
 #'
 #' @section Help:
 #' For a quick help see the README file:
