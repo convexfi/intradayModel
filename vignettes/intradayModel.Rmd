@@ -101,13 +101,15 @@ This package can be used to fit a univariate state-space model for intraday trad
 
 ## Datasets
 
-To use this package, the time series object without missing values should be a n_bin \* n_day numeric matrix. For convenience, the package contains a time series object:
+To use this package, the time series object without missing values should be a n_bin \* n_day numeric matrix. For convenience, the package contains two time series objects:
 
-intraday trading volume: `AAPL_volume` is a matrix containing the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 123 trading days. Each column includes 26 records of intraday volume at a trading day.
+- `AAPL_volume` is a matrix containing the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 124 trading days. Each column includes 26 records of intraday volume at a trading day.
+
+- `GE_volume` is a matrix containing the 15-min intraday volume of GE from 2019-01-02 to 2019-06-28, including 124 trading days. Each column includes 26 records of intraday volume at a trading day.
 
 ```{r}
 library(intradayModel)
-data(AAPL_volume)
+data(GE_volume)
 ```
 
 ## Define a model
@@ -137,14 +139,13 @@ In the proposed model, $\overline{\mathbf{x}}_0, \mathbf{V}_0, \mathbf{A}_{t},\m
 
 We start with the function `uniModelSpec` to define a state-space model without any fixed parameters or given initial value:
 ```{r}
-modelSpec <- uniModelSpec(fit = TRUE)
+modelSpec_nofix <- uniModelSpec(fit = TRUE)
 ```
 If we already know the values for some parameters or want to specify the initial guess for certain parameters, then we can set the argument `fixed.par` and `init.par`:
 ```{r}
 # set fixed value
 fixed.pars <- list()
-fixed.pars$"var_eta" <- 4
-fixed.pars$"x0" <- matrix(c(10, 0), 2)
+fixed.pars$"x0" <- matrix(c(13.33, -0.37), 2)
 
 # set initial value 
 init.pars <- list()
@@ -170,17 +171,48 @@ The components in `fixed.pars` and `init.pars` have the following corresponding 
 
 - `V0`: $\mathbf{V}_0$, contains three doubles, corresponding to the $\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2)$.
 
-If we already know all parameters' values, then we should set the argument `fit = FALSE`:
-
 ## Fit a model
-Once a `uniModelSpec` has been defined, the `uniModelFit` function can be applied:
+Once a `uniModelSpec` has been defined, the `uniModelFit` function can be applied. It is important to note the argument `acceleration`, which indicates whether a fast method is to be used to estimate the parameters (by default, it is `FALSE`). The `verbose` controls the level of information output during the algorithm iterations (by default, it is `1`):
 
-It is important to note the argument `acceleration`, which indicates whether a fast method is to be used to estimate the parameters (by default, it is `FALSE`).
+-`0`: output nothing;
+
+- `1`: output the iteration precision;
+
+- `2`: output the iteration precision and the final model object.
+
+```{r}
+data <- AAPL_volume
+data_train <- AAPL_volume[, 1:104]
+modelSpec_fitted <- uniModelFit(data_train, modelSpec, acceleration = TRUE, verbose = 1)
+```
+
+## Filter
+A model object with all parameters fixed can be used to decompose the intraday trading volume into daily average, intraday dynamic and intraday periodic parts (i.e., the seasonality). Daily average and intraday dynamic are the smoothed state estimate at time $t$ conditioned on all the data, $\mathbf{x}_t^T$. The seasonality is the value of $\phi$ fitted by the `uniModeFit`.
+
+The return value contains the decomposition result and plots for components:
+```{r}
+filter_result <- uniModelFilter(data_train, modelSpec_fitted)
+filter_result$plot
+```
 
 ## Predict
+A model object with all parameters fixed can be used for one-step ahead prediction and accuracy evaluation with `uniModelPred`. Three performance measures are used to evaluate the prediction results:
 
+- `Mean absolute error (MAE)` : $\frac{1}{M}\sum_{i=1}^M\lvert\hat{\sigma_i} - \sigma_i\rvert$,
 
-## Decomposition
+- `Mean absolute percent error (MAPE)`: $\frac{1}{M}\sum_{i=1}^M\frac{\lvert\hat{\sigma_i} - \sigma_i\rvert}{\sigma_i}$,
+
+- `Root Mean Square Error (RMSE)`: $\sqrt{\sum_{i=1}^M\frac{\left(\hat{\sigma_i} - \sigma_i\right)^2}{M}}$,
+
+where $\hat{\sigma_i}$ and $\sigma_i$ are the real and predicted values of trading volume and $M$ is the number of bins.
+
+The return value contains the prediction, real value, performance and a plot. We can view the performance and plot:
+
+```{r}
+predict_result <- uniModelPred(data, modelSpec_fitted, out.sample = 20)
+predict_result$measure
+predict_result$plot
+```
 
 # References {.unnumbered}
 
