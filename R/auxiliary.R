@@ -230,7 +230,7 @@ format_unimodel <- function(uniModel) {
 # remove any variable containing NA/inf/non-numeric
 # remove any variable that won't appear in model
 # flatten the variable if user input a high dimension one
-cleanParsList <- function(input_list) {
+clean_pars_list <- function(input_list) {
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0", "phi")
   expected_pars_len <- list(
     "a_eta" = 1, "a_mu" = 1,
@@ -263,7 +263,7 @@ cleanParsList <- function(input_list) {
 
 
 # part of error check for init.pars/fixed.pars
-checkParsList <- function(uniModel, n_bin = NULL) {
+check_pars_list <- function(uniModel, n_bin = NULL) {
   fit_request_list <- uniModel$fit_request
   par_list <- uniModel$par
   init_list <- uniModel$init
@@ -352,7 +352,7 @@ is_uniModel <- function(uniModel, n_bin = NULL) {
 
   
   # Check no NA inf and dimension
-  msg <- checkParsList(uniModel, n_bin)
+  msg <- check_pars_list(uniModel, n_bin)
   if (!is.null(msg)) {
     stop(msg)
   }
