@@ -1,4 +1,4 @@
-test_that("uniModelFilter, stock = ADBE", {
+test_that("uniModelPred, stock = ADBE", {
   data <- exp(readRDS("data/ADBE_log_volume"))
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
@@ -20,7 +20,7 @@ test_that("uniModelFilter, stock = ADBE", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
-test_that("uniModelFilter, ACN", {
+test_that("uniModelPred, ACN", {
   data <- exp(readRDS("data/ACN_log_volume"))
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
@@ -42,7 +42,7 @@ test_that("uniModelFilter, ACN", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
-test_that("uniModelFilter, stock = CVS", {
+test_that("uniModelPred, stock = CVS", {
   data <- exp(readRDS("data/CVS_log_volume"))
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
