@@ -1,5 +1,5 @@
 ---
-title: "Intraday Volume and Volatility: Modeling and Prediction"
+title: "Intraday Market Signal: Modeling and Prediction "
 author: |
   | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
   | The Hong Kong University of Science and Technology (HKUST)
@@ -8,7 +8,7 @@ output:
   cleanrmd::html_document_clean:
     theme: "bamboo"
     mathjax: default
-    toc: yes
+    toc: true
     toc_depth: 2
 csl: apalike.csl # springer-socpsych-author-date.csl
 csl-entry-spacing: 1.2em
@@ -52,167 +52,196 @@ body {
 
 ------------------------------------------------------------------------
 
-> This vignette illustrates the usage of the package `intradayModel` for modeling and prediction of intraday trading volume and volatility.
+> This vignette illustrates the usage of the package `intradayModel`. The package applies state-space models to model and predict intraday market signal, specifically intraday trading volume. The future version of this package will support the intraday volatility.
 
 # Quick Start
 
-Let's load our package and the sample data: the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 124 trading days. Each column contains 26 records of intraday volume at a trading day.
+Let's load our package and the sample data: the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 124 trading days.
 
-```{r}
-devtools::load_all() # why here cannot use library(intradayModel)
+```{r, message = FALSE}
+devtools::load_all()
 data(AAPL_volume)
-dim(AAPL_volume)
 ```
 
-We define a univariate state-space model for the intraday signal by
+We define a univariate state-space model by the `uniModelSpec` method.
 
 ```{r}
-modelSpec <- uniModelSpec(fit = TRUE)
+model <- uniModelSpec(fit = TRUE)
 ```
 
-Let's use the first 104 trading days to fit the model, and the last 20 days to evaluate the prediction performance. To fit the model using the accelerated EM algorithm, we call
+Let's use the first 104 trading days to fit the model, and the last 20 days to evaluate the prediction performance. The model can be fitted to the training data using its `uniModelFit` method.
 
 ```{r}
 data <- AAPL_volume
 data_train <- AAPL_volume[, 1:104]
-modelSpec_fitted <- uniModelFit(data_train, modelSpec, acceleration = TRUE)
+model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
 ```
 
-To evaluate the fitting performance, we use the fitted model to decompose the intraday volume:
+Once the model is fitted, it can be used to decompose intraday trading signal into daily, seasonal, and intraday dynamic components via `uniModelFilter` method.
 
 ```{r}
-filter_result <- uniModelFilter(data_train, modelSpec_fitted)
+filter_result <- uniModelFilter(data_train, model_fitted)
 filter_result$plot
 ```
 
-With the fitted model, we can do one-bin-ahead prediction and evaluate its accuracy.
+With the fitted model, we can do one-bin-ahead prediction on new data using `uniModelPred`. In this case, we predict on the last 20 trading days of the dataset, and evaluate its accuracy.
 
 ```{r}
-predict_result <- uniModelPred(data, modelSpec_fitted, out.sample = 20)
+predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
 predict_result$measure
 predict_result$plot
 ```
 
-<!-- # Details (refer to rugarch vignette) -->
+&nbsp; 
 
 # Usage of the package
 
-This package can be used to fit a univariate state-space model for intraday trading volume. Besides, it can be used to predict the one-bin-ahead prediction and decomposition of the intraday volume.
+## Preliminary knowledge
 
-## Datasets
+We denote the day with index $t\in\{1,\dots,T\}$ and divide each day into $I$ intervals (referred to as bins) indexed by $i\in\{1,\dots,I\}$ The intraday observations of market signal is labeled with the single subscript $\tau = I \times (t-1) + i$ to represent the index of time series.
 
-To use this package, the time series object without missing values should be a n_bin \* n_day numeric matrix. For convenience, the package contains two time series objects:
+The observed market signal can be written in the following multiplicative form [@brownlees2011intra]:
 
-- `AAPL_volume` is a matrix containing the 15-min intraday volume of AAPL from 2019-01-02 to 2019-06-28, including 124 trading days. Each column includes 26 records of intraday volume at a trading day.
-
-- `GE_volume` is a matrix containing the 15-min intraday volume of GE from 2019-01-02 to 2019-06-28, including 124 trading days. Each column includes 26 records of intraday volume at a trading day.
-
-```{r}
-library(intradayModel)
-data(GE_volume)
-```
-
-## Define a model
-
-This section discusses the specification of model via a call to the `uniModelSpec` function.
 $$
+\large
+\text{intraday signal} = \text{daily} \times \text{seasonal} \times \text{intraday dynamic} \times \text{noise}. \tag{1}
+\small
+$$
+
+By taking the logarithm transform, we rewrite (1) as an addictive formula:
+
+$$
+\large
+y_{\tau} = \eta_{\tau} + \phi_i + \mu_{t,i} + v_{t,i}, \tag{2}
+\small
+$$
+
+where each log-component can be extracted by the state-space model.
+
+The univariate model proposed by [@chen2016forecasting] is defined as
+$$
+\large
 \begin{aligned}
-\mathbf{x}_{t+1} &= \mathbf{A}_{t}\mathbf{x}_{t} + \mathbf{w}_{t},\\
-y_{t} &= \mathbf{C}\mathbf{x}_{t} + \phi_{t} + v_t,
+\mathbf{x}_{\tau+1} &= \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},\\
+y_{\tau} &= \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,
 \end{aligned}
+\tag{3}
+\small
 $$
 where:
 
-- $\mathbf{x}_{t} = [\eta_{t}, \mu_{t}]^\top$ is the hidden state vector containing the daily average part and the intraday dynamic part;
+- $\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top$ is the hidden state vector containing the daily component and the intraday component;
 
-- $\mathbf{A}_{t} = \left[\begin{array}{l}a_t^{\eta}&0\\0&a^{\mu}\end{array} \right]$ is the state transition matrix with $a_t^{\eta} = \begin{cases}a^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}$, $I$ is the number of intervals (referred to as bins) within a day;
+- $\mathbf{A}_{\tau} = \left[\begin{array}{l}a_t^{\eta}&0\\0&a^{\mu}\end{array} \right]$ is the state transition matrix with $a_t^{\eta} = \begin{cases}a^{\eta}&\tau = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}$
 
 - $\mathbf{C} = [1, 1]$ is the observation matrix;
 
-- $\mathbf{w}_{t} = [\epsilon_t^{\eta},\epsilon_t^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{t})$ represents the i.i.d. Gaussian noise in the state transition, with diagonal covariance matrix $\mathbf{Q}_{t} = \left[\begin{array}{l}(\sigma_t^{\eta})^2&0\\0&(\sigma_t^{\mu})\end{array} \right]$ and $\sigma_t^{\eta} = \begin{cases}\sigma^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}$;
+- $\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top$ is the seasonal component;
 
-- $v_t \sim \mathcal{N}(0, r)$ is the i.i.d. Gaussian noise in the observation;
+- $\mathbf{w}_{\tau} = \left[\epsilon_t^{\eta},\epsilon_t^{\mu}\right]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})$ represents the i.i.d. Gaussian noise in the state transition, with diagonal covariance matrix $\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_\tau^{\eta})^2&0\\0&(\sigma^{\mu})^2\end{array} \right]$ and $\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&\tau = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}$
 
-- $\mathbf{x}_0$ is the initial state, and it is assumed to follow $\mathcal{N}(\overline{\mathbf{x}}_0, \mathbf{V}_0)$.
+- $v_\tau \sim \mathcal{N}(0, r)$ is the i.i.d. Gaussian noise in the observation;
 
-In the proposed model, $\overline{\mathbf{x}}_0, \mathbf{V}_0, \mathbf{A}_{t},\mathbf{Q}_{t},r$ and the seasonality $\phi = [\phi_1,\dots, \phi_I]^\top$ are treated as the unknown parameters.
+- $\mathbf{x}_1$ is the initial state, and it is assumed to follow $\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0)$.
 
-We start with the function `uniModelSpec` to define a state-space model without any fixed parameters or given initial value:
+In this model, $\boldsymbol{\Theta} = \{\mathbf{x}_0, \mathbf{V}_0, a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\sigma^{\mu})^2, r, \boldsymbol{\phi} \}$ are treated as parameters.
+
+## Datasets
+
+To use this package, the time series object without missing values should be formatted into an $I \times T$, i.e., `(n_bin, n_day)`, 2D numeric matrix. For convenience, the package contains two sample datasets: `AAPL_volume` and `GE_volume`, including 15-min trading volume of AAPL and GE within 124 trading days from 2019-01-02 to 2019-06-28.
+
 ```{r}
-modelSpec_nofix <- uniModelSpec(fit = TRUE)
+data(GE_volume)
+dim(GE_volume)
 ```
-If we already know the values for some parameters or want to specify the initial guess for certain parameters, then we can set the argument `fixed.par` and `init.par`:
+
+## Model specification
+
+> **uniModelSpec**(fit = FALSE, fixed.pars = NULL, init.pars = NULL)
+
+This function specifies a univariate state-space model. To set `fit=TRUE` if the model contains unknown parameters. If you want to fix parameters to some values, you can provide a list of values to `fixed.pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init.pars`.
+
+Here is a simple example.
+
 ```{r}
 # set fixed value
 fixed.pars <- list()
-fixed.pars$"x0" <- matrix(c(13.33, -0.37), 2)
+fixed.pars$"x0" <- c(13.33, -0.37)
 
 # set initial value 
 init.pars <- list()
 init.pars$"a_eta" <- 1
 
-# define the uniModel
-modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
-```
-The components in `fixed.pars` and `init.pars` have the following corresponding relationship as follows:
-
-- `a_eta`: $a^{\eta}$, contains a double;
-
-- `a_mu`: $a^{\mu}$, contains a double;
-
-- `var_eta`: $\sigma^{\eta}$, contains a double;
-
-- `var_mu`: $\sigma^{\mu}$, contains a double;
-
-- `r`: $r$, contains a double;
-- `phi`: $\phi = [\phi_1,\dots, \phi_I]^\top$, contains I doubles;
-
-- `x0`: $\overline{\mathbf{x}}_0$, contains two doubles;
-
-- `V0`: $\mathbf{V}_0$, contains three doubles, corresponding to the $\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2)$.
-
-## Fit a model
-Once a `uniModelSpec` has been defined, the `uniModelFit` function can be applied. It is important to note the argument `acceleration`, which indicates whether a fast method is to be used to estimate the parameters (by default, it is `FALSE`). The `verbose` controls the level of information output during the algorithm iterations (by default, it is `1`):
-
--`0`: output nothing;
-
-- `1`: output the iteration precision;
-
-- `2`: output the iteration precision and the final model object.
-
-```{r}
-data <- AAPL_volume
-data_train <- AAPL_volume[, 1:104]
-modelSpec_fitted <- uniModelFit(data_train, modelSpec, acceleration = TRUE, verbose = 1)
+# define the univariate model
+model <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
 ```
 
-## Filter
-A model object with all parameters fixed can be used to decompose the intraday trading volume into daily average, intraday dynamic and intraday periodic parts (i.e., the seasonality). Daily average and intraday dynamic are the smoothed state estimate at time $t$ conditioned on all the data, $\mathbf{x}_t^T$. The seasonality is the value of $\phi$ fitted by the `uniModeFit`.
 
-The return value contains the decomposition result and plots for components:
+## Fitting
+
+> **uniModelFit**(data, uniModel, maxit = 3000, abstol = 1e-4, log.switch = TRUE, acceleration = FALSE, verbose = 1)
+
+Once the model with unfitted parameters is defined, you can apply `uniModelFit` function to fit the model. The algorithm used is the expectation–maximization (EM) given in [@chen2016forecasting]. It terminates when iteration reaches `maxit` or the change of the parameters achieves $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
+
+If `log.switch = TRUE`, the intermediate parameters are recored during the algorithm. 
+
+If `acceleration=TRUE`, the accelerated EM algorithm  [@varadhan2008simple] is applied with possibly lower numerical stability.
+
+The `verbose` controls how much output is shown during the fitting process. Possible values:
+
+- `0`: no output
+
+- `1`: show iteration number and change of the parameters
+
+- `2`: 1 + show obtained parameters
+
+The following code shows how to fit the model to the GE stock.
+
 ```{r}
-filter_result <- uniModelFilter(data_train, modelSpec_fitted)
+data <- GE_volume
+data_train <- GE_volume[, 1:104]
+model_fitted <- uniModelFit(data_train, model, acceleration = TRUE, verbose = 2)
+```
+
+## Filtering
+
+> **uniModelFilter**(data, uniModel)
+
+A model with all parameters fixed can be used to decompose the intraday trading signal into daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $t$ are the smoothed state estimate conditioned on all the data. They are mathematically denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the train set. The seasonal component has the value of $\boldsymbol{\phi}$.
+
+Input the intraday market signal that need to be decomposed and the fitted model into function `uniModelFilter`. This function will produce the three components along with a plot.
+
+```{r}
+filter_result <- uniModelFilter(data_train, model_fitted)
+str(filter_result$components)
 filter_result$plot
 ```
 
-## Predict
-A model object with all parameters fixed can be used for one-step ahead prediction and accuracy evaluation with `uniModelPred`. Three performance measures are used to evaluate the prediction results:
+## Prediction
 
-- `Mean absolute error (MAE)` : $\frac{1}{M}\sum_{i=1}^M\lvert\hat{\sigma_i} - \sigma_i\rvert$,
+> **uniModelPred**(data, uniModel, out.sample) 
 
-- `Mean absolute percent error (MAPE)`: $\frac{1}{M}\sum_{i=1}^M\frac{\lvert\hat{\sigma_i} - \sigma_i\rvert}{\sigma_i}$,
+Once the model is fitted, you can predict the intraday market signal one-bin-ahead with the function `uniModelPred`. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$.
+Given the dataset, you need to indicate how many days from the end to keep for out-of-sample prediction.
 
-- `Root Mean Square Error (RMSE)`: $\sqrt{\sum_{i=1}^M\frac{\left(\hat{\sigma_i} - \sigma_i\right)^2}{M}}$,
+Since fitting a model to some data does not entail that it will predict well on unseen data, `uniModelPred` also evaluates the model with the following measures for you.
 
-where $\hat{\sigma_i}$ and $\sigma_i$ are the real and predicted values of trading volume and $M$ is the number of bins.
+- Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$,
 
-The return value contains the prediction, real value, performance and a plot. We can view the performance and plot:
+- Mean absolute percent error (MAPE): $\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_\tau - \sigma_\tau\rvert}{y_\tau}$,
+
+- Root Mean Square Error (RMSE): $\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_\tau - y_\tau\right)^2}{M}}$,
+
+where $M$ is the total number of out-of-sample bins.
 
 ```{r}
-predict_result <- uniModelPred(data, modelSpec_fitted, out.sample = 20)
+predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
+head(predict_result$signal_pred)
 predict_result$measure
 predict_result$plot
 ```
+
+&nbsp; 
 
 # References {.unnumbered}
 
