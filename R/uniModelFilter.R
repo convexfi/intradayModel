@@ -1,21 +1,26 @@
 #' @title Decompose the intraday trading volume signal
 #'
-#' @description Decompose the intraday trading volume into daily average, intraday dynamic and intraday periodic parts (i.e., the seasonality).
-#'              Daily average and intraday dynamic are the smoothed state estimate at time \eqn{t} conditioned on all the data, 
-#'              i.e., \eqn{\mathbf{x}_t^T}. The seasonality is the value of \eqn{\phi} fitted by the \code{uniModeFit}.
+#' @description A model with all parameters fixed can be used to decompose the intraday trading signal into daily, seasonal, 
+#'              and intraday dynamic components. The daily component and intraday dynamic component at time \eqn{t} are the 
+#'              smoothed state estimate conditioned on all the data. They are mathematically denoted by 
+#'              \eqn{\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}, where \eqn{N} is the total number of bins in the train set. 
+#'              The seasonal component has the value of \eqn{\boldsymbol{\phi}}.
+#'              
+#'              This function will produce the three components along with a plot.
 #'
 #' @param data n_bin * n_day trading volume data matrix with no NA.
-#' @param uniModel uniModel object from function \code{uniModelSpec} with all parameters fixed.
+#' @param uniModel uniModel object from function with all parameters fixed.
 #'
 #' @return A list containing the following elements:
-#'        \item{\code{daily}}{Daily average part.}
-#'        \item{\code{dynamic}}{Intraday dynamic part.}
-#'        \item{\code{seasonal}}{Intraday periodic component (the seasonality).}
+#'        \item{\code{components}}{A list containing three components:
+#'              \itemize{ \item{\code{daily}: Daily average part;}
+#'                        \item{\code{dynamic}: Intraday dynamic part;}
+#'                        \item{\code{seasonal}}: Intraday periodic component (the seasonality).}}
+#'        \item{\code{plot}}{The plot of original signal and three components.}
 #'        
-#' @author Shengjie Xiu and Yifan Yu
 #' 
 #' @references
-#' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+#' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
 #' 
 #' @seealso \code{\link{uniModelSpec}}
 #' 
@@ -23,7 +28,7 @@
 #' library(intradayModel)
 #' # load the data
 #' data("AAPL_volume")
-#' #' 
+#' 
 #' # define the uniModel
 #' modelSpec <- uniModelSpec(fit = TRUE)
 #' 
