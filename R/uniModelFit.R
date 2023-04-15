@@ -1,28 +1,23 @@
-#' @title Fit a uniModel via Expectation-Maximization algorithm
+#' @title Fit a Univaraite State-space Model via Expectation-Maximization
 #' 
-#' @description The main function for fitting state-space models. 
-#'              Two kinds of Expectation-Maximization (EM) algorithms are provided.
+#' @description The main function for fitting state-space models using expectation-maximization (EM) algorithms.
 #'
-#' @param data n_bin * n_day trading volume data matrix with no NA.
-#' @param uniModel uniModel object from function \code{uniModelSpec}.
+#' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
+#' @param uniModel Model list object from function \code{uniModelSpec}.
+#' @param acceleration Logical value indicating whether to use the accelerated EM algorithm. If \code{TRUE}, the accelerated one is used (default is \code{FALSE}).
 #' @param maxit Maximum number of iterations (default is \code{3000}).
 #' @param abstol Absolute tolerance on the objective function to be used as the stopping criteria (default is \code{1e-4}).
 #' @param log.switch Logical value indicating whether to record the history of convergence progress. 
-#'                   If \code{TRUE}, the intermediate parameters are recored during the algorithm.
-#'                   A \code{uniModel} object with convergence log is returned (default is \code{TRUE}).
-#' @param acceleration Logical value indicating whether to use accelerated Expectation-Maximization (EM) algorithm. 
-#'                     If \code{TRUE}, accelerated EM algorithm is used (default is \code{FALSE}).  
-#' @param verbose An integer specifying the level of information output during the algorithm iterations.
+#'                   If \code{TRUE}, the intermediate parameters are recorded during the algorithm (default is \code{TRUE}).
+#'                       
+#' @param verbose An integer specifying the print level of information during the algorithm (default is \code{1}).
 #'                \itemize{\item{\code{"0"}: no output;}
 #'                    \item{\code{"1"}: show iteration number and change of the parameters;}
-#'                    \item{\code{"2"}: 1 + show obtained parameters;}}
-#'                (default is \code{1}).
+#'                    \item{\code{"2"}: 1 + show finally obtained parameters.}}
 #' @return A list containing the following elements (if the algorithm converges):
-#'         \item{\code{par}}{Values of fixed parameters.}
-#'         \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not. 
-#'                                   If the EM algorithm converges, all components of \code{fit_request} are \code{FALSE}.}
-#'         \item{\code{par_log}}{List of parameter values during the convergence if \code{log.switch = TRUE}.} 
-#'         If the algorithm does not converge, the original input uniModel with unfixed parameters is returned. 
+#'         \item{\code{par}}{List of parameters' values after fitting.}
+#'         \item{\code{par_log}}{List of intermediate parameters' values during the algorithm if \code{log.switch = TRUE}.} 
+#'         \item{\code{fit_request}}{List of logical values indicating whether the parameters require further fitting.}
 #'                                
 #' 
 #' @references
@@ -33,22 +28,17 @@
 #' 
 #' @seealso \code{\link{uniModelSpec}}
 #' 
-#' @examples
-#' library(intradayModel)
-#' # load the data
-#' data("AAPL_volume")
-#' 
-#' # define the uniModel
-#' modelSpec <- uniModelSpec(fit = TRUE)
-#' 
-#' # fit the model
-#' modelSpec.fit <- uniModelFit(data_log_volume, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' @examples 
+#' # fit the model to AAPL_volume
+#' data(AAPL_volume)
+#' model <- uniModelSpec(fit = TRUE)
+#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
 #' 
 #' @importFrom magrittr %>%
 #' 
 #' @export
-uniModelFit <- function(data, uniModel,
-                        maxit = 3000, abstol = 1e-4, log.switch = TRUE, acceleration = FALSE,
+uniModelFit <- function(data, uniModel, acceleration = FALSE,
+                        maxit = 3000, abstol = 1e-4, log.switch = TRUE,
                         verbose = 1) {
 
   # error control
