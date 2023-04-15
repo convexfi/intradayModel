@@ -238,10 +238,13 @@ clean_pars_list <- function(input_list) {
     "x0" = 2, "V0" = 4
   )
   
+  invalid_param <- c()
+  incorrect_param <- c()
   # check if parameters are valid
   for (name in names(input_list)) {
     if (!(name %in% all_pars_name)) {
       input_list[[name]] <- NULL
+      invalid_param <- c(invalid_param, name)
       next
     }
     input_list[[name]] <- unlist(as.list(input_list[[name]]))
@@ -250,17 +253,31 @@ clean_pars_list <- function(input_list) {
       any(is.na(input_list[[name]])) ||
       any(is.infinite(input_list[[name]]))) {
       input_list[[name]] <- NULL
+      incorrect_param <- c(incorrect_param, name)
     }
 
     if (name == "phi") next
 
     if (expected_pars_len[[name]] != length(input_list[[name]])) {
       input_list[[name]] <- NULL
+      incorrect_param <- c(incorrect_param, name)
     }
   }
   if ("V0" %in% names(input_list)){
     input_list[["V0"]] <- input_list[["V0"]][c(1,2,4)]
   }
+  
+  msg <- NULL
+  if (length(invalid_param) > 0){
+    msg <- c(paste(invalid_param, collapse = ", "), " is not model parameter. Thus its input value is ignored.\n")
+  }
+  if (length(incorrect_param) > 0){
+    msg <- c(msg, c(paste(unique(incorrect_param), collapse = ", "), " has wrong input value. Thus its input value is ignored.\n",
+              "Check whether the input parameter is number with no NA, Inf and right length.\n"))
+  }
+  if (!is.null(msg)) {
+    warning(msg) }
+  
   return(input_list)
 }
 
