@@ -27,17 +27,17 @@ test_that("marss_to_unimodel works", {
   
   predefinde_params <- list()
   predefinde_params$"a_eta" <- 1
-  predefinde_params$"a_mu" <- 0.7
+  predefinde_params$"a_mu" <- 0
   predefinde_params$"var_eta" <- 4
-  predefinde_params$"var_mu" <- 0.06
-  predefinde_params$"r" <- 0.08
+  predefinde_params$"var_mu" <- 1e-4
+  predefinde_params$"r" <- 1e-4
   predefinde_params$"phi" <- matrix(rowMeans(matrix(data_reform, nrow = n_bin)) - mean(data_reform), nrow = n_bin)
   phi_names <- c()
   for (i in 1:n_bin){
     phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
   }
   dimnames(predefinde_params$"phi")[[1]] <- phi_names
-  predefinde_params$"x0" <- matrix(c(10, 0), 2, 1)
+  predefinde_params$"x0" <- matrix(c(mean(data_reform), 0), 2, 1)
   dimnames(predefinde_params$"x0")[[1]] <- c("x01","x02")
   predefinde_params$"V0" <- matrix(c(1e-3, 1e-7, 1e-5), 3, 1)
   dimnames(predefinde_params$"V0")[[1]] <- c("(1,1)","(2,1)","(2,2)")
@@ -110,11 +110,11 @@ test_that("specify_marss works without fixed params", {
   V0 <- extract_value("V0", modelSpec)
   
   ## predefined init value
-  init_default <- list("x0" = matrix(c(10, 0), 2, 1),
-                       "a_eta" = 1, "a_mu" = 0.7,
-                       "r" = 0.08,
-                       "var_eta" = 0.07, "var_mu" = 0.06,
-                       "V0" = matrix(c(1e-03, 1e-07, 1e-5), 3, 1),
+  init_default <- list("x0" = matrix(c(mean(data_reform), 0), 2, 1),
+                       "a_eta" = 1, "a_mu" = 0,
+                       "r" = 1e-4,
+                       "var_eta" = 1e-4, "var_mu" = 1e-4,
+                       "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
                        "phi" = rowMeans(matrix(data_reform, nrow = n_bin)) - mean(data_reform)
   )
   ## Init param
@@ -122,13 +122,14 @@ test_that("specify_marss works without fixed params", {
   
   ## EM
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
-  model_original <- MARSS::MARSS(data_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  model_original <- MARSS::MARSS(data_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE, silent = TRUE)
   
   
   expect_equal(model_test, model_original)
   
 })
 
+# need to be checked again
 test_that("specify_marss works with partial fixed params", {
   data("data_log_volume")
   data <- as.matrix(data_log_volume)
@@ -185,14 +186,14 @@ test_that("specify_marss works with partial fixed params", {
   x0 <- matrix(list(0,0), 2, 1)
   V0 <- "unconstrained"
 
-  MARSS_model$init.gen <-  list(R = 0.08,
+  MARSS_model$init.gen <-  list(R = 1e-4,
                                 V0 = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
                                 B = matrix(c(1), 1, 1),
-                                Q = matrix(c(0.06), 1, 1)
+                                Q = matrix(c(1e-4), 1, 1)
   )
   ## EM
   MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
-  model_original <- MARSS::MARSS(data_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE)
+  model_original <- MARSS::MARSS(data_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE,silent = TRUE)
   
   
   expect_equal(model_test, model_original)
@@ -276,11 +277,11 @@ test_that("cleanParsList works", {
   test.pars$"V0" <- matrix(0,3)
   test.pars$"yyy" <- 6
   
-  test.pars <- cleanParsList(test.pars)
+  test.pars <- clean_pars_list(test.pars)
   
   predefined.pars <- list()
   predefined.pars$"a_mu" <- 1
-  predefined.pars$"V0" <- c(0,0,0)
+  # predefined.pars$"V0" <- c(0,0,0)
   
   expect_equal(test.pars, predefined.pars)
 })
