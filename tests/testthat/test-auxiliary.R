@@ -269,21 +269,39 @@ test_that("extract_init works", {
 })
 
 test_that("cleanParsList works", {
-  test.pars <- list()
-  test.pars$"a_eta" <- "a"
-  test.pars$"a_mu" <- 1
-  test.pars$"var_eta" <- Inf
-  test.pars$"x0" <- matrix(c(NA,0),2)
-  test.pars$"V0" <- matrix(0,3)
-  test.pars$"yyy" <- 6
+  # test.pars <- list()
+  # test.pars$"a_eta" <- "a"
+  # test.pars$"a_mu" <- 1
+  # test.pars$"var_eta" <- Inf
+  # test.pars$"x0" <- matrix(c(NA,0),2)
+  # test.pars$"V0" <- matrix(0,3)
+  # test.pars$"yyy" <- 6
+  # 
+  # test.pars <- clean_pars_list(test.pars)
+  # 
+  # predefined.pars <- list()
+  # predefined.pars$"a_mu" <- 1
+  # 
+  # expect_equal(test.pars, predefined.pars)
   
-  test.pars <- clean_pars_list(test.pars)
+  init.pars <- list()
+  init.pars$"a_eta" <- 1
+  init.pars$"x0" <- matrix(0, 2)
+  init.pars$"xxx" <- 3
+  
+  fixed.pars <- list()
+  fixed.pars$"a_mu" <- NA
+  fixed.pars$"var_eta" <- 4
+  fixed.pars$"x0" <- matrix(0, 2)
+  fixed.pars$"V0" <- matrix(c(1,2,3,4), 2)
+  
+  fixed.pars <- clean_pars_list(fixed.pars, "fixed")$input_list
   
   predefined.pars <- list()
-  predefined.pars$"a_mu" <- 1
-  # predefined.pars$"V0" <- c(0,0,0)
+  predefined.pars$"var_eta" <- 4
+  predefined.pars$"x0" <- c(0, 0)
   
-  expect_equal(test.pars, predefined.pars)
+  expect_equal(fixed.pars, predefined.pars)
 })
 
 test_that("is_uniModel works", {
