@@ -1,29 +1,26 @@
-#' @title Predict one-step ahead trading volume via kalman filter
+#' @title Predict one-bin-ahead trading volume via kalman filter
 #'
-#' @description This function will calculate the modeled value of \eqn{y_t} conditioned on the previous data 
-#'              (the data during the time \eqn{0} to \eqn{t-1}), which is the one-step ahead prediction of trading volume.
-#'              Three performance measures are used to evaluate the prediction results:
+#' @description The one-bin-ahead prediction is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}.
+#'              Given the dataset, you need to indicate how many days from the end to keep for out-of-sample forecast.
+#'              Three performance measures are used to evaluate the forecast results:
 #'              \itemize{\item{Mean absolute error (MAE):
-#'                             \deqn{\frac{1}{M}\sum_{i=1}^M\lvert\hat{\sigma_i} - \sigma_i\rvert,}}
+#'                             \eqn{\frac{1}{M}\sum_{i=1}^M\lvert\hat{y}_{\tau} - y_{\tau}\rvert,}}
 #'                       \item{Mean absolute percent error (MAPE):
-#'                             \deqn{\frac{1}{M}\sum_{i=1}^M\frac{\lvert\hat{\sigma_i} - \sigma_i\rvert}{\sigma_i},}}
+#'                             \eqn{\frac{1}{M}\sum_{i=1}^M\frac{\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{y_{\tau}},}}
 #'                       \item{Root Mean Square Error (RMSE):
-#'                             \deqn{\sqrt{\sum_{i=1}^M\frac{\left(\hat{\sigma_i} - \sigma_i\right)^2}{M}},}}
+#'                             \eqn{\sqrt{\sum_{i=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}},}}
 #'              }
-#'              where \eqn{\hat{\sigma_i}} and \eqn{\sigma_i} are the real and predicted values of trading volume and
-#'              \eqn{M} is the number of bins.
+#'              where \eqn{M} is the number of bins.
 #'
 #' @param data n_bin * n_day trading volume data matrix with no NA.
 #' @param uniModel uniModel object with all parameters fixed.
-#' @param out.sample  Number of days before the last for out of sample prediction.
+#' @param out.sample  Number of days before the last for out of sample forecast.
 #'
 #' @return A list containing the following elements:
-#'         \item{\code{signal_pred}}{One-step ahead trading volume prediction.}
+#'         \item{\code{signal_pred}}{One-bin-ahead trading volume forecast.}
 #'         \item{\code{signal_real}}{Real values of trading volume.}
 #'         \item{\code{measure}}{Prediction performance measured by mae, mape and rmse.}
 #'         \item{\code{plot}}{Plot of prediction and real values.}
-#' 
-#' @author Shengjie Xiu and Yifan Yu
 #' 
 #' @seealso \code{\link{uniModelSpec}}
 #' 
