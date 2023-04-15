@@ -131,7 +131,7 @@ y_{\tau} &= \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,
 \tag{3}
 \small
 $$
-where:
+where
 
 - $\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top$ is the hidden state vector containing the log daily component and the log intraday dynamic component;
 
@@ -139,15 +139,15 @@ where:
 
 - $\mathbf{C} = [1, 1]$ is the observation matrix;
 
-- $\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top$ is the log seasonal component;
+- $\phi_{\tau}$ is the corresponding element from $\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top$, which is the log seasonal component;
 
 - $\mathbf{w}_{\tau} = \left[\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}\right]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})$ represents the i.i.d. Gaussian noise in the state transition, with a time-varying covariance matrix $\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_\tau^{\eta})^2&0\\0&(\sigma^{\mu})^2\end{array} \right]$ and $\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&\tau = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}$
 
 - $v_\tau \sim \mathcal{N}(0, r)$ is the i.i.d. Gaussian noise in the observation;
 
-- $\mathbf{x}_1$ is the initial state at $\tau = 1$, and it is assumed to follow $\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0)$.
+- $\mathbf{x}_1$ is the initial state at $\tau = 1$, and it follows $\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0)$.
 
-In this model, $\boldsymbol{\Theta} = \{\mathbf{x}_0, \mathbf{V}_0, a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\sigma^{\mu})^2, r, \boldsymbol{\phi} \}$ are treated as parameters.
+In this model, $\boldsymbol{\Theta} = \{a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\sigma^{\mu})^2, r, \boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0 \}$ are treated as parameters.
 
 ## Datasets
 
