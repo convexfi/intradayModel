@@ -58,7 +58,7 @@ uniModelFit <- function(data, uniModel,
 
   # check if fit is required
   if (Reduce("+", uniModel$fit_request) == 0) {
-    cat("All parameters are fixed. No need to fit.\n")
+    cat("All parameters are already fixed.")
     return(uniModel)
   }
 

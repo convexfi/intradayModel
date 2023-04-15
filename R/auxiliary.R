@@ -287,15 +287,15 @@ check_pars_list <- function(uniModel, n_bin = NULL) {
         msg <- c(msg, paste(name, "must be numeric, have no NAs, and no Infs.\n"))
       }
       if (!identical(dim_expect[[name]], dim(par_list[[name]]))) {
-        msg <- c(msg, paste("Dimension of uniModel par ", name, " is wrong.\n", sep = ""))
+        msg <- c(msg, paste("Dimension of uniModel$par$", name, " is wrong.\n", sep = ""))
       }
       if (name %in% scalar_par_list && !identical(len_expect[[name]], length(par_list[[name]]))) {
-        msg <- c(msg, paste("Length of uniModel par ", name, " is wrong.\n", sep = ""))
+        msg <- c(msg, paste("Length of uniModel$par$", name, " is wrong.\n", sep = ""))
       }
     }
     for (name in unfixed){
       if (!all(is.na(par_list[[name]]))) {
-        msg <- c(msg, paste("uniModel par ", name, " and uniModel fit_request ", name, " are conflicted.\n", sep = ""))
+        msg <- c(msg, paste("uniModel$par$", name, " and uniModel$fit_request$", name, " are conflicted.\n", sep = ""))
       }
     }
   
@@ -311,10 +311,10 @@ check_pars_list <- function(uniModel, n_bin = NULL) {
         msg <- c(msg, paste(name, "must be numeric, have no NAs, and no Infs.\n"))
       }
       if (!identical(dim_expect[[name]], dim(init_list[[name]]))) {
-        msg <- c(msg, paste("Dimension of uniModel init ", name, " is wrong.\n", sep = ""))
+        msg <- c(msg, paste("Dimension of uniModel$init$", name, " is wrong.\n", sep = ""))
       }
       if (name %in% scalar_par_list && !identical(len_expect[[name]], length(init_list[[name]]))) {
-        msg <- c(msg, paste("Lenght of uniModel init ", name, " is wrong.", sep = ""))
+        msg <- c(msg, paste("Lenght of uniModel$init$", name, " is wrong.", sep = ""))
       }
     }
   return (msg)
@@ -334,10 +334,10 @@ is_uniModel <- function(uniModel, n_bin = NULL) {
   msg <- NULL
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   if (!all(all_pars_name %in% names(uniModel$par))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = ", "), " is missing from the uniModel par.\n")
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = ", "), " is missing from the uniModel$par.\n")
   }
   if (!all(all_pars_name %in% names(uniModel$fit_request))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = ", "), " is missing from the uniModel fit_request.\n")
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = ", "), " is missing from the uniModel$fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
