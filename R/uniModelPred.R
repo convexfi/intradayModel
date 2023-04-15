@@ -51,6 +51,7 @@ uniModelPred <- function(data, uniModel, out.sample) {
   # error control
   if (!is.matrix(data)) stop("data must be a matrix.")
   if (anyNA(data)) stop("data must have no NA.")
+  if (out.sample > ncol(data)) stop("out.sample must be smaller than the number of columns in data matrix.")
   is_uniModel(uniModel, nrow(data))
 
   # check if fit is necessary

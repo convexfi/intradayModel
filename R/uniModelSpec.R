@@ -105,7 +105,7 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   # decide if each variable requires fitting
   if (fit == FALSE) {
     if (anyNA(unlist(uniModel$par))) {
-      stop("Wrong input: unfitted model contains unknown parameters \n")
+      stop("Wrong input: unfitted model contains unknown parameters.\n")
       break
     }
   }
