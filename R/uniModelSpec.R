@@ -105,7 +105,10 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   # decide if each variable requires fitting
   if (fit == FALSE) {
     if (anyNA(unlist(uniModel$par))) {
-      stop("Wrong input: unfitted model contains unknown parameters.\n")
+      na_check <- lapply(uniModel$par, anyNA)
+      na_par <- names(na_check[na_check == TRUE])
+      msg <- c("If fit = FALSE, ", paste(na_par, collapse = ", "), " must have no NAs.")
+      stop(msg)
       break
     }
   }
