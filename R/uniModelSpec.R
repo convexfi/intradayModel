@@ -34,8 +34,8 @@
 #'                  The unfitted parameters without user-defined initial values will be given default values in \code{uniModelFit}.
 #'
 #' @return A univaraite model class which is a list containing the following elements:
-#'         \item{\code{par}}{List of values of all parameters.}
-#'         \item{\code{init}}{List of initial values of the unfitted parameters.}
+#'         \item{\code{par}}{List of parameters' values.}
+#'         \item{\code{init}}{List of unfitted parameters' initial values.}
 #'         \item{\code{fit_request}}{List of logical values indicating whether the parameters require fitting.}
 #' 
 #' @references
@@ -47,7 +47,6 @@
 #' @seealso \code{\link{uniModelFit}}, \code{\link{uniModelFilter}}, \code{\link{uniModelPred}}
 #'
 #' @examples
-#' library(intradayModel)
 #' # set initial value 
 #' init.pars <- list()
 #' init.pars$"a_eta" <- 1
