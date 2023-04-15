@@ -155,6 +155,7 @@ em_update <- function(...) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
     if (diff < abstol) {
+      iter <- i
       convergence <- TRUE
       break
     }
@@ -175,9 +176,9 @@ em_update <- function(...) {
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
 
   if (convergence) {
-    cat("EM algorithm converges.\n")
+    cat("Success! abstol test passed at ", iter, " iterations.\n")
   } else {
-    warning("No convergence")
+    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
   result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
   return(result)
@@ -279,6 +280,7 @@ em_update_acc <- function(...) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
     if (diff < abstol) {
+      iter <- i
       convergence <- TRUE
       break
     }
@@ -299,9 +301,9 @@ em_update_acc <- function(...) {
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
   if (convergence) {
-    cat("EM algorithm converges.\n")
+    cat("Success! abstol test passed at ", iter, " iterations.\n")
   } else {
-    warning("No convergence")
+    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
   result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
   return(result)

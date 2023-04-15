@@ -327,17 +327,17 @@ is_uniModel <- function(uniModel, n_bin = NULL) {
   el <- c("fit_request", "par", "init")
   # if some components are missing from the uniModel, rest of the tests won't work so stop now
   if (!all(el %in% names(uniModel))) {
-    stop("Element ", paste(el[!(el %in% names(uniModel))], collapse = " & "), " is missing from the uniModel object.\n")
+    stop("Element ", paste(el[!(el %in% names(uniModel))], collapse = ", "), " is missing from the uniModel object.\n")
   }
   
   # if some args are missing from the uniModel's components, the code will stop when all missing parts are found.
   msg <- NULL
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   if (!all(all_pars_name %in% names(uniModel$par))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = " & "), " is missing from the uniModel par.\n")
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = ", "), " is missing from the uniModel par.\n")
   }
   if (!all(all_pars_name %in% names(uniModel$fit_request))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = " & "), " is missing from the uniModel fit_request.\n")
+    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = ", "), " is missing from the uniModel fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)

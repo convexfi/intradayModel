@@ -55,7 +55,9 @@ uniModelPred <- function(data, uniModel, out.sample) {
 
   # check if fit is necessary
   if (Reduce("+", uniModel$fit_request) != 0) {
-    stop("All parameters must be fixed.\n")
+    msg <- c("All parameters must be fitted.\n ",
+             "Parameter ", paste(names(uniModel$fit_request[uniModel$fit_request == TRUE]), collapse = ", "), " is not fitted.")
+    stop(msg)
   }
 
   # one-step ahead prediction using MARSS
