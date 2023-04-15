@@ -132,7 +132,6 @@ plot_prediction <- function(signal_real, signal_pred) {
       legend.title = element_blank(),
       legend.key.size = unit(1, "cm"),
       plot.title = element_text(size=18, face = "bold", hjust = 0.5),
-      axis.title.x=element_blank(),
       axis.text.x=element_blank()
     ) + 
     plot_annotation(title = "One-bin-ahead prediction (log scale)",
