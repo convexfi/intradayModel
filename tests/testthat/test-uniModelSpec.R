@@ -22,7 +22,8 @@ test_that("unimodel specification return coincide with the predefined ones", {
                                    "r" = TRUE, "phi" = TRUE,
                                    "x0" = TRUE, "V0" = FALSE)
   
-  expect_equal(uniModelSpec(fit = TRUE, init.pars = init.pars, fixed.pars = fixed.pars), predefinde_model)
+  test_model <- uniModelSpec(fit = TRUE, init.pars = init.pars, fixed.pars = fixed.pars)
+  expect_equal(test_model, predefinde_model)
   
 })
 
