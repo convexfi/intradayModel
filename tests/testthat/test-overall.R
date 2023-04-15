@@ -55,20 +55,58 @@ test_that("messages, stock = GE", {
   data(GE_volume)
 
   # Spec
-  expect_error(uniModelSpec(fit = FALSE), regexp = "Wrong input: unfitted model contains unknown parameters.\n")
+  expect_error(uniModelSpec(fit = FALSE), regexp = "If fit = FALSE, a_eta, a_mu, var_eta, var_mu, r, phi, x0, V0 must have no NAs.")
 
   # Fitting
   modelSpec <- uniModelSpec(fit = TRUE)
   data <- GE_volume
   data_train <- GE_volume[, 1:104]
+  data_error_test <- data_train
+  data_error_test[1,1] <- NA
+  
   expect_warning(uniModelFit(data_train, modelSpec, maxit = 1), regexp = "Warning! Reached maxit before parameters converged. Maxit was 1.\n")
   expect_output(uniModelFit(data_train, modelSpec, maxit = 1000, acceleration = TRUE, verbose = 0), regexp = "Success! abstol test passed at 22 iterations.")
+  expect_error(uniModelFit(c(1,1), modelSpec), regexp = "data must be a matrix.")
+  expect_error(uniModelFit(data_error_test, modelSpec), regexp = "data must have no NA.")
   
-  modelSpec.fit_acc <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
-  # ?
-  # expect_output(uniModelFit(data_train, modelSpec.fit_acc), "All parameters are fixed. No need to fit.\n")
+  modelSpec.fit_acc <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE, verbose = 0)
   
+  expect_output(uniModelFit(data_train, modelSpec.fit_acc), "All parameters are already fixed.")
+  
+  n_bin <- 26
+  fixed.pars <- list()
+  fixed.pars$"a_mu" <- 1
+  fixed.pars$"var_eta" <- 4
+  fixed.pars$"x0" <- matrix(0,2)
+  fixed.pars$"phi" <- matrix(2, n_bin)
+  modelSpec_check <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
+  
+  ## missing component
+  modelSpec_check1 <- modelSpec_check[c("par", "init")]
+  expect_error(uniModelFit(data_train, modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
+  
+  ## missing element
+  modelSpec_check2 <- modelSpec_check
+  modelSpec_check2$par[["x0"]] <- NULL
+  expect_error(uniModelFit(data_train, modelSpec_check2),"Element x0 is missing from the uniModel[$]par.\n")
+  
+  ## fixed paramenter with NA
+  modelSpec_check3 <- modelSpec_check
+  modelSpec_check3$fit_request[["a_eta"]] <- FALSE
+  expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
+  
+  ## wrong dimension/lenghth
+  modelSpec_check4 <- modelSpec_check
+  modelSpec_check4$par[["x0"]] <- 1
+  modelSpec_check4$par[["var_eta"]] <- array(c(1,2))
+  modelSpec_check4$par[["phi"]] <- matrix(2, 25)
+  error_message <- paste("Dimension of uniModel[$]par[$]var_eta is wrong.\n","Length of uniModel[$]par[$]var_eta is wrong.\n",
+                         "Dimension of uniModel[$]par[$]phi is wrong.\n","Dimension of uniModel[$]par[$]x0 is wrong.\n", sep = "")
+  expect_error(uniModelFit(data_train, modelSpec_check4), error_message)
+  
+  # Filtering
   expect_error(uniModelFilter(data, modelSpec), regexp = "All parameters must be fitted.\n Parameter a_eta, a_mu, var_eta, var_mu, r, phi, x0, V0 is not fitted.")
   
+  # Prediction
   expect_error(uniModelPred(data, modelSpec.fit_acc, 300), regexp = "out.sample must be smaller than the number of columns in data matrix.")
 })
