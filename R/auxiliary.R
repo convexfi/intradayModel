@@ -235,9 +235,9 @@ clean_pars_list <- function(input_list) {
   expected_pars_len <- list(
     "a_eta" = 1, "a_mu" = 1,
     "var_eta" = 1, "var_mu" = 1, "r" = 1,
-    "x0" = 2, "V0" = 3
+    "x0" = 2, "V0" = 4
   )
-
+  
   # check if parameters are valid
   for (name in names(input_list)) {
     if (!(name %in% all_pars_name)) {
@@ -257,6 +257,9 @@ clean_pars_list <- function(input_list) {
     if (expected_pars_len[[name]] != length(input_list[[name]])) {
       input_list[[name]] <- NULL
     }
+  }
+  if ("V0" %in% names(input_list)){
+    input_list[["V0"]] <- input_list[["V0"]][c(1,2,4)]
   }
   return(input_list)
 }
