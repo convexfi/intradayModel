@@ -176,7 +176,7 @@ em_update <- function(...) {
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
 
   if (convergence) {
-    cat("Success! abstol test passed at ", iter, " iterations.\n")
+    cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
     warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
@@ -301,7 +301,7 @@ em_update_acc <- function(...) {
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
   if (convergence) {
-    cat("Success! abstol test passed at ", iter, " iterations.\n")
+    cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
     warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
