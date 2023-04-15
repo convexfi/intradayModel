@@ -1,12 +1,13 @@
 #' @title Fit a Univaraite State-space Model via Expectation-Maximization
 #' 
-#' @description The main function for fitting state-space models using expectation-maximization (EM) algorithms.
+#' @description The main function for fitting the univaraite state-space model using expectation-maximization (EM) algorithms. The closed-form expression 
+#' of the EM iterations are provided by (Chen et al., 2016). The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}}{|| \Delta \Theta(i) || <= abstol} is satisfied.
 #'
 #' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
-#' @param uniModel Model list object from function \code{uniModelSpec}.
-#' @param acceleration Logical value indicating whether to use the accelerated EM algorithm. If \code{TRUE}, the accelerated one is used (default is \code{FALSE}).
+#' @param uniModel Univariate model list object from function \code{uniModelSpec}.
+#' @param acceleration Logical value indicating whether to use the accelerated EM algorithm. If \code{TRUE}, the accelerated one will be used (default is \code{FALSE}).
 #' @param maxit Maximum number of iterations (default is \code{3000}).
-#' @param abstol Absolute tolerance on the objective function to be used as the stopping criteria (default is \code{1e-4}).
+#' @param abstol Absolute tolerance for parameters change as the stopping criteria (default is \code{1e-4}).
 #' @param log.switch Logical value indicating whether to record the history of convergence progress. 
 #'                   If \code{TRUE}, the intermediate parameters are recorded during the algorithm (default is \code{TRUE}).
 #'                       
