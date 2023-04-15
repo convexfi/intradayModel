@@ -1,22 +1,22 @@
-#' @title Decompose the intraday trading volume signal
+#' @title Decompose the Intraday Market Signal
 #'
-#' @description A model with all parameters fixed can be used to decompose the intraday trading signal into daily, seasonal, 
-#'              and intraday dynamic components. The daily component and intraday dynamic component at time \eqn{t} are the 
-#'              smoothed state estimate conditioned on all the data. They are mathematically denoted by 
-#'              \eqn{\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}, where \eqn{N} is the total number of bins in the train set. 
-#'              The seasonal component has the value of \eqn{\boldsymbol{\phi}}.
+#' @description A model with all parameters fixed can be used to decompose the intraday market signal into daily, seasonal, 
+#'              and intraday dynamic components. The daily component and intraday dynamic component at time \eqn{\tau} are the smoothed state estimate 
+#'              conditioned on all the data, and denoted by \eqn{\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}{E[ x(\tau) | y(\tau), \tau = 1, ..., N ]}, 
+#'              where \eqn{N} is the total number of bins in the train set. The seasonal component has the value of 
+#'              \eqn{\boldsymbol{\phi}}{\phi}.
 #'              
 #'              This function will produce the three components along with a plot.
 #'
-#' @param data n_bin * n_day trading volume data matrix with no NA.
-#' @param uniModel uniModel object from function with all parameters fixed.
+#' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
+#' @param uniModel Model list object with all parameters fixed.
 #'
 #' @return A list containing the following elements:
 #'        \item{\code{components}}{A list containing three components:
-#'              \itemize{ \item{\code{daily}: Daily average part;}
-#'                        \item{\code{dynamic}: Intraday dynamic part;}
-#'                        \item{\code{seasonal}}: Intraday periodic component (the seasonality).}}
-#'        \item{\code{plot}}{The plot of original signal and three components.}
+#'              \itemize{ \item{\code{daily}: Daily component;}
+#'                        \item{\code{seasonal}: Seasonal component;}
+#'                        \item{\code{dynamic}}: Intraday dynamic component.}}
+#'        \item{\code{plot}}{A plot of the original signal and three components.}
 #'        
 #' 
 #' @references
@@ -25,18 +25,11 @@
 #' @seealso \code{\link{uniModelSpec}}
 #' 
 #' @examples
-#' library(intradayModel)
-#' # load the data
-#' data("AAPL_volume")
-#' 
-#' # define the uniModel
-#' modelSpec <- uniModelSpec(fit = TRUE)
-#' 
-#' # fit the model
-#' modelSpec.fit <- uniModelFit(data_log_volume, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-#' 
-#' # filter
-#' components <- uniModelFilter(data_log_volume, uniModel.fit)
+#' # filter AAPL_volume
+#' data(AAPL_volume)
+#' model <- uniModelSpec(fit = TRUE)
+#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' filter_result <- uniModelFilter(AAPL_volume, model_fitted)
 #' 
 #' @export
 uniModelFilter <- function(data, uniModel) {
