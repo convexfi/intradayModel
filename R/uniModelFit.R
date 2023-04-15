@@ -8,13 +8,14 @@
 #' @param maxit Maximum number of iterations (default is \code{3000}).
 #' @param abstol Absolute tolerance on the objective function to be used as the stopping criteria (default is \code{1e-4}).
 #' @param log.switch Logical value indicating whether to record the history of convergence progress. 
-#'                   If \code{TRUE}, a \code{uniModel} object with convergence log is returned (default is \code{TRUE}).
+#'                   If \code{TRUE}, the intermediate parameters are recored during the algorithm.
+#'                   A \code{uniModel} object with convergence log is returned (default is \code{TRUE}).
 #' @param acceleration Logical value indicating whether to use accelerated Expectation-Maximization (EM) algorithm. 
 #'                     If \code{TRUE}, accelerated EM algorithm is used (default is \code{FALSE}).  
 #' @param verbose An integer specifying the level of information output during the algorithm iterations.
-#'                \itemize{\item{\code{"0"}: output nothing;}
-#'                    \item{\code{"1"}: output the iteration precision;}
-#'                    \item{\code{"2"}: output the iteration precision and the final model object;}}
+#'                \itemize{\item{\code{"0"}: no output;}
+#'                    \item{\code{"1"}: show iteration number and change of the parameters;}
+#'                    \item{\code{"2"}: 1 + show obtained parameters;}}
 #'                (default is \code{1}).
 #' @return A list containing the following elements (if the algorithm converges):
 #'         \item{\code{par}}{Values of fixed parameters.}
@@ -23,10 +24,12 @@
 #'         \item{\code{par_log}}{List of parameter values during the convergence if \code{log.switch = TRUE}.} 
 #'         If the algorithm does not converge, the original input uniModel with unfixed parameters is returned. 
 #'                                
-#' @author Shengjie Xiu and Yifan Yu
 #' 
 #' @references
-#' R. Chen, Y. Feng, and D. Palomar, “Forecasting intraday trading volume: a kalman filter approach,” Available at SSRN 3101695, 2016.
+#' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
+#' 
+#' Varadhan, R., and Roland, C. (2008). Simple and globally convergent methods for accelerating the convergence of any EM algorithm. 
+#' Scandinavian Journal of Statistics, 35(2), 335–353.
 #' 
 #' @seealso \code{\link{uniModelSpec}}
 #' 
@@ -152,6 +155,7 @@ em_update <- function(...) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
     if (diff < abstol) {
+      iter <- i
       convergence <- TRUE
       break
     }
@@ -172,9 +176,9 @@ em_update <- function(...) {
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
 
   if (convergence) {
-    cat("EM algorithm converges.\n")
+    cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
-    warning("No convergence")
+    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
   result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
   return(result)
@@ -276,6 +280,7 @@ em_update_acc <- function(...) {
       cat("iter:", i, " diff:", diff, "\n", sep = "")
     }
     if (diff < abstol) {
+      iter <- i
       convergence <- TRUE
       break
     }
@@ -296,9 +301,9 @@ em_update_acc <- function(...) {
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
   if (convergence) {
-    cat("EM algorithm converges.\n")
+    cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
-    warning("No convergence")
+    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
   result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
   return(result)

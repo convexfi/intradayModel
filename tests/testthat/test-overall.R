@@ -48,3 +48,27 @@ test_that("package, stock = GE", {
   expect_equal(as.vector(as.matrix(predict_result_acc$measure)), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-2)
   
 })
+
+
+
+test_that("messages, stock = GE", {
+  data(GE_volume)
+
+  # Spec
+  expect_error(uniModelSpec(fit = FALSE), regexp = "Wrong input: unfitted model contains unknown parameters.\n")
+
+  # Fitting
+  modelSpec <- uniModelSpec(fit = TRUE)
+  data <- GE_volume
+  data_train <- GE_volume[, 1:104]
+  expect_warning(uniModelFit(data_train, modelSpec, maxit = 1), regexp = "Warning! Reached maxit before parameters converged. Maxit was 1.\n")
+  expect_output(uniModelFit(data_train, modelSpec, maxit = 1000, acceleration = TRUE, verbose = 0), regexp = "Success! abstol test passed at 22 iterations.")
+  
+  modelSpec.fit_acc <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
+  # ?
+  # expect_output(uniModelFit(data_train, modelSpec.fit_acc), "All parameters are fixed. No need to fit.\n")
+  
+  expect_error(uniModelFilter(data, modelSpec), regexp = "All parameters must be fitted.\n Parameter a_eta, a_mu, var_eta, var_mu, r, phi, x0, V0 is not fitted.")
+  
+  expect_error(uniModelPred(data, modelSpec.fit_acc, 300), regexp = "out.sample must be smaller than the number of columns in data matrix.")
+})
