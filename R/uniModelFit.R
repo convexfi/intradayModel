@@ -1,23 +1,24 @@
-#' @title Fit a Univaraite State-space Model via Expectation-Maximization
+#' @title Fit a Univaraite State-Space Model via Expectation-Maximization Algorithm
 #' 
-#' @description The main function for fitting the univaraite state-space model using expectation-maximization (EM) algorithms. The closed-form expression 
-#' of the EM iterations are provided by (Chen et al., 2016). The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}}{|| \Delta \Theta(i) || <= abstol} is satisfied.
+#' @description The main function for fitting a univaraite state-space model by using expectation-maximization (EM) algorithms. 
+#' The implementation follows (Chen et al., 2016), and the accelerated scheme is provided in (Varadhan and Roland, 2008).
+#' The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 #'
 #' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
 #' @param uniModel Univariate model list object from function \code{uniModelSpec}.
 #' @param acceleration Logical value indicating whether to use the accelerated EM algorithm. If \code{TRUE}, the accelerated one will be used (default is \code{FALSE}).
 #' @param maxit Maximum number of iterations (default is \code{3000}).
-#' @param abstol Absolute tolerance for parameters change as the stopping criteria (default is \code{1e-4}).
+#' @param abstol Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default is \code{1e-4}).
 #' @param log.switch Logical value indicating whether to record the history of convergence progress. 
 #'                   If \code{TRUE}, the intermediate parameters are recorded during the algorithm (default is \code{TRUE}).
 #'                       
-#' @param verbose An integer specifying the print level of information during the algorithm (default is \code{1}).
+#' @param verbose An integer specifying the print level of information during the algorithm (default is \code{1}). Possible numbers:
 #'                \itemize{\item{\code{"0"}: no output;}
-#'                    \item{\code{"1"}: show iteration number and change of the parameters;}
-#'                    \item{\code{"2"}: 1 + show finally obtained parameters.}}
+#'                    \item{\code{"1"}: show the iteration number and \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||};}
+#'                    \item{\code{"2"}: 1 + show the final parameters.}}
 #' @return A list containing the following elements (if the algorithm converges):
-#'         \item{\code{par}}{List of parameters' values after fitting.}
-#'         \item{\code{par_log}}{List of intermediate parameters' values during the algorithm if \code{log.switch = TRUE}.} 
+#'         \item{\code{par}}{List of parameters' fitted values.}
+#'         \item{\code{par_log}}{List of intermediate parameters' values if \code{log.switch = TRUE}.} 
 #'         \item{\code{fit_request}}{List of logical values indicating whether the parameters require further fitting.}
 #'                                
 #' 
