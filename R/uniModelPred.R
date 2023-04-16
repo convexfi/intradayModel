@@ -1,31 +1,31 @@
-#' @title Forecast One-bin-ahead Intraday Market Signal via a Univariate State-space Model  
+#' @title Predict One-bin-ahead Intraday Market Signal via a Univariate State-Space Model  
 #'
 #' @description The one-bin-ahead prediction is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
-#'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample forecasting.
-#'              Three performance measures are used to evaluate the forecasting results:
+#'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
+#'              Three measures are used to evaluate the prediction performance:
 #'              \itemize{\item{Mean absolute error (MAE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
 #'                       \item{Mean absolute percent error (MAPE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{y_{\tau}},}{\sum (|y*(\tau) - y(\tau)| / y(\tau)) / M} ;}
-#'                       \item{Root Mean Square Error (RMSE):
+#'                       \item{Root mean square error (RMSE):
 #'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} ,}
 #'              }
 #'              where \eqn{M} is the total number of out-of-sample bins.
 #'
 #' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
 #' @param uniModel Univariate model list object with all parameters fixed.
-#' @param out.sample  Number of days from the end of the dataset for out-of-sample forecasting.
+#' @param out.sample  Number of days from the end of the dataset for out-of-sample prediction.
 #'
 #' @return A list containing the following elements:
 #'         \item{\code{signal_pred}}{One-bin-ahead prediction of intraday market signal.}
 #'         \item{\code{signal_real}}{Real out-of-sample intraday market signal.}
-#'         \item{\code{measure}}{MAE, MAPE, RMSE measures of out-of-sample forecasting performance.}
-#'         \item{\code{plot}}{Plot of the forecast and real values.}
+#'         \item{\code{measure}}{MAE, MAPE, RMSE of out-of-sample prediction performance.}
+#'         \item{\code{plot}}{Plot of the prediction and real values.}
 #' 
 #' @seealso \code{\link{uniModelSpec}}
 #' 
 #' @examples
-#' # One-bin-ahead forecasting on the last 20 days of AAPL_volume
+#' # One-bin-ahead prediction on the last 20 days of AAPL_volume
 #' data("AAPL_volume")
 #' data <- AAPL_volume
 #' data_train <- AAPL_volume[, 1:104]

@@ -1,4 +1,4 @@
-#' @title Define a Univariate State-space Model
+#' @title Define a Univariate State-Space Model
 #' 
 #' @description This function defines a univariate state-space model proposed by (Chen et al., 2016). The model has the formulation:
 #'              \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}{x(\tau+1) = A(\tau) x(\tau) + w(\tau),}
@@ -20,7 +20,7 @@
 #' 
 #' @param fit Logical value indicating whether the model needs to be fitted (default is \code{FALSE}). 
 #'            If \code{FLASE}, all parameters should be assigned values via \code{fixed.pars}.
-#' @param fixed.pars List of values of fixed parameters. The allowed input parameters are given as follows,
+#' @param fixed.pars List of parameters' fixed values. The allowed parameters are listed below,
 #'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
 #'                           \item{\code{"a_mu"}: \eqn{a^{\mu}}{a.\mu}} of size 1 ;
 #'                           \item{\code{"var_eta"}: \eqn{\sigma^{\eta}}{(\sigma.\eta)^2}} of size 1 ;
@@ -28,33 +28,30 @@
 #'                           \item{\code{"r"}: \eqn{r}{r} of size 1 ;}
 #'                           \item{\code{"phi"}: \eqn{\phi = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]} of size \eqn{I} ;}
 #'                           \item{\code{"x0"}: \eqn{\mathbf{x}_0}{x(0)} of size 2 ;}
-#'                           \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)}, contains three doubles, corresponding to the 
-#'                                              \eqn{\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2).}}}
-#' @param init.pars List of initial values of the unfitted parameters. The parameters are the same as \code{fixed.pars}. 
-#'                  The unfitted parameters without user-defined initial values will be given default values in \code{uniModelFit}.
+#'                           \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)} of size 2 * 2 .}}
+#' @param init.pars List of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
+#'                  If the user does not assign initial values for the unfitted parameters, default ones will be used in \code{uniModelFit}.
 #'
 #' @return A univaraite model list object which contains the following elements:
 #'         \item{\code{par}}{List of parameters' values.}
-#'         \item{\code{init}}{List of unfitted parameters' initial values.}
-#'         \item{\code{fit_request}}{List of logical values indicating whether the parameters require fitting.}
+#'         \item{\code{init}}{List of unfitted parameters' initial values defined by users.}
+#'         \item{\code{fit_request}}{List of logical values indicating whether each parameters requires fitting.}
 #' 
 #' @references
 #' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
 #' 
-#' Brownlees, C. T., Cipollini, F., and Gallo, G. M. (2011). Intra-daily volume modeling and prediction for algorithmic trading. 
-#' Journal of Financial Econometrics, 9(3), 489–518.
 #' 
 #' @seealso \code{\link{uniModelFit}}, \code{\link{uniModelFilter}}, \code{\link{uniModelPred}}
 #'
 #' @examples
-#' # set initial value 
-#' init.pars <- list()
-#' init.pars$"a_eta" <- 1
-#'
 #' # set fixed value
 #' fixed.pars <- list()
 #' fixed.pars$"var_eta" <- 4
-#' fixed.pars$"x0" <- matrix(c(10, 0), 2)
+#' fixed.pars$"x0" <- c(10, 0)
+#' 
+#' # set initial value 
+#' init.pars <- list()
+#' init.pars$"a_eta" <- 1
 #'
 #' # define the univariate model
 #' model <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)

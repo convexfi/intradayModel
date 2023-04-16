@@ -203,7 +203,7 @@ model_fitted <- uniModelFit(data_train, model, acceleration = TRUE, verbose = 2)
 
 > **uniModelFilter**(data, uniModel)
 
-The `uniModelFilter` function in this package allows you to decompose an intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the train set. The seasonal component has the value of $\boldsymbol{\phi}$.
+The `uniModelFilter` function in this package allows you to decompose an intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. The seasonal component has the value of $\boldsymbol{\phi}$.
 
 To use this function, input your intraday signal and the fitted model as arguments. This function will produce the three components along with a plot.
 
@@ -217,15 +217,15 @@ filter_result$plot
 
 > **uniModelPred**(data, uniModel, out.sample) 
 
-The `uniModelPred` function allows you to predict the intraday signal one-bin-ahead, given your dataset and the fitted model. The one-bin-ahead forecast is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample forecasting.
+The `uniModelPred` function allows you to predict the intraday signal one-bin-ahead, given your dataset and the fitted model. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
 
-Since fitting a model to some data does not guarantee good predictions on unseen data, `uniModelPred` also evaluates the model's performance with the following measures for you:
+Since fitting a model to some data does not guarantee good prediction on unseen data, `uniModelPred` also evaluates the model's performance with the following measures for you:
 
 - Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$.
 
 - Mean absolute percent error (MAPE): $\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_\tau - y_\tau\rvert}{y_\tau}$.
 
-- Root Mean Square Error (RMSE): $\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_\tau - y_\tau\right)^2}{M}}$.
+- Root mean square error (RMSE): $\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_\tau - y_\tau\right)^2}{M}}$.
 
 Here $M$ is the total number of out-of-sample bins. The sample code is given as follows.
 

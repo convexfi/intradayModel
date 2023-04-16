@@ -1,22 +1,22 @@
-#' @title Decompose Intraday Market Signal via a Univariate State-space Model 
+#' @title Decompose Intraday Market Signal via a Univariate State-Space Model 
 #'
 #' @description A model with all parameters fixed can be used to decompose the intraday market signal into daily, seasonal, 
 #'              and intraday dynamic components. The daily component and intraday dynamic component at time \eqn{\tau} are the smoothed state estimate 
 #'              conditioned on all the data, and denoted by \eqn{\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}{E[ x(\tau) | y(\tau), \tau = 1, ... , N ]}, 
-#'              where \eqn{N} is the total number of bins in the train set. The seasonal component has the value of 
+#'              where \eqn{N} is the total number of bins in the dataset. The seasonal component has the value of 
 #'              \eqn{\boldsymbol{\phi}}{\phi}.
 #'              
-#'              This function will produce the three components along with a plot.
+#'              This function will produce the above three components with a plot.
 #'
 #' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
 #' @param uniModel Univariate model list object with all parameters fixed.
 #'
 #' @return A list containing the following elements:
-#'        \item{\code{components}}{A list containing three components:
+#'        \item{\code{components}}{A list of the three components:
 #'              \itemize{ \item{\code{daily}: Daily component;}
 #'                        \item{\code{seasonal}: Seasonal component;}
 #'                        \item{\code{dynamic}}: Intraday dynamic component.}}
-#'        \item{\code{plot}}{A plot of the original signal and three components.}
+#'        \item{\code{plot}}{A plot of the original signal and the three components.}
 #'        
 #' 
 #' @references
