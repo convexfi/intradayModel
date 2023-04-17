@@ -1,28 +1,3 @@
----
-output:
-  html_document:
-    variant: markdown_github
-    keep_md: true
-  md_document:
-    variant: markdown_github
----
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, echo=FALSE}
-library(knitr)
-opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  fig.align = "center",
-  fig.retina = 2,
-  out.width = "75%",
-  dpi = 96
-)
-knit_hooks$set(pngquant = hook_pngquant)
-```
-
 Model and forecast financial intraday signals, including trading volume and volatility, using state-space models. Currently, the univaraite state-space model for intraday trading volume is available.
 
 ## Installation
