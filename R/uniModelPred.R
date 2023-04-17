@@ -1,50 +1,38 @@
-#' @title Predict one-bin-ahead trading volume via kalman filter
+#' @title Predict One-bin-ahead Financial Intraday Signal via a Univariate State-Space Model  
 #'
-#' @description The one-bin-ahead prediction is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}.
-#'              Given the dataset, you need to indicate how many days from the end to keep for out-of-sample forecast.
-#'              Three performance measures are used to evaluate the forecast results:
+#' @description The one-bin-ahead prediction is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
+#'              Three measures are used to evaluate the prediction performance:
 #'              \itemize{\item{Mean absolute error (MAE):
-#'                             \eqn{\frac{1}{M}\sum_{i=1}^M\lvert\hat{y}_{\tau} - y_{\tau}\rvert,}}
+#'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
 #'                       \item{Mean absolute percent error (MAPE):
-#'                             \eqn{\frac{1}{M}\sum_{i=1}^M\frac{\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{y_{\tau}},}}
-#'                       \item{Root Mean Square Error (RMSE):
-#'                             \eqn{\sqrt{\sum_{i=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}},}}
+#'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{y_{\tau}},}{\sum (|y*(\tau) - y(\tau)| / y(\tau)) / M} ;}
+#'                       \item{Root mean square error (RMSE):
+#'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} ,}
 #'              }
-#'              where \eqn{M} is the number of bins.
+#'              where \eqn{M} is the total number of out-of-sample bins.
 #'
-#' @param data n_bin * n_day trading volume data matrix with no NA.
-#' @param uniModel uniModel object with all parameters fixed.
-#' @param out.sample  Number of days before the last for out of sample forecast.
+#' @param data Matrix of intraday signal of size n_bin * n_day without any missing values.
+#' @param uniModel Univariate model list object with all parameters fixed.
+#' @param out.sample  Number of days from the end of the dataset for out-of-sample prediction.
 #'
 #' @return A list containing the following elements:
-#'         \item{\code{signal_pred}}{One-bin-ahead trading volume forecast.}
-#'         \item{\code{signal_real}}{Real values of trading volume.}
-#'         \item{\code{measure}}{Prediction performance measured by mae, mape and rmse.}
-#'         \item{\code{plot}}{Plot of prediction and real values.}
+#'         \item{\code{signal_pred}}{One-bin-ahead prediction of intraday signal.}
+#'         \item{\code{signal_real}}{Real out-of-sample intraday signal.}
+#'         \item{\code{measure}}{MAE, MAPE, RMSE of out-of-sample prediction performance.}
+#'         \item{\code{plot}}{Plot of the prediction and real values.}
 #' 
 #' @seealso \code{\link{uniModelSpec}}
 #' 
 #' @examples
-#' library(intradayModel)
-#' # load the data
+#' # One-bin-ahead prediction on the last 20 days of AAPL_volume
 #' data("AAPL_volume")
-#' 
-#' # define the uniModel
-#' modelSpec <- uniModelSpec(fit = TRUE)
-#' 
-#' # fit the model
 #' data <- AAPL_volume
 #' data_train <- AAPL_volume[, 1:104]
-#' modelSpec_fitted <- uniModelFit(data_train, modelSpec, acceleration = TRUE)
 #' 
-#' # predict
-#' predict_result <- uniModelPred(data, modelSpec_fitted, out.sample = 20)
-#' 
-#' # predict performance measures
-#' predict_result$measure
-#' 
-#' # predict result plot
-#' predict_result$plot
+#' model <- uniModelSpec(fit = TRUE)
+#' model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
+#' predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
 #' 
 #' @export
 uniModelPred <- function(data, uniModel, out.sample) {
