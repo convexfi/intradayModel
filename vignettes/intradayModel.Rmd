@@ -61,6 +61,7 @@ To get started, we load the package and some sample data: the 15-minute intraday
 ```{r, message = FALSE}
 devtools::load_all()
 data(AAPL_volume)
+AAPL_volume[1:5, 1:5]
 ```
 
 Next, we define a univariate state-space model using the `uniModelSpec` function.
