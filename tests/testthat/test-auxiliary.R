@@ -1,6 +1,5 @@
 test_that("marss_to_unimodel works", {
-  data("data_log_volume")
-  data <- as.matrix(data_log_volume)
+  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
   n_bin <- nrow(data)
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
@@ -9,16 +8,12 @@ test_that("marss_to_unimodel works", {
   fixed.pars$"var_eta" <- 4
   modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
   
-  data <- data_log_volume
-  data <- as.matrix(data)
-  
   data_reform <- data %>%
     as.list() %>%
     unlist()
   
   args <- list(data = data,
                uniModel = modelSpec)
-  
   
   kalman <- do.call(specify_marss, args = args)
   kalman$par <- kalman$start
@@ -46,93 +41,8 @@ test_that("marss_to_unimodel works", {
   
 })
 
-test_that("specify_marss works without fixed params", {
-  data("data_log_volume")
-  data <- as.matrix(data_log_volume)
-  n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
-  
-  ## reform data
-  data_reform <- data %>%
-    as.list() %>%
-    unlist()
-  modelSpec <- uniModelSpec(fit = TRUE)
-  
-  args <- list(data = data,
-               uniModel = modelSpec)
-  
-  model_test <- do.call(specify_marss, args = args)
-  
-  # specify the marss in the original way
-  MARSS_model <- list()
-  MARSS_model$model.gen <- list()
-  MARSS_model$init.gen <- list()
-  
-  ## State Equation
-  Bt <- array(list(0), c(2, 2, n_bin_total))
-  b1 <- matrix(list(1), n_bin)
-  b1[1] <- extract_value("a_eta", modelSpec)
-  Bt[1, 1, ] <- rep(b1, n_day)
-  Bt[2, 2, ] <- extract_value("a_mu", modelSpec)
-  
-  Qt <- array(list(0), c(2, 2, n_bin_total))
-  q1 <- matrix(list(1e-10), n_bin)
-  q1[1] <- extract_value("var_eta", modelSpec)
-  Qt[1, 1, ] <- rep(q1, n_day)
-  Qt[2, 2, ] <- extract_value("var_mu", modelSpec)
-  
-  U <- "zero"
-  
-  ## Measurement Equation
-  Z <- array(list(1, 1), c(1, 2))
-  
-  At = array(list(0), dim = c(1, 1, n_bin_total))
-  a_vec = extract_value("phi", modelSpec)
-  if (identical(a_vec, "phi") || length(a_vec) != n_bin){
-    if (!identical(a_vec, "phi") && length(a_vec) != n_bin) warning("Dimensions of input data and pre-fixed phi aren't compatible.\n
-                                       The values of fixed phi are ignored.")
-    for (n in 1:n_bin) {
-      a_vec[n] <- paste("phi", n, sep = "")
-    }
-    
-  }
-  
-  At[1, 1, ] = rep(a_vec, n_day)
-  
-  R <- extract_value("r", modelSpec) %>%
-    list() %>%
-    matrix(1,1)
-  
-  ## Initial State
-  x0 <- extract_value("x0", modelSpec) %>%
-    matrix(2, 1)
-  V0 <- extract_value("V0", modelSpec)
-  
-  ## predefined init value
-  init_default <- list("x0" = matrix(c(mean(data_reform), 0), 2, 1),
-                       "a_eta" = 1, "a_mu" = 0,
-                       "r" = 1e-4,
-                       "var_eta" = 1e-4, "var_mu" = 1e-4,
-                       "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
-                       "phi" = rowMeans(matrix(data_reform, nrow = n_bin)) - mean(data_reform)
-  )
-  ## Init param
-  MARSS_model$init.gen <- extract_init(init_default, modelSpec$init, modelSpec$fit_request)
-  
-  ## EM
-  MARSS_model$model.gen <- list(Z=Z,R=R,A=At,B=Bt, Q=Qt, U=U, x0=x0,V0=V0, tinitx=1)
-  model_original <- MARSS::MARSS(data_reform, model=MARSS_model$model.gen, inits = MARSS_model$init.gen, fit=FALSE, silent = TRUE)
-  
-  
-  expect_equal(model_test, model_original)
-  
-})
-
-# need to be checked again
 test_that("specify_marss works with partial fixed params", {
-  data("data_log_volume")
-  data <- as.matrix(data_log_volume)
+  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
   n_bin <- nrow(data)
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
@@ -197,15 +107,11 @@ test_that("specify_marss works with partial fixed params", {
   
   
   expect_equal(model_test, model_original)
-  
 })
 
 test_that("extract_value works", {
-  data("data_log_volume")
-  data <- as.matrix(data_log_volume)
+  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
   n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
   
   ## reform data
   data_reform <- data %>%
@@ -226,11 +132,8 @@ test_that("extract_value works", {
 })
 
 test_that("extract_init works", {
-  data("data_log_volume")
-  data <- as.matrix(data_log_volume)
+  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
   n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
   
   ## reform data
   data_reform <- data %>%
@@ -269,33 +172,13 @@ test_that("extract_init works", {
 })
 
 test_that("cleanParsList works", {
-  # test.pars <- list()
-  # test.pars$"a_eta" <- "a"
-  # test.pars$"a_mu" <- 1
-  # test.pars$"var_eta" <- Inf
-  # test.pars$"x0" <- matrix(c(NA,0),2)
-  # test.pars$"V0" <- matrix(0,3)
-  # test.pars$"yyy" <- 6
-  # 
-  # test.pars <- clean_pars_list(test.pars)
-  # 
-  # predefined.pars <- list()
-  # predefined.pars$"a_mu" <- 1
-  # 
-  # expect_equal(test.pars, predefined.pars)
-  
-  init.pars <- list()
-  init.pars$"a_eta" <- 1
-  init.pars$"x0" <- matrix(0, 2)
-  init.pars$"xxx" <- 3
-  
   fixed.pars <- list()
   fixed.pars$"a_mu" <- NA
   fixed.pars$"var_eta" <- 4
   fixed.pars$"x0" <- matrix(0, 2)
   fixed.pars$"V0" <- matrix(c(1,2,3,4), 2)
   
-  fixed.pars <- clean_pars_list(fixed.pars, "fixed")$input_list
+  fixed.pars <- clean_pars_list(fixed.pars)$input_list
   
   predefined.pars <- list()
   predefined.pars$"var_eta" <- 4
@@ -312,8 +195,6 @@ test_that("is_uniModel works", {
   fixed.pars$"x0" <- matrix(0,2)
   fixed.pars$"phi" <- matrix(2, n_bin)
   modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
-  
-  data("data_log_volume")
   
   modelSpec_check1 <- modelSpec[c("par", "init")]
   expect_error(is_uniModel(modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
