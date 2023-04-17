@@ -104,6 +104,7 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
     }
   }
 
+  # store inputs in univariate model object
   for (name in all_pars_name) {
     if (name %in% names(fixed.pars)) {
       uniModel$par[[name]] <- fixed.pars[[name]]
