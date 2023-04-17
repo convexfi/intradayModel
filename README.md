@@ -1,8 +1,12 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-Model and forecast financial intraday signals, including trading volume
-and volatility, using state-space models. Currently, the univaraite
-state-space model for intraday trading volume is available.
+# intradayModel
+
+Our package unlocks the power of intraday trading for you. With
+state-of-the-art state-space models, you can effortlessly decompose and
+forecast financial intraday signals. Our package now offers a univariate
+model for intraday trading volume, with more exciting features on
+intraday volatility and multivariate models coming soon.
 
 ## Installation
 
@@ -24,24 +28,12 @@ intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
 devtools::load_all()
 data(AAPL_volume)
 AAPL_volume[1:5, 1:5]
-#>          2019-01-02 2019-01-03
-#> 09:30 AM   10142172    3434769
-#> 09:45 AM    5691840   19751251
-#> 10:00 AM    6240374   14743180
-#> 10:15 AM    5273488   14841012
-#> 10:30 AM    4587159   18041115
-#>          2019-01-04 2019-01-07
-#> 09:30 AM   20852127   15463747
-#> 09:45 AM   13374784    9962816
-#> 10:00 AM   11478596    7453044
-#> 10:15 AM   16024512    7270399
-#> 10:30 AM    8686059    7130980
-#>          2019-01-08
-#> 09:30 AM   14719388
-#> 09:45 AM    9515796
-#> 10:00 AM    6145623
-#> 10:15 AM    6031988
-#> 10:30 AM    5479852
+#>          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08
+#> 09:30 AM   10142172    3434769   20852127   15463747   14719388
+#> 09:45 AM    5691840   19751251   13374784    9962816    9515796
+#> 10:00 AM    6240374   14743180   11478596    7453044    6145623
+#> 10:15 AM    5273488   14841012   16024512    7270399    6031988
+#> 10:30 AM    4587159   18041115    8686059    7130980    5479852
 ```
 
 Next, we define a univariate state-space model using the `uniModelSpec`
@@ -95,6 +87,19 @@ predict_result$plot
 ```
 
 <img src="man/figures/README-quick-start-pred-1.png" width="75%" style="display: block; margin: auto;" />
+
+## Contributing
+
+We welcome all sorts of contributions. Please feel free to open an issue
+to report a bug or discuss a feature request.
+
+## Citation
+
+If you made use of this software please consider citing:
+
+-   Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday
+    trading volume: A kalman filter approach.
+    <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695>
 
 ## Links
 
