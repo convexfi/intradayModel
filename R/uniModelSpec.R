@@ -79,7 +79,7 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   fixed_clean_result <- clean_pars_list(fixed.pars)
   fixed.pars <- fixed_clean_result$input_list
   
-  unecessary_init <- union(names(init.pars), names(fixed.pars))
+  unecessary_init <- intersect(names(init.pars), names(fixed.pars))
   init.pars <- init.pars[setdiff(names(init.pars), names(fixed.pars))]
   init_clean_result <- clean_pars_list(init.pars)
   init.pars <- init_clean_result$input_list
