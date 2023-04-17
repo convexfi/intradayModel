@@ -383,7 +383,15 @@ is_uniModel <- function(uniModel, n_bin = NULL) {
   #     msg <- c(msg, "Element\n")
   #   }
   # }
-
+  
+  # check fit_request
+  logical_check <- lapply(test_flag, is.logical)
+  if (any(logical_check == FALSE)) {
+    msg <- c("Invalid value of uniModel$fit_request$", 
+             paste(names(logical_check[logical_check == FALSE]), collapse = ", "), 
+             ". Elements in uniModel$fit_request must be TRUE or FALSE." )
+    stop(msg)
+  }
   
   # Check no NA inf and dimension
   msg <- check_pars_list(uniModel, n_bin)
