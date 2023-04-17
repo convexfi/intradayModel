@@ -92,8 +92,29 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   uniModel$init <- list()
 
   # read in input parameters
-  fixed.pars <- clean_pars_list(fixed.pars)
-  init.pars <- clean_pars_list(init.pars)
+  fixed_clean_result <- clean_pars_list(fixed.pars)
+  fixed.pars <- fixed_clean_result$input_list
+  
+  unecessary_init <- union(names(init.pars), names(fixed.pars))
+  init.pars <- init.pars[setdiff(names(init.pars), names(fixed.pars))]
+  init_clean_result <- clean_pars_list(init.pars)
+  init.pars <- init_clean_result$input_list
+  
+  # generate warning message
+  msg <- NULL
+  if (!is.null(fixed_clean_result$msg)){
+    msg <- c("In fixed.pars:\n", fixed_clean_result$msg)
+  }
+  if (!is.null(init_clean_result$msg)){
+    msg <- c(msg, "In init.pars:\n", init_clean_result$msg)
+  }
+  if (!is.null(unecessary_init)){
+    msg <- c(msg, paste(paste(unecessary_init, collapse = ", ")," is set by the fixed.pars.\n"))
+  }
+  if (!is.null(msg)){
+    warning(c(msg, "Thus above mentioned input value is ignored. For more details, please type ?uniModelSpec."))
+  }
+  
   for (name in all_pars_name) {
     if (name %in% names(fixed.pars)) {
       uniModel$par[[name]] <- fixed.pars[[name]]
