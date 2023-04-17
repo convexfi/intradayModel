@@ -79,26 +79,31 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   fixed_clean_result <- clean_pars_list(fixed.pars)
   fixed.pars <- fixed_clean_result$input_list
   
-  unecessary_init <- union(names(init.pars), names(fixed.pars))
+  unecessary_init <- intersect(names(init.pars), names(fixed.pars))
   init.pars <- init.pars[setdiff(names(init.pars), names(fixed.pars))]
   init_clean_result <- clean_pars_list(init.pars)
   init.pars <- init_clean_result$input_list
   
   # generate warning message
-  msg <- NULL
-  if (!is.null(fixed_clean_result$msg)){
-    msg <- c("In fixed.pars:\n", fixed_clean_result$msg)
+  if (length(fixed_clean_result$msg) > 0) {
+    cat("Warnings in fixed.pars:\n")
+    for (m in fixed_clean_result$msg) {
+      cat("  ", m, "\n", sep = "")
+    }
   }
-  if (!is.null(init_clean_result$msg)){
-    msg <- c(msg, "In init.pars:\n", init_clean_result$msg)
+  if (length(init_clean_result$msg) > 0 | length(unecessary_init) > 0) {
+    cat("Warnings in init.pars:\n")
+    if (!is.null(init_clean_result$msg)) {
+      for (m in init_clean_result$msg) {
+        cat("  ", m, "\n", sep = "")
+      }
+    }
+    if (length(unecessary_init) > 0) {
+      cat("  Elements ", paste(unecessary_init, collapse = ", "),
+          " have already been fixed.\n", sep = "")
+    }
   }
-  if (!is.null(unecessary_init)){
-    msg <- c(msg, paste(paste(unecessary_init, collapse = ", ")," is set by the fixed.pars.\n"))
-  }
-  if (!is.null(msg)){
-    warning(c(msg, "Thus above mentioned input value is ignored. For more details, please type ?uniModelSpec."))
-  }
-  
+
   for (name in all_pars_name) {
     if (name %in% names(fixed.pars)) {
       uniModel$par[[name]] <- fixed.pars[[name]]

@@ -283,10 +283,12 @@ clean_pars_list <- function(input_list) {
 
   msg <- NULL
   if (length(invalid_param) > 0){
-    msg <- c(paste(invalid_param, collapse = ", "), " is not model parameter.\n")
+    msg <- c(msg, paste("Elements ", paste(invalid_param, collapse = ", "),
+                   " are not allowed in parameter list.", sep = ""))
   }
   if (length(incorrect_param) > 0){
-    msg <- c(msg, c(paste(unique(incorrect_param), collapse = ", "), " has wrong input value. \n"))
+    msg <- c(msg, paste("Elements ", paste(unique(incorrect_param), collapse = ", "),
+                   " have invalid input.", sep = ""))
   }
   clean_result <- list("input_list" = input_list,
                        "msg" = msg)
