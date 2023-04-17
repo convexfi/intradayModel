@@ -1,10 +1,10 @@
 ---
 output:
+  md_document:
+    variant: markdown_github
   html_document:
     variant: markdown_github
     keep_md: true
-  md_document:
-    variant: markdown_github
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -23,7 +23,8 @@ opts_chunk$set(
 knit_hooks$set(pngquant = hook_pngquant)
 ```
 
-Model and forecast financial intraday signals, including trading volume and volatility, using state-space models. Currently, the univaraite state-space model for intraday trading volume is available.
+# intradayModel
+Our package unlocks the power of intraday trading for you. With state-of-the-art state-space models, you can effortlessly decompose and forecast financial intraday signals. Our package now offers a univariate model for intraday trading volume, with more exciting features on intraday volatility and multivariate models coming soon.
 
 ## Installation
 The package can be installed from [GitHub](https://github.com/convexfi/intradayModeling):
@@ -70,6 +71,14 @@ predict_result$measure
 predict_result$plot
 ```
 
+## Contributing
+We welcome all sorts of contributions. Please feel free to open an issue
+to report a bug or discuss a feature request.
+
+## Citation
+If you made use of this software please consider citing:
+
+- Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695>
 
 ## Links
 Package: [GitHub](https://github.com/convexfi/intradayModeling)
