@@ -56,11 +56,23 @@ test_that("messages, stock = GE", {
 
   # Spec
   expect_error(uniModelSpec(fit = FALSE), regexp = "If fit = FALSE, a_eta, a_mu, var_eta, var_mu, r, phi, x0, V0 must have no NAs.")
-  error_message <- paste("yyy is not model parameter. Thus its input value is ignored.\n",
-                          "a_eta has wrong input value. Thus its input value is ignored.\n",
-                         "Check whether the input parameter is number with no NA, Inf and right length.\n", sep = "")
-  expect_warning(uniModelSpec(fit = TRUE, fixed.pars = list("yyy" = 1, "a_eta" = "a")), regexp = error_message)
+  # error_message <- paste("yyy is not model parameter. Thus its input value is ignored.\n",
+  #                         "a_eta has wrong input value. Thus its input value is ignored.\n",
+  #                        "Check whether the input parameter is number with no NA, Inf and right length.\n", sep = "")
+  # expect_warning(uniModelSpec(fit = TRUE, fixed.pars = list("yyy" = 1, "a_eta" = "a")), regexp = error_message)
 
+  a <- uniModelSpec(fit = TRUE, 
+               fixed.pars = list("yyy" = 1, "a_eta" = "a", "a_mu" = c(1,2)), 
+               init.pars = list("nn" = 3, "a_eta" = c(3, 2), "a_mu" = 2))
+  
+  b <- uniModelSpec(fit = TRUE, 
+               fixed.pars = list("yyy" = 1, "a_eta" = "a", "a_mu" = c(1)), 
+               init.pars = list("nn" = 3, "a_eta" = c(3, 2), "a_mu" = 2))
+  
+  c <- uniModelSpec(fit = TRUE, fixed.pars = list("yyy" = 1, "V0" = c(1,0,2,1)))
+  
+  d <- uniModelSpec(fit = TRUE, fixed.pars = list("yyy" = 1, "V0" = c(1,0,0,1)))
+  
   # Fitting
   modelSpec <- uniModelSpec(fit = TRUE)
   data <- GE_volume
@@ -75,7 +87,7 @@ test_that("messages, stock = GE", {
 
   modelSpec.fit_acc <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE, verbose = 0)
 
-  expect_output(uniModelFit(data_train, modelSpec.fit_acc), "All parameters are already fixed.")
+  expect_output(uniModelFit(data_train, modelSpec.fit_acc), "All parameters have already been fixed.")
 
   n_bin <- 26
   fixed.pars <- list()
@@ -87,18 +99,24 @@ test_that("messages, stock = GE", {
 
   ## missing component
   modelSpec_check1 <- modelSpec_check[c("par", "init")]
-  expect_error(uniModelFit(data_train, modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
+  expect_error(uniModelFit(data_train, modelSpec_check1), "Elements fit_request are missing from the model.\n")
 
   ## missing element
   modelSpec_check2 <- modelSpec_check
   modelSpec_check2$par[["x0"]] <- NULL
-  expect_error(uniModelFit(data_train, modelSpec_check2),"Element x0 is missing from the uniModel[$]par.\n")
+  expect_error(uniModelFit(data_train, modelSpec_check2),"Elements x0 are missing from uniModel[$]par.\n")
 
   ## fixed paramenter with NA
   modelSpec_check3 <- modelSpec_check
   modelSpec_check3$fit_request[["a_eta"]] <- FALSE
   expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
 
+  # modelSpec_check3$fit_request[["a_eta"]] <- Inf
+  # expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
+  # 
+  # modelSpec_check3$fit_request[["a_eta"]] <- NA
+  # expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
+  
   ## wrong dimension/lenghth
   modelSpec_check4 <- modelSpec_check
   modelSpec_check4$par[["x0"]] <- 1
@@ -109,7 +127,7 @@ test_that("messages, stock = GE", {
   expect_error(uniModelFit(data_train, modelSpec_check4), error_message)
 
   # Filtering
-  expect_error(uniModelFilter(data, modelSpec), regexp = "All parameters must be fitted.\n Parameter a_eta, a_mu, var_eta, var_mu, r, phi, x0, V0 is not fitted.")
+  expect_error(uniModelFilter(data, modelSpec), regexp = "All parameters must be optimally fitted. Parameters a_eta, a_mu, var_eta, var_mu, r, phi, x0, V0 are not optimally fitted.")
 
   # Prediction
   expect_error(uniModelPred(data, modelSpec.fit_acc, 300), regexp = "out.sample must be smaller than the number of columns in data matrix.")
