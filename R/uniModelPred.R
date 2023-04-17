@@ -1,4 +1,4 @@
-#' @title Predict One-bin-ahead Intraday Market Signal via a Univariate State-Space Model  
+#' @title Predict One-bin-ahead Financial Intraday Signal via a Univariate State-Space Model  
 #'
 #' @description The one-bin-ahead prediction is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
 #'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
@@ -12,13 +12,13 @@
 #'              }
 #'              where \eqn{M} is the total number of out-of-sample bins.
 #'
-#' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
+#' @param data Matrix of intraday signal of size n_bin * n_day without any missing values.
 #' @param uniModel Univariate model list object with all parameters fixed.
 #' @param out.sample  Number of days from the end of the dataset for out-of-sample prediction.
 #'
 #' @return A list containing the following elements:
-#'         \item{\code{signal_pred}}{One-bin-ahead prediction of intraday market signal.}
-#'         \item{\code{signal_real}}{Real out-of-sample intraday market signal.}
+#'         \item{\code{signal_pred}}{One-bin-ahead prediction of intraday signal.}
+#'         \item{\code{signal_real}}{Real out-of-sample intraday signal.}
 #'         \item{\code{measure}}{MAE, MAPE, RMSE of out-of-sample prediction performance.}
 #'         \item{\code{plot}}{Plot of the prediction and real values.}
 #' 

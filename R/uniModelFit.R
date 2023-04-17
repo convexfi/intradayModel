@@ -4,7 +4,7 @@
 #' The implementation follows (Chen et al., 2016), and the accelerated scheme is provided in (Varadhan and Roland, 2008).
 #' The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 #'
-#' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
+#' @param data Matrix of intraday signal of size n_bin * n_day without any missing values.
 #' @param uniModel Univariate model list object from function \code{uniModelSpec}.
 #' @param acceleration Logical value indicating whether to use the accelerated EM algorithm. If \code{TRUE}, the accelerated one will be used (default is \code{FALSE}).
 #' @param maxit Maximum number of iterations (default is \code{3000}).
