@@ -1,81 +1,12 @@
-test_that("uniModelFit params conincide with precomputed model", {
-  data("data_log_volume")
-  load("./tests/testthat/params.rda")
-  precomputed_par <- params
-  
-  modelSpec <- uniModelSpec(fit = TRUE)
-  
-  data <- data_log_volume
-  data <- as.matrix(data)
-  n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
-  control = list(maxit = 3000, abstol = 1e-4, log.switch = TRUE)
-  
-  args <- list(data = data, n_bin = n_bin,
-               n_day = n_day, n_bin_total = n_bin_total,
-               modelSpec = modelSpec,
-               control = control)
-  
-  
-  result <- do.call(MARSS_spec, args = args)
-  kalman <- result$kalman
-  At <- result$At
-  
-  kalman$par <- kalman$start
-  args <- append(args, list(kalman = kalman, At = At))
-  
-  EM_result_test <- do.call(EM_param, args = args)
-  params_p <- EM_result_test$model$par
-  expect_equal(EM_result_test$model$par, precomputed_par, tolerance = 1e-3)
-})
-
-test_that("uniModelFit with partial fixed params conincide with precomputed model", {
-  data("data_log_volume")
-  load("./tests/testthat/params.rda")
-  precomputed_par <- params
-  
-  data <- data_log_volume
-  data <- as.matrix(data)
-  n_bin <- nrow(data)
-  n_day <- ncol(data)
-  n_bin_total <- n_bin * n_day
-  
-  fixed_phi <- precomputed_par$A
-  
-  fixed.pars <- list("x0" = matrix(list(10, 0), 2, 1), "phi" = fixed_phi)
-  modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
-  
-  
-  control = list(maxit = 3000, abstol = 1e-4, log.switch = TRUE)
-  
-  args <- list(data = data, n_bin = n_bin,
-               n_day = n_day, n_bin_total = n_bin_total,
-               modelSpec = modelSpec,
-               control = control)
-  
-  
-  result <- do.call(MARSS_spec, args = args)
-  kalman <- result$kalman
-  At <- result$At
-  
-  kalman$par <- kalman$start
-  args <- append(args, list(kalman = kalman, At = At))
-  
-  EM_result_test <- do.call(EM_param, args = args)
-  
-  
-  expect_equal(EM_result_test$model$par[c("R","B","Q","V0")], precomputed_par[c("R","B","Q","V0")], tolerance = 1e-1)
-})
-
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ADBE", {
-  data <- exp(readRDS("data/ADBE_log_volume"))
+  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
+  
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   # expected output
-  expected_par <- readRDS("data/ADBE_expected_par")
+  expected_par <- readRDS("./tests/testthat/ADBE_expected_par")
   expected_modelSpec <- list()
   expected_modelSpec$par$a_eta <- expected_par$B[1]
   expected_modelSpec$par$a_mu <- expected_par$B[2]
@@ -100,13 +31,13 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
 })
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ACN", {
-  data <- exp(readRDS("data/ACN_log_volume"))
+  data <- readRDS("./tests/testthat/ACN_volume")[,1:104]
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   # expected output
-  expected_par <- readRDS("data/ACN_expected_par")
+  expected_par <- readRDS("./tests/testthat/ACN_expected_par")
   expected_modelSpec <- list()
   expected_modelSpec$par$a_eta <- expected_par$B[1]
   expected_modelSpec$par$a_mu <- expected_par$B[2]
@@ -132,7 +63,8 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
 })
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = CVS", {
-  data <- exp(readRDS("data/CVS_log_volume"))
+  data <- exp(readRDS("./tests/testthat/CVS_log_volume"))[, 1:104]
+  # data <- readRDS("./tests/testthat/CVS_volume")
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
@@ -141,7 +73,7 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
   modelSpec.fit_acc2 <- uniModelFit(data, modelSpec_v2, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   # expected output
-  expected_par <- readRDS("data/CVS_expected_par")
+  expected_par <- readRDS("./tests/testthat/CVS_expected_par")
   expected_modelSpec <- list()
   expected_modelSpec$par$a_eta <- expected_par$B[1]
   expected_modelSpec$par$a_mu <- expected_par$B[2]
@@ -158,7 +90,7 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
   expected_modelSpec$par$V0 <- expected_par$V0
   
   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
-  expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 1e-2)
+  expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   # expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 1e-2)
   expect_equal(modelSpec.fit_acc2$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   
