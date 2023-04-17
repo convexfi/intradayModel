@@ -1,5 +1,5 @@
 ---
-title: "Intraday Market Signal: Modeling and Forecasting "
+title: "Financial Intraday Signal: Modeling and Forecasting "
 author: |
   | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
   | The Hong Kong University of Science and Technology (HKUST)
@@ -52,7 +52,7 @@ body {
 
 ------------------------------------------------------------------------
 
-> Welcome to the `intradayModel` package! This vignette provides an overview of the package's features and how to use them. `intradayModel` uses state-space models to model and forecast intraday market signal, with a focus on intraday trading volume. Our team is currently working on expanding the package to include more support for intraday volatility.
+> Welcome to the `intradayModel` package! This vignette provides an overview of the package's features and how to use them. `intradayModel` uses state-space models to model and forecast financial intraday signal, with a focus on intraday trading volume. Our team is currently working on expanding the package to include more support for intraday volatility.
 
 # Quick Start
 
@@ -77,7 +77,7 @@ data_train <- AAPL_volume[, 1:104]
 model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
 ```
 
-Once the model is fitted, we use the `uniModelFilter` function to decompose intraday trading signal into daily, seasonal, and intraday dynamic components. This helps us better understand the composition of the intraday market signal.
+Once the model is fitted, we use the `uniModelFilter` function to decompose intraday trading signal into daily, seasonal, and intraday dynamic components. This helps us better understand the composition of the intraday signal.
 
 ```{r}
 filter_result <- uniModelFilter(data_train, model_fitted)
@@ -100,12 +100,12 @@ Exciting, right? Let's dive in!
 
 ## Preliminary theory
 
-Intraday observations of market signals are divided into days, indexed by $t\in\{1,\dots,T\}$. Each day is further divided into bins, indexed by $i\in\{1,\dots,I\}$. To refer to a specific observation, we use the index $\tau = I \times (t-1) + i$.
+Intraday observations of signals are divided into days, indexed by $t\in\{1,\dots,T\}$. Each day is further divided into bins, indexed by $i\in\{1,\dots,I\}$. To refer to a specific observation, we use the index $\tau = I \times (t-1) + i$.
 
-Our package uses a state-space model to extract several components of intraday market signals. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
+Our package uses a state-space model to extract several components of intraday signals. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
 
 
-The observed market signal can be written in the multiplicative combination of the components [@brownlees2011intra]:
+The observed intraday signal can be written in the multiplicative combination of the components [@brownlees2011intra]:
 
 $$
 \large

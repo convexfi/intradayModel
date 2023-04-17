@@ -1,6 +1,6 @@
-#' @title Decompose Intraday Market Signal via a Univariate State-Space Model 
+#' @title Decompose Financial Intraday Signal via a Univariate State-Space Model 
 #'
-#' @description A model with all parameters fixed can be used to decompose the intraday market signal into daily, seasonal, 
+#' @description A model with all parameters fixed can be used to decompose the financial intraday signal into daily, seasonal, 
 #'              and intraday dynamic components. The daily component and intraday dynamic component at time \eqn{\tau} are the smoothed state estimate 
 #'              conditioned on all the data, and denoted by \eqn{\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}{E[ x(\tau) | y(\tau), \tau = 1, ... , N ]}, 
 #'              where \eqn{N} is the total number of bins in the dataset. The seasonal component has the value of 
@@ -8,7 +8,7 @@
 #'              
 #'              This function will produce the above three components with a plot.
 #'
-#' @param data Matrix of intraday market signal of size n_bin * n_day without any missing values.
+#' @param data Matrix of intraday signal of size n_bin * n_day without any missing values.
 #' @param uniModel Univariate model list object with all parameters fixed.
 #'
 #' @return A list containing the following elements:
