@@ -235,13 +235,16 @@ clean_pars_list <- function(input_list) {
   expected_pars_len <- list(
     "a_eta" = 1, "a_mu" = 1,
     "var_eta" = 1, "var_mu" = 1, "r" = 1,
-    "x0" = 2, "V0" = 3
+    "x0" = 2, "V0" = 4
   )
 
+  invalid_param <- c()
+  incorrect_param <- c()
   # check if parameters are valid
   for (name in names(input_list)) {
     if (!(name %in% all_pars_name)) {
       input_list[[name]] <- NULL
+      invalid_param <- c(invalid_param, name)
       next
     }
     input_list[[name]] <- unlist(as.list(input_list[[name]]))
@@ -250,17 +253,46 @@ clean_pars_list <- function(input_list) {
       any(is.na(input_list[[name]])) ||
       any(is.infinite(input_list[[name]]))) {
       input_list[[name]] <- NULL
+      incorrect_param <- c(incorrect_param, name)
+      next
     }
 
     if (name == "phi") next
 
     if (expected_pars_len[[name]] != length(input_list[[name]])) {
       input_list[[name]] <- NULL
+      incorrect_param <- c(incorrect_param, name)
+      next
     }
+    
+    switch (name,
+      "V0" = { V_matrix <-matrix(input_list[["V0"]],2)
+               eigen_value <- eigen(matrix(input_list[["V0"]],2), only.values = TRUE)$values >= 0  
+              if (!isSymmetric(V_matrix)|| !eigen_value[1]||!eigen_value[2]){
+               input_list[[name]] <- NULL
+               incorrect_param <- c(incorrect_param, name)}
+              else{
+               input_list[["V0"]] <- input_list[["V0"]][c(1,2,4)]}
+                },
+      "r" = {if(input_list[["r"]] < 0) {
+             input_list[["r"]] <- NULL
+             incorrect_param <- c(incorrect_param, "r")
+      }}
+    )
   }
-  return(input_list)
-}
 
+  msg <- NULL
+  if (length(invalid_param) > 0){
+    msg <- c(paste(invalid_param, collapse = ", "), " is not model parameter.\n")
+  }
+  if (length(incorrect_param) > 0){
+    msg <- c(msg, c(paste(unique(incorrect_param), collapse = ", "), " has wrong input value. \n"))
+  }
+  clean_result <- list("input_list" = input_list,
+                       "msg" = msg)
+
+  return(clean_result)
+}
 
 # part of error check for init.pars/fixed.pars
 check_pars_list <- function(uniModel, n_bin = NULL) {
