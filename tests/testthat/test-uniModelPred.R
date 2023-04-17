@@ -48,14 +48,12 @@ test_that("uniModelPred, stock = CVS", {
   data.pred <- readRDS("./tests/testthat/CVS_volume")
   data <- data.pred[,1:104]
   
-  # data <- readRDS("./tests/testthat/CVS_volume")
   modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
   
   modelSpec_v2 <- uniModelSpec(fit = TRUE, init.pars = list(a_mu = 0))
   modelSpec.fit_acc <- uniModelFit(data, modelSpec_v2, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
-  # data.pred <- exp(readRDS("./tests/testthat/CVS_log_volume_pred"))
   log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
   log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
