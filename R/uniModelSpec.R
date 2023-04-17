@@ -1,76 +1,60 @@
-#' @title Define a uniModel object
+#' @title Define a Univariate State-Space Model
 #' 
-#' @description Define the state space model for intraday log trading volume. We denote the day with index \eqn{t\in\{1,\dots,T\}} 
-#'              and divide each day into \eqn{I} intervals (referred to as bins) indexed by \eqn{i\in\{1,\dots,I\}}. 
-#'              The intraday observations of market signal is labeled with the single subscript \eqn{\tau = I \times (t-1) + i} 
-#'              to represent the index of time series. 
-#'              
-#'              The observed market signal can be written in the following multiplicative form:
-#'              \deqn{\text{intraday signal} = \text{daily} \times \text{seasonal} \times \text{intraday dynamic} \times \text{noise}. }
-#'              By taking the logarithm transform, we rewrite (1) as an addictive formula:
-#'              \deqn{ y_{\tau} = \eta_{\tau} + \phi_i + \mu_{t,i} + v_{t,i},}
-#'              where each log-component can be extracted by the state-space model.
-#'              The model is formulated as:
-#'              \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}
-#'              \deqn{y_{\tau} = \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,}
-#'              where:
-#'              \itemize{\item{\eqn{\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top} is the hidden state vector containing the daily average part and the intraday dynamic part;} 
-#'                       \item{\eqn{\mathbf{A}_{\tau} = \left[\begin{array}{l}a_{\tau}^{\eta}&0\\0&a^{\mu}\end{array} \right]} 
-#'                             is the state transition matrix with \eqn{a_{\tau}^{\eta} = \begin{cases}a^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}};}
-#'                       \item{\eqn{\mathbf{C} = [1, 1]} is the observation matrix;}
-#'                       \item{\eqn{\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top} is the seasonal component;}
-#'                       \item{\eqn{\mathbf{w}_{\tau} = [\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})} 
-#'                             represents the i.i.d. Gaussian noise in the state transition, with diagonal covariance matrix 
-#'                             \eqn{\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_{\tau}^{\eta})^2&0\\0&(\sigma_{\tau}^{\mu})\end{array} \right]} 
-#'                             and \eqn{\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise}\end{cases}};}
-#'                        \item{\eqn{v_\tau \sim \mathcal{N}(0, r)} is the i.i.d. Gaussian noise in the observation;}
-#'                        \item{\eqn{\mathbf{x}_1} is the initial state, and it is assumed to follow \eqn{\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0).}}}
-#'             In the proposed model, \eqn{\boldsymbol{\theta} = \left\{\mathbf{x}_0, \mathbf{V}_0, \mathbf{A}_{\tau},\mathbf{Q}_{\tau},r,\boldsymbol{\phi}\right\}} 
-#'             are treated as the unknown parameters.
+#' @description This function defines a univariate state-space model proposed by (Chen et al., 2016). The model has the formulation:
+#'              \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}{x(\tau+1) = A(\tau) x(\tau) + w(\tau),}
+#'              \deqn{y_{\tau} = \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,}{y(\tau) = C x(\tau) + \phi(\tau) + v(\tau),}
+#'              where
+#'              \itemize{\item{\eqn{\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top}{x(\tau) = [\eta(\tau); \mu(\tau)]} is the hidden state vector containing the log daily component and the log intraday dynamic component;} 
+#'                       \item{\eqn{\mathbf{A}_{\tau} = \left[\begin{array}{l}a_{\tau}^{\eta}&0\\0&a^{\mu}\end{array} \right]}{A(\tau) = [a.\eta(\tau), 0; 0, a.\mu]} 
+#'                             is the state transition matrix with \eqn{a_{\tau}^{\eta} = \begin{cases}a^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}}{a.\eta(\tau) = a.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
+#'                       \item{\eqn{\mathbf{C} = [1, 1]}{C = [1, 1]} is the observation matrix;}
+#'                       \item{\eqn{\phi_{\tau}}{\phi(\tau)} is the corresponding element from \eqn{\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]}, which is the log seasonal component;}
+#'                       \item{\eqn{\mathbf{w}_{\tau} = [\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})}{w(\tau) = [\epsilon.\eta(\tau); \epsilon.\mu(\tau)] ~ N(0, Q(\tau))} 
+#'                             represents the i.i.d. Gaussian noise in the state transition, with a time-varying covariance matrix 
+#'                             \eqn{\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_{\tau}^{\eta})^2&0\\0&(\sigma_{\tau}^{\mu})\end{array} \right]}{Q(\tau) = [(\sigma.\eta(\tau))^2, 0; 0, (\sigma.\mu)^2]} 
+#'                             and \eqn{\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}}{\sigma.\eta(\tau) = \sigma.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
+#'                        \item{\eqn{v_\tau \sim \mathcal{N}(0, r)}{v(\tau) ~ N(0, r)} is the i.i.d. Gaussian noise in the observation;}
+#'                        \item{\eqn{\mathbf{x}_1}{x(1)} is the initial state at \eqn{\tau = 1}{\tau = 1}, and it follows \eqn{\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0).}{N(x(0), V(0))}}.}
+#'             In the proposed model, \eqn{\boldsymbol{\theta} = \left\{\mathbf{A}_{\tau},\mathbf{Q}_{\tau},r,\boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0\right\}}{\Theta = {a.\eta, a.\mu, (\sigma.\eta)^2, (\sigma.\mu)^2, r, \phi, x(0), V(0)}} 
+#'             are treated as parameters.
 #' 
-#' @param fit Logical value indicating whether the model need to be fitted (default is \code{FALSE}). 
-#'            If \code{FLASE}, all unknown parameters should be assigned a fixed value in \code{fixed.pars}.
-#' @param fixed.pars List of values of fixed parameters. The elements in the list specify the values for the unknown parameters. 
-#'                   The list elements should be a subset of following ones: 
-#'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}};}
-#'                           \item{\code{"a_mu"}: \eqn{a^{\mu}};}
-#'                           \item{\code{"var_eta"}: \eqn{\sigma^{\eta}};}
-#'                           \item{\code{"var_mu"}: \eqn{\sigma^{\mu}};}
-#'                           \item{\code{"r"}: \eqn{r};}
-#'                           \item{\code{"phi"}: \eqn{\phi = [\phi_1,\dots, \phi_I]^\top};}
-#'                           \item{\code{"x0"}: \eqn{\mathbf{x}_0};}
-#'                           \item{\code{"V0"}: \eqn{\mathbf{V}_0}, contains three doubles, corresponding to the 
-#'                                              \eqn{\mathbf{V}_0(1,1),\mathbf{V}_0(1,2),\mathbf{V}_0(2,2).}}}
-#'                   The parameters without a fixed value in \code{uniModelSpec} should be fitted with \code{uniModelFit}.
-#' @param init.pars List of initial values of unfixed parameters. The elements are the same with \code{fixed.pars}. 
-#'                  The unfixed parameters without specified initial values will be given default initial values in \code{uniModelFit}.
+#' @param fit Logical value indicating whether the model needs to be fitted (default is \code{FALSE}). 
+#'            If \code{FLASE}, all parameters should be assigned values via \code{fixed.pars}.
+#' @param fixed.pars List of parameters' fixed values. The allowed parameters are listed below,
+#'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
+#'                           \item{\code{"a_mu"}: \eqn{a^{\mu}}{a.\mu}} of size 1 ;
+#'                           \item{\code{"var_eta"}: \eqn{\sigma^{\eta}}{(\sigma.\eta)^2}} of size 1 ;
+#'                           \item{\code{"var_mu"}: \eqn{\sigma^{\mu}}{(\sigma.\mu)^2}} of size 1 ;
+#'                           \item{\code{"r"}: \eqn{r}{r} of size 1 ;}
+#'                           \item{\code{"phi"}: \eqn{\phi = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]} of size \eqn{I} ;}
+#'                           \item{\code{"x0"}: \eqn{\mathbf{x}_0}{x(0)} of size 2 ;}
+#'                           \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)} of size 2 * 2 .}}
+#' @param init.pars List of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
+#'                  If the user does not assign initial values for the unfitted parameters, default ones will be used in \code{uniModelFit}.
 #'
-#' @return A list containing the following elements:
-#'         \item{\code{par}}{Values of fixed parameters.}
-#'         \item{\code{init}}{Initial values of unfixed parameters.}
-#'         \item{\code{fit_request}}{List of logical values indicating whether the parameters are fixed or not.}
+#' @return A univaraite model list object which contains the following elements:
+#'         \item{\code{par}}{List of parameters' values.}
+#'         \item{\code{init}}{List of unfitted parameters' initial values defined by users.}
+#'         \item{\code{fit_request}}{List of logical values indicating whether each parameters requires fitting.}
 #' 
 #' @references
 #' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
 #' 
-#' Brownlees, C. T., Cipollini, F., and Gallo, G. M. (2011). Intra-daily volume modeling and prediction for algorithmic trading. 
-#' Journal of Financial Econometrics, 9(3), 489–518.
 #' 
 #' @seealso \code{\link{uniModelFit}}, \code{\link{uniModelFilter}}, \code{\link{uniModelPred}}
 #'
 #' @examples
-#' library(intradayModel)
+#' # set fixed value
+#' fixed.pars <- list()
+#' fixed.pars$"var_eta" <- 4
+#' fixed.pars$"x0" <- c(10, 0)
+#' 
 #' # set initial value 
 #' init.pars <- list()
 #' init.pars$"a_eta" <- 1
 #'
-#' # set fixed value
-#' fixed.pars <- list()
-#' fixed.pars$"var_eta" <- 4
-#' fixed.pars$"x0" <- matrix(c(10, 0), 2)
-#'
-#' # define the uniModel
-#' modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
+#' # define the univariate model
+#' model <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
 #' @export
 uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   uniModel <- list()
