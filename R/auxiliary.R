@@ -386,11 +386,9 @@ is_uniModel <- function(uniModel, n_bin = NULL) {
   # }
   
   # check fit_request
-  logical_check <- lapply(test_flag, is.logical)
+  logical_check <- lapply(uniModel$fit_request, function (f) isTRUE(f) | identical(f, FALSE))
   if (any(logical_check == FALSE)) {
-    msg <- c("Invalid value of uniModel$fit_request$", 
-             paste(names(logical_check[logical_check == FALSE]), collapse = ", "), 
-             ". Elements in uniModel$fit_request must be TRUE or FALSE." )
+    msg <- c("Elements in uniModel$fit_request must be TRUE/FALSE.\n")
     stop(msg)
   }
   

@@ -106,16 +106,16 @@ test_that("messages, stock = GE", {
   modelSpec_check2$par[["x0"]] <- NULL
   expect_error(uniModelFit(data_train, modelSpec_check2),"Elements x0 are missing from uniModel[$]par.\n")
 
-  ## fixed paramenter with NA
+  ## fitted paramenter with NA
   modelSpec_check3 <- modelSpec_check
   modelSpec_check3$fit_request[["a_eta"]] <- FALSE
   expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
 
-  # modelSpec_check3$fit_request[["a_eta"]] <- Inf
-  # expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
-  # 
-  # modelSpec_check3$fit_request[["a_eta"]] <- NA
-  # expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
+  ## fit_request not boolean
+  modelSpec_check3$fit_request[["a_eta"]] <- Inf
+  expect_error(uniModelFit(data_train, modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
+  modelSpec_check3$fit_request[["a_eta"]] <- NA
+  expect_error(uniModelFit(data_train, modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
   
   ## wrong dimension/lenghth
   modelSpec_check4 <- modelSpec_check
