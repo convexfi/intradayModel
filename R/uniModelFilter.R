@@ -38,10 +38,10 @@ uniModelFilter <- function(data, uniModel) {
   if (anyNA(data)) stop("data must have no NA.")
   is_uniModel(uniModel, nrow(data))
 
-  # check if fit is necessary
+  # if model isn't optimally fitted (no convergence), it cannot filter
   if (Reduce("+", uniModel$fit_request) != 0) {
-    msg <- c("All parameters must be fitted.\n ",
-             "Parameter ", paste(names(uniModel$fit_request[uniModel$fit_request == TRUE]), collapse = ", "), " is not fitted.")
+    msg <- c("All parameters must be optimally fitted. ",
+             "Parameters ", paste(names(uniModel$fit_request[uniModel$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
     stop(msg)
   }
 
