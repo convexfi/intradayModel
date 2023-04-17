@@ -51,7 +51,7 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
   # check if fit is required
   if (Reduce("+", uniModel$fit_request) == 0) {
     if (verbose > 0) {
-      cat("All parameters have been already fixed.\n")
+      cat("All parameters have already been fixed.\n")
     }
     return(uniModel)
   }

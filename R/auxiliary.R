@@ -240,6 +240,8 @@ clean_pars_list <- function(input_list) {
 
   invalid_param <- c()
   incorrect_param <- c()
+  msg <- NULL
+  
   # check if parameters are valid
   for (name in names(input_list)) {
     if (!(name %in% all_pars_name)) {
@@ -281,14 +283,13 @@ clean_pars_list <- function(input_list) {
     )
   }
 
-  msg <- NULL
   if (length(invalid_param) > 0){
     msg <- c(msg, paste("Elements ", paste(invalid_param, collapse = ", "),
                    " are not allowed in parameter list.", sep = ""))
   }
   if (length(incorrect_param) > 0){
     msg <- c(msg, paste("Elements ", paste(unique(incorrect_param), collapse = ", "),
-                   " have invalid input.", sep = ""))
+                   " are invalid (check number/dimension/PSD).", sep = ""))
   }
   clean_result <- list("input_list" = input_list,
                        "msg" = msg)
@@ -348,7 +349,7 @@ check_pars_list <- function(uniModel, n_bin = NULL) {
         msg <- c(msg, paste("Dimension of uniModel$init$", name, " is wrong.\n", sep = ""))
       }
       if (name %in% scalar_par_list && !identical(len_expect[[name]], length(init_list[[name]]))) {
-        msg <- c(msg, paste("Lenght of uniModel$init$", name, " is wrong.", sep = ""))
+        msg <- c(msg, paste("Lenght of uniModel$init$", name, " is wrong.\n", sep = ""))
       }
     }
   return (msg)
@@ -361,17 +362,17 @@ is_uniModel <- function(uniModel, n_bin = NULL) {
   el <- c("fit_request", "par", "init")
   # if some components are missing from the uniModel, rest of the tests won't work so stop now
   if (!all(el %in% names(uniModel))) {
-    stop("Element ", paste(el[!(el %in% names(uniModel))], collapse = ", "), " is missing from the uniModel object.\n")
+    stop("Elements ", paste(el[!(el %in% names(uniModel))], collapse = ", "), " are missing from the model.\n")
   }
   
   # if some args are missing from the uniModel's components, the code will stop when all missing parts are found.
   msg <- NULL
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   if (!all(all_pars_name %in% names(uniModel$par))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = ", "), " is missing from the uniModel$par.\n")
+    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$par))], collapse = ", "), " are missing from uniModel$par.\n")
   }
   if (!all(all_pars_name %in% names(uniModel$fit_request))) {
-    msg <- c(msg, "Element ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = ", "), " is missing from the uniModel$fit_request.\n")
+    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(uniModel$fit_request))], collapse = ", "), " are missing from uniModel$fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
