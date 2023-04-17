@@ -50,7 +50,9 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
 
   # check if fit is required
   if (Reduce("+", uniModel$fit_request) == 0) {
-    cat("All parameters are already fixed.")
+    if (verbose > 0) {
+      cat("All parameters have been already fixed.\n")
+    }
     return(uniModel)
   }
 
@@ -75,6 +77,10 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
     em_result <- do.call(em_update_acc, args)
   }
   uniModel$par_log <- em_result$par_log
+  
+  if (length(em_result$warning_msg) > 0) {
+    warning(em_result$warning_msg)
+  }
 
   # change parameters in MARSS format to uniModel format
   uniModel$par <- marss_to_unimodel(em_result$marss_obj$par, uniModel$par)
@@ -167,12 +173,14 @@ em_update <- function(...) {
   marss_obj$par$R <- array(marss_obj$par$R, dim = c(1, 1), dimnames = list("r", NULL))
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
 
+  warning_msg <- NULL
   if (convergence) {
     cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
-    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
+    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
-  result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
+  result <- list("marss_obj" = marss_obj, "convergence" = convergence, 
+                 "par_log" = par_log, "warning_msg" = warning_msg)
   return(result)
 }
 
@@ -292,12 +300,14 @@ em_update_acc <- function(...) {
   marss_obj$par$R <- array(marss_obj$par$R, dim = c(1, 1), dimnames = list("r", NULL))
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
+  warning_msg <- NULL
   if (convergence) {
     cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
-    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
+    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
-  result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
+  result <- list("marss_obj" = marss_obj, "convergence" = convergence, 
+                 "par_log" = par_log, "warning_msg" = warning_msg)
   return(result)
 }
 
