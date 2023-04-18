@@ -2,7 +2,10 @@ Package: intradayModel
 Title: Modeling and Forecasting Financial Intraday Signals
 Version: 0.0.1
 Date: 2023-4-11
-Description: `intradayModel` package uses state-of-the-art state-space models to facilitate the modeling and forecasting of financial intraday signals. This package currently offers a univariate model for intraday trading volume, with new features on intraday volatility and multivariate models in development. It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
+Description: `intradayModel` package uses state-of-the-art state-space models to facilitate the modeling 
+             and forecasting of financial intraday signals. This package currently offers a univariate model 
+             for intraday trading volume, with new features on intraday volatility and multivariate models in development. 
+             It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 Authors@R: c(
   person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
   person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk"),
