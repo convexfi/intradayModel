@@ -1,5 +1,5 @@
 test_that("marss_to_unimodel works", {
-  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
+  data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
   n_bin <- nrow(data)
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
@@ -42,7 +42,7 @@ test_that("marss_to_unimodel works", {
 })
 
 test_that("specify_marss works with partial fixed params", {
-  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
+  data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
   n_bin <- nrow(data)
   n_day <- ncol(data)
   n_bin_total <- n_bin * n_day
@@ -110,7 +110,7 @@ test_that("specify_marss works with partial fixed params", {
 })
 
 test_that("extract_value works", {
-  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
+  data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
   n_bin <- nrow(data)
   
   ## reform data
@@ -132,7 +132,7 @@ test_that("extract_value works", {
 })
 
 test_that("extract_init works", {
-  data <- readRDS("./tests/testthat/ADBE_volume")[,1:104]
+  data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
   n_bin <- nrow(data)
   
   ## reform data
@@ -197,11 +197,11 @@ test_that("is_uniModel works", {
   modelSpec <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars)
   
   modelSpec_check1 <- modelSpec[c("par", "init")]
-  expect_error(is_uniModel(modelSpec_check1), "Element fit_request is missing from the uniModel object.\n")
+  expect_error(is_uniModel(modelSpec_check1), "Elements fit_request are missing from the model.\n")
   
   modelSpec_check2 <- modelSpec
   modelSpec_check2$par[["x0"]] <- NULL
-  expect_error(is_uniModel(modelSpec_check2),"Element x0 is missing from the uniModel[$]par.\n")
+  expect_error(is_uniModel(modelSpec_check2),"Elements x0 are missing from uniModel[$]par.\n")
   
   modelSpec_check3 <- modelSpec
   modelSpec_check3$fit_request[["var_eta"]] <- TRUE

@@ -1,10 +1,10 @@
 ---
 output:
+  md_document:
+    variant: markdown_github
   html_document:
     variant: markdown_github
     keep_md: true
-  md_document:
-    variant: markdown_github
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -23,110 +23,66 @@ opts_chunk$set(
 knit_hooks$set(pngquant = hook_pngquant)
 ```
 
-# fitHeavyTail
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/fitHeavyTail)](https://CRAN.R-project.org/package=fitHeavyTail)
-[![CRAN Downloads](https://cranlogs.r-pkg.org/badges/fitHeavyTail)](https://CRAN.R-project.org/package=fitHeavyTail)
-[![CRAN Downloads Total](https://cranlogs.r-pkg.org/badges/grand-total/fitHeavyTail?color=brightgreen)](https://CRAN.R-project.org/package=fitHeavyTail)
-
-Robust estimation methods for the mean vector and covariance matrix 
-from data (possibly containing NAs) under multivariate heavy-tailed 
-distributions such as angular Gaussian, Cauchy, and Student's _t_. Additionally,
-a factor model structure can be specified for the covariance matrix.
-    
+# intradayModel
+Our package uses state-of-the-art state-space models to facilitate the modeling and forecasting of financial intraday signals. This package currently offers a univariate model for intraday trading volume, with new features on intraday volatility and multivariate models in development. It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 
 ## Installation
-The package can be installed from [CRAN](https://CRAN.R-project.org/package=fitHeavyTail) or [GitHub](https://github.com/dppalomar/fitHeavyTail):
+The package can be installed from [GitHub](https://github.com/convexfi/intradayModeling):
 ```{r, eval=FALSE}
-# install stable version from CRAN
-install.packages("fitHeavyTail")
-
 # install development version from GitHub
-devtools::install_github("dppalomar/fitHeavyTail")
+devtools::install_github("convexfi/intradayModeling")
 ```
-
-To get help:
-```{r, eval=FALSE}
-library(fitHeavyTail)
-help(package = "fitHeavyTail")
-?fit_mvt
-```
-
-To cite `fitHeavyTail` in publications:
-```{r, eval=FALSE}
-citation("fitHeavyTail")
-```
-
 
 ## Quick Start
-To illustrate the simple usage of the package `fitHeavyTail`, let's start by generating some multivariate data under a Student's _t_ distribution with significant heavy tails:
+To get started, we load the package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days.
+
+```{r, message = FALSE}
+devtools::load_all()
+data(AAPL_volume)
+AAPL_volume[1:5, 1:5]
+```
+
+Next, we define a univariate state-space model using the `uniModelSpec` function.
+
 ```{r}
-library(mvtnorm)  # package for multivariate t distribution
-N <- 10   # number of variables
-T <- 80   # number of observations
-nu <- 4   # degrees of freedom for tail heavyness
-
-set.seed(42)
-mu <- rep(0, N)
-U <- t(rmvnorm(n = round(0.3*N), sigma = 0.1*diag(N)))
-Sigma_cov     <- U %*% t(U) + diag(N)  # covariance matrix with factor model structure
-Sigma_scatter <- (nu-2)/nu * Sigma_cov
-X <- rmvt(n = T, delta = mu, sigma = Sigma_scatter, df = nu)  # generate data
+model <- uniModelSpec(fit = TRUE)
 ```
 
-We can first estimate the mean vector and covariance matrix via the traditional sample estimates (i.e., sample mean and sample covariance matrix):
+Then, we use the first 104 trading days to fit the model and the last 20 days to evaluate its forecasting performance. Fitting can be achieved by the `uniModelFit` function.
+
 ```{r}
-mu_sm <- colMeans(X)
-Sigma_scm <- cov(X)
+data <- AAPL_volume
+data_train <- AAPL_volume[, 1:104]
+model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
 ```
 
-Then we can compute the robust estimates via the package `fitHeavyTail`:
-```{r}
-library(fitHeavyTail)
-fitted <- fit_mvt(X)
+Once the model is fitted, we use the `uniModelFilter` function to decompose intraday trading signal into daily, seasonal, and intraday dynamic components. This helps us better understand the composition of the intraday signal.
+
+```{r quick-start-filter}
+filter_result <- uniModelFilter(data_train, model_fitted)
+filter_result$plot
 ```
 
-We can now compute the estimation errors and see the big improvement:
-```{r}
-sum((mu_sm     - mu)^2)
-sum((fitted$mu - mu)^2)
+To see how well our model performs on new data, we use the `uniModelPred` function to do one-step-ahead prediction on the last 20 trading days of the dataset. This function also helps to evaluate the accuracy of the forecast.
 
-sum((Sigma_scm  - Sigma_cov)^2)
-sum((fitted$cov - Sigma_cov)^2)
+```{r quick-start-pred}
+predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
+predict_result$measure
+predict_result$plot
 ```
 
-To get a visual idea of the robustness, we can plot the shapes of the covariance matrices (true and estimated ones) projected on two dimensions. Observe how the heavy-tailed estimation follows the true one more closely than the sample covariance matrix:
+## Contributing
+We welcome all sorts of contributions. Please feel free to open an issue
+to report a bug or discuss a feature request.
 
-```{r ellipses, echo=FALSE, message=FALSE, fig.width = 9, fig.height = 5, out.width = "75%"}
-library(ggplot2)
-library(ellipse)
+## Citation
+If you made use of this software please consider citing:
 
-i1 <- 7; i2 <- 5
-colnames(fitted$cov) <- rownames(fitted$cov) <- NULL
-ggplot(data.frame(x = X[, i1], y = X[, i2]), aes(x, y)) +
-  geom_point(alpha = 0.7, size = 3) +
-  geom_path(data = data.frame(ellipse(Sigma_cov[c(i1, i2), c(i1, i2)])), 
-            aes(x, y, col = "true"), lwd = 1) +
-  geom_path(data = data.frame(ellipse(Sigma_scm[c(i1, i2), c(i1, i2)], centre = mu_sm[c(i1, i2)])), 
-            aes(x, y, col = "SCM estimation"), lwd = 1) +
-  geom_path(data = data.frame(ellipse(fitted$cov[c(i1, i2), c(i1, i2)], centre = fitted$mu[c(i1, i2)])), 
-            aes(x, y, col = "heavy-tailed estimation"), lwd = 1) +
-  scale_colour_manual(name = "ellipses",
-                      values = c("true" = "black", "SCM estimation" = "red", "heavy-tailed estimation" = "blue")) +
-  guides(color = guide_legend(reverse = TRUE)) +
-  labs(title = "Data points and shapes of covariance matrices", x = NULL, y = NULL)
-```
-
-
-
-## Documentation
-For more detailed information, please check the
-[vignette](https://CRAN.R-project.org/package=fitHeavyTail/vignettes/CovarianceEstimationHeavyTail.html).
-
-
+- Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695>
 
 ## Links
-Package: [CRAN](https://CRAN.R-project.org/package=fitHeavyTail) and [GitHub](https://github.com/dppalomar/fitHeavyTail).
+Package: [GitHub](https://github.com/convexfi/intradayModeling)
 
-README file: [GitHub-readme](https://github.com/dppalomar/fitHeavyTail/blob/master/README.md).
+README file: [GitHub-readme](https://github.com/convexfi/intradayModeling/blob/master/README.md).
 
-Vignette: [CRAN-vignette](https://CRAN.R-project.org/package=fitHeavyTail/vignettes/CovarianceEstimationHeavyTail.html) and [GitHub-vignette](https://htmlpreview.github.io/?https://github.com/dppalomar/fitHeavyTail/blob/master/vignettes/CovarianceEstimationHeavyTail.html).
+Vignette: [GitHub-vignette](https://htmlpreview.github.io/?https://github.com/convexfi/intradayModeling/blob/master/vignettes/intradayModel.html).

@@ -34,6 +34,8 @@
 #' model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
 #' predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
 #' 
+#' @importFrom utils tail
+#' 
 #' @export
 uniModelPred <- function(data, uniModel, out.sample) {
   # error control
@@ -82,7 +84,7 @@ marss_predict <- function(data, uniModel, out.sample) {
   seasonal <- uniModel$par$phi[, 1]
   names(seasonal) <- NULL
   y_pred <- x_pred[1, ] + x_pred[2, ] + rep(seasonal, ncol(data))
-  y_pred <- tail(y_pred, nrow(data) * out.sample)
+  y_pred <- utils::tail(y_pred, nrow(data) * out.sample)
   
   return(y_pred)
 }

@@ -34,7 +34,8 @@
 #' # fit the model to AAPL_volume
 #' data(AAPL_volume)
 #' model <- uniModelSpec(fit = TRUE)
-#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, 
+#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE)
 #' 
 #' @importFrom magrittr %>%
 #' 
@@ -50,7 +51,9 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
 
   # check if fit is required
   if (Reduce("+", uniModel$fit_request) == 0) {
-    cat("All parameters are already fixed.")
+    if (verbose > 0) {
+      cat("All parameters have already been fixed.\n")
+    }
     return(uniModel)
   }
 
@@ -75,6 +78,10 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
     em_result <- do.call(em_update_acc, args)
   }
   uniModel$par_log <- em_result$par_log
+  
+  if (length(em_result$warning_msg) > 0) {
+    warning(em_result$warning_msg)
+  }
 
   # change parameters in MARSS format to uniModel format
   uniModel$par <- marss_to_unimodel(em_result$marss_obj$par, uniModel$par)
@@ -85,7 +92,12 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
   
   # verbose
   if (verbose >= 2) {
-    str(uniModel$par)
+    cat("--- obtained parameters ---\n")
+    par_visual <- lapply(uniModel$par, as.numeric)
+    par_visual$V0 <- matrix(c(par_visual$V0[1], par_visual$V0[2],
+                              par_visual$V0[2], par_visual$V0[3]), 2)
+    utils::str(par_visual)
+    cat("---------------------------\n")
   }
 
   return(uniModel)
@@ -167,12 +179,14 @@ em_update <- function(...) {
   marss_obj$par$R <- array(marss_obj$par$R, dim = c(1, 1), dimnames = list("r", NULL))
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
 
+  warning_msg <- NULL
   if (convergence) {
     cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
-    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
+    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
-  result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
+  result <- list("marss_obj" = marss_obj, "convergence" = convergence, 
+                 "par_log" = par_log, "warning_msg" = warning_msg)
   return(result)
 }
 
@@ -214,6 +228,7 @@ em_update_acc <- function(...) {
   info$data_reform <- data_reform
   info$y_daily_matrix <- y_daily_matrix
   info$unfitted_pars <- unfitted_pars
+  info$uniModel <- uniModel
 
   curr_par <- marss_obj$par
   for (i in 1:maxit) {
@@ -292,12 +307,14 @@ em_update_acc <- function(...) {
   marss_obj$par$R <- array(marss_obj$par$R, dim = c(1, 1), dimnames = list("r", NULL))
   # marss_obj$par$x0 <- array(marss_obj$par$x0, dim = c(2,1), dimnames = list(c("x01","x02"),NULL))
   
+  warning_msg <- NULL
   if (convergence) {
     cat("Success! abstol test passed at", iter, "iterations.\n")
   } else {
-    warning(paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
+    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
   }
-  result <- list("marss_obj" = marss_obj, "convergence" = convergence, "par_log" = par_log)
+  result <- list("marss_obj" = marss_obj, "convergence" = convergence, 
+                 "par_log" = par_log, "warning_msg" = warning_msg)
   return(result)
 }
 
@@ -335,7 +352,7 @@ em_one_loop <- function(input_par, info) {
              if ("phi" %in% info$unfitted_pars) {
                phi_matrix <- rep(matrix(new_par$A, nrow = 1), info$n_day)
              } else {
-               phi_matrix <- unlist(uniModel$par[["phi"]])
+               phi_matrix <- unlist(info$uniModel$par[["phi"]])
              } # need input
              new_par$R <- mean(info$data_reform^2 + apply(Pt, 3, function(p) info$Z_matrix %*% p %*% t(info$Z_matrix)) -
                                   2 * info$data_reform * as.numeric(info$Z_matrix %*% Kf$xtT) +
@@ -355,7 +372,7 @@ em_one_loop <- function(input_par, info) {
              if ("a_eta" %in% info$unfitted_pars) {
                curr_a_eta <- new_par$B["a_eta", 1]
              } else {
-               curr_a_eta <- uniModel$par[["a_eta"]]
+               curr_a_eta <- info$uniModel$par[["a_eta"]]
              } # need input
              new_par$Q["var_eta", 1] <- mean(Pt[1, 1, info$jump_interval] +
                                                 curr_a_eta^2 * Pt[1, 1, info$jump_interval - 1] -
@@ -365,7 +382,7 @@ em_one_loop <- function(input_par, info) {
              if ("a_mu" %in% info$unfitted_pars) {
                curr_a_mu <- new_par$B["a_mu", 1]
              } else {
-               curr_a_mu <- uniModel$par[["a_mu"]]
+               curr_a_mu <- info$uniModel$par[["a_mu"]]
              } # need input
              new_par$Q["var_mu", 1] <- mean(Pt[2, 2, 2:info$n_bin_total] +
                                                curr_a_mu^2 * Pt[2, 2, 1:(info$n_bin_total - 1)] -

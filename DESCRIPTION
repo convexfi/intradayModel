@@ -1,14 +1,12 @@
 Package: intradayModel
-Title: State-Space Modeling of Intraday Trading Volume
+Title: Modeling and Forecasting Financial Intraday Signals
 Version: 0.0.1
 Date: 2023-4-11
-Description: Maximum-likelihood parameter estimation for state-space models fit to time-series data.  
-            Fitting is primarily via the Expectation-Maximization (EM) algorithm. Functions for 
-            prediction and filtering are also provided. The package is based on the papers: Chen, Feng, and Palomar (2016).
+Description: `intradayModel` package uses state-of-the-art state-space models to facilitate the modeling and forecasting of financial intraday signals. This package currently offers a univariate model for intraday trading volume, with new features on intraday volatility and multivariate models in development. It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 Authors@R: c(
-  person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com"),
   person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
-  person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk")
+  person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk"),
+  person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com")
   )
 Maintainer: Daniel P. Palomar <daniel.p.palomar@gmail.com>
 URL: https://github.com/convexfi/intradayModeling,
@@ -18,6 +16,7 @@ BugReports: https://github.com/convexfi/intradayModeling/issues
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.1
+Depends: R (>= 2.10)
 Imports:
     ggplot2,
     magrittr,
@@ -28,12 +27,12 @@ Imports:
     wesanderson
 Suggests:
     knitr,
-    prettydoc,
     rmarkdown,
     R.rsp,
     testthat (>= 3.0.0),
     xts,
-    cleanrmd
+    cleanrmd,
+    devtools
 VignetteBuilder:
     knitr,
     rmarkdown,

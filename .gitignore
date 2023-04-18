@@ -3,7 +3,8 @@
 .RData
 .Ruserdata
 .DS_Store
-man/
+man/*.Rd
 NAMESPACE
 /doc/
 /Meta/
+*.pdf

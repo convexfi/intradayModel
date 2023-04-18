@@ -28,7 +28,8 @@
 #' # filter AAPL_volume
 #' data(AAPL_volume)
 #' model <- uniModelSpec(fit = TRUE)
-#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, 
+#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE)
 #' filter_result <- uniModelFilter(AAPL_volume, model_fitted)
 #' 
 #' @export
@@ -38,10 +39,10 @@ uniModelFilter <- function(data, uniModel) {
   if (anyNA(data)) stop("data must have no NA.")
   is_uniModel(uniModel, nrow(data))
 
-  # check if fit is necessary
+  # if model isn't optimally fitted (no convergence), it cannot filter
   if (Reduce("+", uniModel$fit_request) != 0) {
-    msg <- c("All parameters must be fitted.\n ",
-             "Parameter ", paste(names(uniModel$fit_request[uniModel$fit_request == TRUE]), collapse = ", "), " is not fitted.")
+    msg <- c("All parameters must be optimally fitted. ",
+             "Parameters ", paste(names(uniModel$fit_request[uniModel$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
     stop(msg)
   }
 

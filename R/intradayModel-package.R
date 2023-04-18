@@ -1,8 +1,6 @@
-#' intradayModel: State-Space Modeling of Intraday Trading Volume
+#' intradayModel: Modeling and Forecasting Financial Intraday Signals
 #'
-#' Maximum-likelihood parameter estimation for state-space models fit to time-series data.  
-#' Fitting is primarily via the Expectation-Maximization (EM) algorithm. Functions for 
-#' prediction and filtering are also provided. The package is based on the papers: Chen, Feng, and Palomar (2016).
+#' `intradayModel` package uses state-of-the-art state-space models to facilitate the modeling and forecasting of financial intraday signals. This package currently offers a univariate model for intraday trading volume, with new features on intraday volatility and multivariate models in development. It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 #' 
 #' @section Functions:
 #' \code{\link{uniModelSpec}},
@@ -11,12 +9,12 @@
 #' \code{\link{uniModelFilter}}
 #'
 #' @section Data:
-#' \code{\link{AAPL_volume}}
+#' \code{\link{AAPL_volume}},
 #' \code{\link{GE_volume}}
 #'
 #' @section Help:
 #' For a quick help see the README file:
-#' \href{https://github.com/dppalomar/portfolioBacktest/blob/master/README.md}{GitHub-README}.
+#' \href{https://github.com/convexfi/intradayModeling/blob/master/README.md}{GitHub-README}.
 #'
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
