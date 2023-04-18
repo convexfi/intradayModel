@@ -1,5 +1,5 @@
 test_that("uniModelPred, stock = ADBE", {
-  data.pred <- readRDS("./tests/testthat/ADBE_volume")
+  data.pred <- readRDS(test_path("fixtures", "ADBE_volume"))
   data <- data.pred[,1:104]
 
   modelSpec <- uniModelSpec(fit = TRUE)
@@ -14,15 +14,15 @@ test_that("uniModelPred, stock = ADBE", {
   mape <- calculate_mape(log_volume_real, log_volume_pred)
   rmse <-calculate_rmse(log_volume_real, log_volume_pred)
   
-  expected_res <- readRDS("./tests/testthat/ADBE_expected_pred")
-  
+  expected_res <- readRDS(test_path("fixtures", "ADBE_expected_pred"))
+
   expect_equal(log_volume_pred, expected_res$log_volume_pred, tolerance = 1e-3)
   expect_equal(log_volume_pred_acc, expected_res$log_volume_pred, tolerance = 1e-3)
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
 test_that("uniModelPred, ACN", {
-  data.pred <- readRDS("./tests/testthat/ACN_volume")
+  data.pred <- readRDS(test_path("fixtures", "ACN_volume"))
   data <- data.pred[,1:104]
   
   modelSpec <- uniModelSpec(fit = TRUE)
@@ -37,7 +37,7 @@ test_that("uniModelPred, ACN", {
   mape <- calculate_mape(log_volume_real, log_volume_pred)
   rmse <-calculate_rmse(log_volume_real, log_volume_pred)
   
-  expected_res <- readRDS("./tests/testthat/ACN_expected_pred")
+  expected_res <- readRDS(test_path("fixtures", "ACN_expected_pred"))
   
   expect_equal(log_volume_pred, expected_res$log_volume_pred, tolerance = 1e-4)
   expect_equal(log_volume_pred_acc, expected_res$log_volume_pred, tolerance = 1e-4)
@@ -45,7 +45,7 @@ test_that("uniModelPred, ACN", {
 })
 
 test_that("uniModelPred, stock = CVS", {
-  data.pred <- readRDS("./tests/testthat/CVS_volume")
+  data.pred <- readRDS(test_path("fixtures", "CVS_volume"))
   data <- data.pred[,1:104]
   
   modelSpec <- uniModelSpec(fit = TRUE)
@@ -62,7 +62,7 @@ test_that("uniModelPred, stock = CVS", {
   mape <- calculate_mape(log_volume_real, log_volume_pred)
   rmse <-calculate_rmse(log_volume_real, log_volume_pred)
   
-  expected_res <- readRDS("./tests/testthat/CVS_expected_pred")
+  expected_res <- readRDS(test_path("fixtures", "CVS_expected_pred"))
   
   expect_equal(log_volume_pred, expected_res$log_volume_pred, tolerance = 1e-3)
   expect_equal(log_volume_pred_acc, expected_res$log_volume_pred, tolerance = 1e-3)
