@@ -7,3 +7,4 @@ man/*.Rd
 NAMESPACE
 /doc/
 /Meta/
+*.pdf
