@@ -1,8 +1,6 @@
-#' intradayModel: Univariate State-Space Modeling for Financial Intraday Signal
+#' intradayModel: Modeling and Forecasting Financial Intraday Signals
 #'
-#' Univariate state-space models fit to financial intraday signal, with a focus on intraday trading volume.  
-#' Fitting is primarily via the Maximum-likelihood estimation and Expectation-Maximization (EM) algorithm. 
-#' In addition, functions for prediction and filtering are provided.
+#' `intradayModel` package uses state-of-the-art state-space models to facilitate the modeling and forecasting of financial intraday signals. This package currently offers a univariate model for intraday trading volume, with new features on intraday volatility and multivariate models in development. It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 #' 
 #' @section Functions:
 #' \code{\link{uniModelSpec}},
@@ -16,7 +14,7 @@
 #'
 #' @section Help:
 #' For a quick help see the README file:
-#' \href{}{GitHub-README}.
+#' \href{https://github.com/convexfi/intradayModeling/blob/master/README.md}{GitHub-README}.
 #'
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar

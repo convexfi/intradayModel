@@ -2,11 +2,12 @@
 
 # intradayModel
 
-Our package unlocks the power of intraday trading for you. With
-state-of-the-art state-space models, you can effortlessly decompose and
-forecast financial intraday signals. Our package now offers a univariate
-model for intraday trading volume, with more exciting features on
-intraday volatility and multivariate models coming soon.
+Our package uses state-of-the-art state-space models to facilitate the
+modeling and forecasting of financial intraday signals. This package
+currently offers a univariate model for intraday trading volume, with
+new features on intraday volatility and multivariate models in
+development. It is a valuable tool for anyone interested in exploring
+intraday, algorithmic, and high-frequency trading.
 
 ## Installation
 
