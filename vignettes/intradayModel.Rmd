@@ -1,5 +1,5 @@
 ---
-title: "Financial Intraday Signal: Modeling and Forecasting "
+title: "intradayModel: Modeling and Forecasting Financial Intraday Signals"
 author: |
   | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
   | The Hong Kong University of Science and Technology (HKUST)
@@ -29,7 +29,7 @@ opts_chunk$set(
   fig.align = "center",
   fig.retina = 2,
   out.width = "85%",
-  dpi = 96,
+  dpi = 96 ,
   pngquant = "--speed=1"
 )
 knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
@@ -61,6 +61,7 @@ To get started, we load the package and some sample data: the 15-minute intraday
 ```{r, message = FALSE}
 devtools::load_all()
 data(AAPL_volume)
+AAPL_volume[1:5, 1:5]
 ```
 
 Next, we define a univariate state-space model using the `uniModelSpec` function.
