@@ -91,7 +91,7 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
   
   # verbose
   if (verbose >= 2) {
-    str(uniModel$par)
+    utils::str(uniModel$par)
   }
 
   return(uniModel)
@@ -222,6 +222,7 @@ em_update_acc <- function(...) {
   info$data_reform <- data_reform
   info$y_daily_matrix <- y_daily_matrix
   info$unfitted_pars <- unfitted_pars
+  info$uniModel <- uniModel
 
   curr_par <- marss_obj$par
   for (i in 1:maxit) {
@@ -345,7 +346,7 @@ em_one_loop <- function(input_par, info) {
              if ("phi" %in% info$unfitted_pars) {
                phi_matrix <- rep(matrix(new_par$A, nrow = 1), info$n_day)
              } else {
-               phi_matrix <- unlist(uniModel$par[["phi"]])
+               phi_matrix <- unlist(info$uniModel$par[["phi"]])
              } # need input
              new_par$R <- mean(info$data_reform^2 + apply(Pt, 3, function(p) info$Z_matrix %*% p %*% t(info$Z_matrix)) -
                                   2 * info$data_reform * as.numeric(info$Z_matrix %*% Kf$xtT) +
@@ -365,7 +366,7 @@ em_one_loop <- function(input_par, info) {
              if ("a_eta" %in% info$unfitted_pars) {
                curr_a_eta <- new_par$B["a_eta", 1]
              } else {
-               curr_a_eta <- uniModel$par[["a_eta"]]
+               curr_a_eta <- info$uniModel$par[["a_eta"]]
              } # need input
              new_par$Q["var_eta", 1] <- mean(Pt[1, 1, info$jump_interval] +
                                                 curr_a_eta^2 * Pt[1, 1, info$jump_interval - 1] -
@@ -375,7 +376,7 @@ em_one_loop <- function(input_par, info) {
              if ("a_mu" %in% info$unfitted_pars) {
                curr_a_mu <- new_par$B["a_mu", 1]
              } else {
-               curr_a_mu <- uniModel$par[["a_mu"]]
+               curr_a_mu <- info$uniModel$par[["a_mu"]]
              } # need input
              new_par$Q["var_mu", 1] <- mean(Pt[2, 2, 2:info$n_bin_total] +
                                                curr_a_mu^2 * Pt[2, 2, 1:(info$n_bin_total - 1)] -
