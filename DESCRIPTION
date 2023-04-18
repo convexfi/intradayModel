@@ -1,10 +1,10 @@
 Package: intradayModel
-Title: State-Space Modeling of Intraday Trading Volume
+Title: Univariate State-Space Modeling for Intraday Trading Volume
 Version: 0.0.1
 Date: 2023-4-11
-Description: Maximum-likelihood parameter estimation for state-space models fit to time-series data.  
-            Fitting is primarily via the Expectation-Maximization (EM) algorithm. Functions for 
-            prediction and filtering are also provided. The package is based on the papers: Chen, Feng, and Palomar (2016).
+Description: Maximum-likelihood parameter estimation for univariate state-space models fit to finantial time-series signals.  
+            Fitting is primarily via the Expectation-Maximization (EM) algorithm. In addition, functions for 
+            prediction and filtering are provided.
 Authors@R: c(
   person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com"),
   person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),

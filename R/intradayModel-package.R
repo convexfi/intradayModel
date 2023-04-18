@@ -1,4 +1,4 @@
-#' intradayModel: State-Space Modeling of Intraday Trading Volume
+#' intradayModel: Univariate State-Space Modeling for Intraday Trading Volume
 #'
 #' Maximum-likelihood parameter estimation for state-space models fit to time-series data.  
 #' Fitting is primarily via the Expectation-Maximization (EM) algorithm. Functions for 
@@ -16,7 +16,7 @@
 #'
 #' @section Help:
 #' For a quick help see the README file:
-#' \href{https://github.com/dppalomar/portfolioBacktest/blob/master/README.md}{GitHub-README}.
+#' \href{}{GitHub-README}.
 #'
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
