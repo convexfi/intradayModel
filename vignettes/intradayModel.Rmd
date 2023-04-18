@@ -29,7 +29,7 @@ opts_chunk$set(
   fig.align = "center",
   fig.retina = 2,
   out.width = "85%",
-  dpi = 96,
+  dpi = 96 ,
   pngquant = "--speed=1"
 )
 knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
