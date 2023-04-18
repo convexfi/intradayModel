@@ -9,7 +9,7 @@
 #' \code{\link{uniModelFilter}}
 #'
 #' @section Data:
-#' \code{\link{AAPL_volume}}
+#' \code{\link{AAPL_volume}},
 #' \code{\link{GE_volume}}
 #'
 #' @section Help:
