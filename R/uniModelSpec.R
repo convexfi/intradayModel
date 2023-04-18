@@ -11,11 +11,11 @@
 #'                       \item{\eqn{\phi_{\tau}}{\phi(\tau)} is the corresponding element from \eqn{\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]}, which is the log seasonal component;}
 #'                       \item{\eqn{\mathbf{w}_{\tau} = [\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})}{w(\tau) = [\epsilon.\eta(\tau); \epsilon.\mu(\tau)] ~ N(0, Q(\tau))} 
 #'                             represents the i.i.d. Gaussian noise in the state transition, with a time-varying covariance matrix 
-#'                             \eqn{\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_{\tau}^{\eta})^2&0\\ 0&(\sigma_{\tau}^{\mu})^2\end{array} \right]}{Q(\tau) = [(\sigma.\eta(\tau))^2, 0; 0, (\sigma.\mu)^2]} 
+#'                             \eqn{\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_{\tau}^{\eta})^2&0\\ 0&(\sigma^{\mu})^2\end{array} \right]}{Q(\tau) = [(\sigma.\eta(\tau))^2, 0; 0, (\sigma.\mu)^2]} 
 #'                             and \eqn{\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}}{\sigma.\eta(\tau) = \sigma.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
 #'                        \item{\eqn{v_\tau \sim \mathcal{N}(0, r)}{v(\tau) ~ N(0, r)} is the i.i.d. Gaussian noise in the observation;}
 #'                        \item{\eqn{\mathbf{x}_1}{x(1)} is the initial state at \eqn{\tau = 1}{\tau = 1}, and it follows \eqn{\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0).}{N(x(0), V(0))}}.}
-#'             In the proposed model, \eqn{\boldsymbol{\theta} = \left\{\mathbf{A}_{\tau},\mathbf{Q}_{\tau},r,\boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0\right\}}{\Theta = {a.\eta, a.\mu, (\sigma.\eta)^2, (\sigma.\mu)^2, r, \phi, x(0), V(0)}} 
+#'             In the proposed model, \eqn{\boldsymbol{\theta} = \left\{a^{\eta},a^{\mu},\sigma^{\eta},\sigma^{\mu},r,\boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0\right\}}{\Theta = {a.\eta, a.\mu, (\sigma.\eta)^2, (\sigma.\mu)^2, r, \phi, x(0), V(0)}} 
 #'             are treated as parameters.
 #' 
 #' @param fit Logical value indicating whether the model needs to be fitted (default is \code{FALSE}). 
@@ -120,7 +120,6 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
       na_par <- names(na_check[na_check == TRUE])
       msg <- c("If fit = FALSE, ", paste(na_par, collapse = ", "), " must have no NAs.")
       stop(msg)
-      break
     }
   }
   uniModel$fit_request <- list()
