@@ -1,5 +1,5 @@
 ---
-title: "Financial Intraday Signal: Modeling and Forecasting"
+title: "intradayModel: Modeling and Forecasting Financial Intraday Signals"
 author: |
   | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
   | The Hong Kong University of Science and Technology (HKUST)
