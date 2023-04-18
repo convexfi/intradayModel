@@ -8,7 +8,7 @@ test_that("package, stock = GE", {
   modelSpec.fit_acc <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
 
   # Fitting
-  expected_par <- readRDS("./tests/testthat/GE_expected_par")
+  expected_par <- readRDS(test_path("fixtures", "GE_expected_par"))
   expected_modelSpec <- list()
   expected_modelSpec$par$a_eta <- expected_par$B[1]
   expected_modelSpec$par$a_mu <- expected_par$B[2]
@@ -41,7 +41,7 @@ test_that("package, stock = GE", {
   predict_result <- uniModelPred(data, modelSpec.fit, out.sample = 20)
   predict_result_acc <- uniModelPred(data, modelSpec.fit_acc, out.sample = 20)
   
-  expected_res <- readRDS("./tests/testthat/GE_expected_pred")
+  expected_res <- readRDS(test_path("fixtures", "GE_expected_pred"))
   expect_equal(predict_result$signal_pred, expected_res$volume_pred, tolerance = 1e-2)
   expect_equal(predict_result_acc$signal_pred, expected_res$volume_pred, tolerance = 1e-2)
   expect_equal(as.vector(as.matrix(predict_result$measure)), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-2)
