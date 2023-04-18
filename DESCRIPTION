@@ -1,10 +1,10 @@
 Package: intradayModel
-Title: Univariate State-Space Modeling for Intraday Trading Volume
+Title: Univariate State-Space Modeling for Financial Intraday Signal
 Version: 0.0.1
 Date: 2023-4-11
-Description: Maximum-likelihood parameter estimation for univariate state-space models fit to finantial time-series signals.  
-            Fitting is primarily via the Expectation-Maximization (EM) algorithm. In addition, functions for 
-            prediction and filtering are provided.
+Description: Univariate state-space models fit to financial intraday signal, with a focus on intraday trading volume.  
+            Fitting is primarily via the Maximum-likelihood estimation and Expectation-Maximization (EM) algorithm. 
+            In addition, functions for prediction and filtering are provided.
 Authors@R: c(
   person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com"),
   person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
