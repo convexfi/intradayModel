@@ -34,7 +34,8 @@
 #' # fit the model to AAPL_volume
 #' data(AAPL_volume)
 #' model <- uniModelSpec(fit = TRUE)
-#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, 
+#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE)
 #' 
 #' @importFrom magrittr %>%
 #' 
