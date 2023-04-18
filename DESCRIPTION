@@ -15,7 +15,8 @@ URL: https://github.com/convexfi/intradayModeling,
 BugReports: https://github.com/convexfi/intradayModeling/issues
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.2.1
+Depends: R (>= 2.10)
 Imports:
     ggplot2,
     magrittr,
@@ -26,12 +27,12 @@ Imports:
     wesanderson
 Suggests:
     knitr,
-    prettydoc,
     rmarkdown,
     R.rsp,
     testthat (>= 3.0.0),
     xts,
-    cleanrmd
+    cleanrmd,
+    devtools
 VignetteBuilder:
     knitr,
     rmarkdown,
