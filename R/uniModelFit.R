@@ -92,7 +92,12 @@ uniModelFit <- function(data, uniModel, acceleration = FALSE,
   
   # verbose
   if (verbose >= 2) {
-    utils::str(uniModel$par)
+    cat("--- obtained parameters ---\n")
+    par_visual <- lapply(uniModel$par, as.numeric)
+    par_visual$V0 <- matrix(c(par_visual$V0[1], par_visual$V0[2],
+                              par_visual$V0[2], par_visual$V0[3]), 2)
+    utils::str(par_visual)
+    cat("---------------------------\n")
   }
 
   return(uniModel)
