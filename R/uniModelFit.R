@@ -141,7 +141,7 @@ uniss_em_alg <- function(...) {
   if (convergence) {
     cat("Success! abstol test passed at", i, "iterations.\n")
   } else {
-    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
+    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", control$maxit, ".\n", sep = ""))
   }
   result <- list("uniss_obj" = uniss_obj, "convergence" = convergence, 
                  "par_log" = par_log, "warning_msg" = warning_msg)
@@ -230,7 +230,7 @@ uniss_em_alg_acc <- function(...) {
   if (convergence) {
     cat("Success! abstol test passed at", i, "iterations.\n")
   } else {
-    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", maxit, ".\n", sep = ""))
+    warning_msg <- c(warning_msg, paste("Warning! Reached maxit before parameters converged. Maxit was ", control$maxit, ".\n", sep = ""))
   }
   result <- list("uniss_obj" = uniss_obj, "convergence" = convergence, 
                  "par_log" = par_log, "warning_msg" = warning_msg)
