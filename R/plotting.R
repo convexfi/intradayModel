@@ -107,6 +107,7 @@ plot_decomposition <- function(data, filter_result) {
 #' @importFrom magrittr %>%
 plot_prediction <- function(signal_real, signal_pred) {
   i <- real <- pred <- NULL
+  signal <- type <- NULL
   plt_data_log <- 
     data.frame(
       real = log(signal_real),

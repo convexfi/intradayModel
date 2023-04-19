@@ -36,6 +36,9 @@ test_that("package, stock = GE", {
   predict_result <- uniModelPred(data, modelSpec.fit, out.sample = 20)
   predict_result_acc <- uniModelPred(data, modelSpec.fit_acc, out.sample = 20)
   
+  predict_result$plot
+  predict_result_acc$plot
+  
   expected_res <- readRDS(test_path("fixtures", "GE_expected_pred"))
   expect_equal(predict_result$signal_pred, expected_res$volume_pred, tolerance = 1e-2)
   expect_equal(predict_result_acc$signal_pred, expected_res$volume_pred, tolerance = 1e-2)
