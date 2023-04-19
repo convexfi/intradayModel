@@ -12,21 +12,16 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
   expected_modelSpec$par$var_eta <- expected_par$Q[1]
   expected_modelSpec$par$var_mu <- expected_par$Q[2]
   expected_modelSpec$par$r <- expected_par$R[1]
+  expected_modelSpec$par$phi <- as.vector(expected_par$A)
+  expected_modelSpec$par$x0 <- as.vector(expected_par$x0)
+  expected_modelSpec$par$V0 <- as.vector(expected_par$V0)
   
-  phi_names <- c()
-  for (i in 1:26){
-    phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
-  }
-  expected_modelSpec$par$phi <- array(expected_par$A, dim = c(26, 1), dimnames = list(phi_names, NULL))
-  expected_modelSpec$par$x0 <- array(expected_par$x0, dim = c(2, 1), dimnames = list(c("x01", "x02"), NULL))
-  expected_modelSpec$par$V0 <- expected_par$V0
-
   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
   expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
 
-  plot(fetch_par_log(modelSpec.fit$par_log, "B")[1, ])
-  plot(fetch_par_log(modelSpec.fit_acc$par_log, "B")[1, ])
+  plot(fetch_par_log(modelSpec.fit$par_log, "a_eta")[1, ])
+  plot(fetch_par_log(modelSpec.fit_acc$par_log, "a_eta")[1, ])
 })
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ACN", {
@@ -44,21 +39,16 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
   expected_modelSpec$par$var_mu <- expected_par$Q[2]
   expected_modelSpec$par$r <- expected_par$R[1]
   
-  phi_names <- c()
-  for (i in 1:26){
-    phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
-  }
-  expected_modelSpec$par$phi <- array(expected_par$A, dim = c(26, 1), dimnames = list(phi_names, NULL))
-  expected_modelSpec$par$x0 <- array(expected_par$x0, dim = c(2, 1), dimnames = list(c("x01", "x02"), NULL))
-  expected_modelSpec$par$V0 <- expected_par$V0
+  expected_modelSpec$par$phi <- as.vector(expected_par$A)
+  expected_modelSpec$par$x0 <- as.vector(expected_par$x0)
+  expected_modelSpec$par$V0 <- as.vector(expected_par$V0)
   
   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
-  
   expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   
-  plot(fetch_par_log(modelSpec.fit$par_log, "B")[1, ])
-  plot(fetch_par_log(modelSpec.fit_acc$par_log, "B")[1, ])
+  plot(fetch_par_log(modelSpec.fit$par_log, "a_eta")[1, ])
+  plot(fetch_par_log(modelSpec.fit_acc$par_log, "a_eta")[1, ])
 })
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = CVS", {
@@ -75,19 +65,14 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
   expected_modelSpec$par$var_eta <- expected_par$Q[1]
   expected_modelSpec$par$var_mu <- expected_par$Q[2]
   expected_modelSpec$par$r <- expected_par$R[1]
-  
-  phi_names <- c()
-  for (i in 1:26){
-    phi_names <- append(phi_names, paste(paste("phi", i, sep = "")))
-  }
-  expected_modelSpec$par$phi <- array(expected_par$A, dim = c(26, 1), dimnames = list(phi_names, NULL))
-  expected_modelSpec$par$x0 <- array(expected_par$x0, dim = c(2, 1), dimnames = list(c("x01", "x02"), NULL))
-  expected_modelSpec$par$V0 <- expected_par$V0
+  expected_modelSpec$par$phi <- as.vector(expected_par$A)
+  expected_modelSpec$par$x0 <- as.vector(expected_par$x0)
+  expected_modelSpec$par$V0 <- as.vector(expected_par$V0)
   
   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
   expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
    
-  plot(fetch_par_log(modelSpec.fit$par_log, "B")[2, ])
-  plot(fetch_par_log(modelSpec.fit_acc$par_log, "B")[2, ])
+  plot(fetch_par_log(modelSpec.fit$par_log, "a_mu")[1, ])
+  plot(fetch_par_log(modelSpec.fit_acc$par_log, "a_mu")[1, ])
 })

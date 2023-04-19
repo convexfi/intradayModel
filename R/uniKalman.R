@@ -179,7 +179,7 @@ uniss_kalman <- function(uniss_obj, type = "em_update") {
           phi_matrix <- rep(matrix(new_par$phi, nrow = 1), uniss_obj$n_day)
         } else {
           phi_matrix <- unlist(uniss_obj$par$phi)
-        } # need input
+        } ## need input
         new_par$r <- mean(uniss_obj$y^2 + apply(Pt, 3, function(p) C %*% p %*% t(C)) -
           2 * uniss_obj$y * as.numeric(C %*% xtT) +
           phi_matrix^2 -
@@ -199,7 +199,7 @@ uniss_kalman <- function(uniss_obj, type = "em_update") {
           curr_a_eta <- new_par$a_eta
         } else {
           curr_a_eta <- uniss_obj$par$a_eta
-        } # need input
+        } ## need input
         new_par$var_eta <- mean(Pt[1, 1, jump_interval] +
           curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
           2 * curr_a_eta * Ptt1[1, 1, jump_interval])
@@ -209,7 +209,7 @@ uniss_kalman <- function(uniss_obj, type = "em_update") {
           curr_a_mu <- new_par$a_mu
         } else {
           curr_a_mu <- uniss_obj$par$a_mu
-        } # need input
+        } ## need input
         new_par$var_mu <- mean(Pt[2, 2, 2:uniss_obj$n_bin_total] +
           curr_a_mu^2 * Pt[2, 2, 1:(uniss_obj$n_bin_total - 1)] -
           2 * curr_a_mu * Ptt1[2, 2, 2:uniss_obj$n_bin_total])
