@@ -52,14 +52,16 @@ the `uniModelFit` function.
 data <- AAPL_volume
 data_train <- AAPL_volume[, 1:104]
 model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
-#> iter:5 diff:0.002868336
-#> iter:10 diff:0.001158425
-#> iter:15 diff:0.001227888
-#> iter:20 diff:0.0007639653
-#> iter:25 diff:0.0005356731
-#> iter:30 diff:0.0002915528
-#> iter:35 diff:0.0003324134
-#> Success! abstol test passed at 37 iterations.
+#> iter:5 diff:0.002868503
+#> iter:10 diff:0.001158477
+#> iter:15 diff:0.001227848
+#> iter:20 diff:0.0007639725
+#> iter:25 diff:0.0005357166
+#> iter:30 diff:0.0002927454
+#> iter:35 diff:0.0005428917
+#> iter:40 diff:0.0001707282
+#> iter:45 diff:0.0002356185
+#> Success! abstol test passed at 47 iterations.
 ```
 
 Once the model is fitted, we use the `uniModelFilter` function to
@@ -83,7 +85,7 @@ accuracy of the forecast.
 predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
 predict_result$measure
 #>        mae      mape    rmse
-#> 1 631351.4 0.2085738 1418007
+#> 1 630877.9 0.2083228 1418145
 predict_result$plot
 ```
 
