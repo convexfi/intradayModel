@@ -3,6 +3,7 @@
 #' @import ggplot2
 #' @importFrom magrittr %>%
 plot_decomposition <- function(data, filter_result) {
+  i <- signal <- daily <-  seasonal <- dynamic <- NULL
   data <- as.matrix(data) # convert df to matrix
   plt_data_log <- 
     data.frame(
@@ -105,6 +106,8 @@ plot_decomposition <- function(data, filter_result) {
 #' @import ggplot2
 #' @importFrom magrittr %>%
 plot_prediction <- function(signal_real, signal_pred) {
+  i <- real <- pred <- NULL
+  signal <- type <- NULL
   plt_data_log <- 
     data.frame(
       real = log(signal_real),

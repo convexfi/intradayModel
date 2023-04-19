@@ -28,12 +28,12 @@ specify_uniss <- function(...) {
   uniss_obj$par <- list()
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
   init.default <- list(
-    "x0" = matrix(c(mean(data.reform), 0), 2, 1),
+    "x0" = c(mean(data.reform), 0),
     "a_eta" = 1, "a_mu" = 0,
     "r" = 1e-4,
     "var_eta" = 1e-4, "var_mu" = 1e-4,
-    "V0" = matrix(c(1e-3, 1e-7, 1e-5), 3, 1),
-    "phi" = rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform)
+    "V0" = c(1e-3, 1e-7, 1e-5),
+    "phi" = c(rowMeans(matrix(data.reform, nrow = n_bin)) - mean(data.reform))
   )
   for (name in all.pars.name) {
     ### specify EM initial values
