@@ -46,8 +46,19 @@ uniModelFilter <- function(data, uniModel) {
     stop(msg)
   }
 
-  # filter using MARSS
-  components <- marss_filter(log(data), uniModel)
+  # filter using UNISS (our own Kalman)
+  args <- list(
+    data = log(data),
+    uniModel = uniModel
+  )
+  uniss_obj <- do.call(specify_uniss, args)
+  Kf <- uniss_kalman(uniss_obj, "smoother")
+
+  components <- list(
+    "daily" = Kf$xtT[1, ],
+    "dynamic" = Kf$xtT[2, ],
+    "seasonal" = rep(uniss_obj$par$phi, uniss_obj$n_day)
+  )
   
   # add decomposition plot
   plot <- plot_decomposition(data, components)
@@ -55,21 +66,4 @@ uniModelFilter <- function(data, uniModel) {
               plot = plot)
   
   return(res)
-}
-
-marss_filter <- function(data, uniModel) {
-  data <- as.matrix(data)
-  args <- list(
-    data = data,
-    uniModel = uniModel
-  )
-  marss_obj <- do.call(specify_marss, args)
-  Kf <- MARSS::MARSSkfas(marss_obj)
-  result <- list(
-    "daily" = Kf$xtT[1, ],
-    "dynamic" = Kf$xtT[2, ],
-    "seasonal" = as.vector(marss_obj$model$fixed[["A"]])
-  )
-
-  return(result)
 }
