@@ -1,4 +1,5 @@
-# define the uniss model (prepare all required information) in log form
+# define the UNIvariate State-Space (UNISS) model
+# (prepare all required information) in log form
 specify_uniss <- function(...) {
   # read input information
   args <- list(...)
@@ -132,17 +133,90 @@ uniss_kalman <- function(uniss_obj, type = "em_update") {
     VtT[, , i] <- Vtt[, , i] + Lt[, , i] %*% (VtT[, , i + 1] - Vtt1[, , i + 1]) %*% t(Lt[, , i])
   }
 
+  x0T <- xtT[, 1]
+  V0T <- VtT[, , 1]
+
+  result$x0T <- x0T
+  result$V0T <- V0T
   result$xtT <- xtT
   result$VtT <- VtT
   result$Lt <- Lt
   if (type == "smoother") {
     return(result)
   }
-  
+
   # em update -----------------------------------
 
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
+  unfitted_pars <- names(uniss_obj$fit_request[uniss_obj$fit_request == TRUE])
+
+  Pt <- Ptt1 <- array(NA, c(2, 2, uniss_obj$n_bin_total))
+  for (n in 1:uniss_obj$n_bin_total) {
+    Pt[, , n] <- VtT[, , n] + xtT[, n] %*% t(xtT[, n])
+  }
+  for (n in 2:uniss_obj$n_bin_total) {
+    Ptt1[, , n] <- VtT[, , n] %*% t(Lt[, , n - 1]) + xtT[, n] %*% t(xtT[, n - 1])
+  }
+  jump_interval <- seq(uniss_obj$n_bin + 1, uniss_obj$n_bin_total, uniss_obj$n_bin)
   
+  new_par <- uniss_obj$par
+  for (name in unfitted_pars) {
+    switch(name,
+      "x0" = {
+        new_par$x0 <- x0T
+      },
+      "V0" = {
+        new_par$V0[1] <- V0T[1, 1]
+        new_par$V0[2] <- V0T[2, 1]
+        new_par$V0[3] <- V0T[2, 2]
+      },
+      "phi" = {
+        new_par$phi <- rowMeans(matrix(uniss_obj$y - C %*% xtT, nrow = uniss_obj$n_bin))
+        new_par$phi <- new_par$phi - mean(new_par$phi)
+      },
+      "r" = {
+        if ("phi" %in% unfitted_pars) {
+          phi_matrix <- rep(matrix(new_par$phi, nrow = 1), uniss_obj$n_day)
+        } else {
+          phi_matrix <- unlist(uniss_obj$par$phi)
+        } # need input
+        new_par$r <- mean(uniss_obj$y^2 + apply(Pt, 3, function(p) C %*% p %*% t(C)) -
+          2 * uniss_obj$y * as.numeric(C %*% xtT) +
+          phi_matrix^2 -
+          2 * uniss_obj$y * phi_matrix +
+          2 * phi_matrix * as.numeric(C %*% xtT))
+      },
+      "a_eta" = {
+        new_par$a_eta <- sum(Ptt1[1, 1, jump_interval]) /
+          sum(Pt[1, 1, jump_interval - 1])
+      },
+      "a_mu" = {
+        new_par$a_mu <- sum(Ptt1[2, 2, 2:uniss_obj$n_bin_total]) /
+          sum(Pt[2, 2, 1:(uniss_obj$n_bin_total - 1)])
+      },
+      "var_eta" = {
+        if ("a_eta" %in% unfitted_pars) {
+          curr_a_eta <- new_par$a_eta
+        } else {
+          curr_a_eta <- uniss_obj$par$a_eta
+        } # need input
+        new_par$var_eta <- mean(Pt[1, 1, jump_interval] +
+          curr_a_eta^2 * Pt[1, 1, jump_interval - 1] -
+          2 * curr_a_eta * Ptt1[1, 1, jump_interval])
+      },
+      "var_mu" = {
+        if ("a_mu" %in% unfitted_pars) {
+          curr_a_mu <- new_par$a_mu
+        } else {
+          curr_a_mu <- uniss_obj$par$a_mu
+        } # need input
+        new_par$var_mu <- mean(Pt[2, 2, 2:uniss_obj$n_bin_total] +
+          curr_a_mu^2 * Pt[2, 2, 1:(uniss_obj$n_bin_total - 1)] -
+          2 * curr_a_mu * Ptt1[2, 2, 2:uniss_obj$n_bin_total])
+      }
+    )
+  }
   
-  browser()
+  result$new_par <- new_par
+  return(result)
 }
