@@ -51,8 +51,16 @@ uniModelPred <- function(data, uniModel, out.sample) {
     stop(msg)
   }
 
-  # one-step ahead prediction using MARSS
-  signal_pred <- exp(marss_predict(log(data), uniModel, out.sample))
+  # one-step ahead prediction using UNISS (our own Kalman)
+  args <- list(
+    data = log(data),
+    uniModel = uniModel
+  )
+  uniss_obj <- do.call(specify_uniss, args)
+  Kf <- uniss_kalman(uniss_obj, "filter")
+  y_pred <- Kf$xtt1[1, ] + Kf$xtt1[2, ] + rep(uniss_obj$par$phi, uniss_obj$n_day)
+  y_pred <- utils::tail(y_pred, nrow(data) * out.sample)
+  signal_pred <- exp(y_pred)
   
   # error measures
   signal_real <- tail(as.vector(as.matrix(data)), nrow(data) * out.sample)
@@ -69,22 +77,4 @@ uniModelPred <- function(data, uniModel, out.sample) {
               plot = plot)
   
   return(res)
-}
-
-marss_predict <- function(data, uniModel, out.sample) {
-  data <- as.matrix(data)
-  args <- list(
-    data = data,
-    uniModel = uniModel
-  )
-
-  marss_obj <- do.call(specify_marss, args = args)
-  Kf <- MARSS::MARSSkfas(marss_obj)
-  x_pred <- Kf[["xtt1"]]
-  seasonal <- uniModel$par$phi[, 1]
-  names(seasonal) <- NULL
-  y_pred <- x_pred[1, ] + x_pred[2, ] + rep(seasonal, ncol(data))
-  y_pred <- utils::tail(y_pred, nrow(data) * out.sample)
-  
-  return(y_pred)
 }
