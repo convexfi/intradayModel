@@ -71,8 +71,8 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
   uniModel$par$"var_mu" <- NA
   uniModel$par$"r" <- NA
   uniModel$par$"phi" <- NA
-  uniModel$par$"x0" <- matrix(NA, 2)
-  uniModel$par$"V0" <- matrix(NA, 3)
+  uniModel$par$"x0" <- rep(NA, 2)
+  uniModel$par$"V0" <- rep(NA, 3)
   uniModel$init <- list()
 
   # read in input parameters
@@ -130,9 +130,6 @@ uniModelSpec <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
       uniModel$fit_request[[name]] <- FALSE
     }
   }
-
-  # unify the uniModel parameters format
-  uniModel <- format_unimodel(uniModel)
 
   return(uniModel)
 }
