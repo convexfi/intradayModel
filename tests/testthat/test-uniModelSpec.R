@@ -15,8 +15,8 @@ test_that("unimodel specification return coincide with the predefined one", {
   predefinde_model$par <- list("a_eta" =  NA, "a_mu" = NA,
                                "var_eta" = 4, "var_mu" = NA,
                                "r" = NA, "phi" = NA,
-                               "x0" = matrix(NA, 2),
-                               "V0" = array(c(1,0,1), dim = c(3, 1), dimnames = list(c("(1,1)", "(2,1)", "(2,2)"), NULL)))
+                               "x0" = rep(NA, 2),
+                               "V0" = c(1,0,1))
   predefinde_model$init <- list("a_eta" =  1)
   predefinde_model$fit_request <- list("a_eta" =  TRUE, "a_mu" = TRUE,
                                    "var_eta" = FALSE, "var_mu" = TRUE,
