@@ -1,11 +1,15 @@
+# HEADER --------------------------------------------
 # UNIvariate State-Space (UNISS) model
-# The engine of Kalman filter & smoother & em updates
+# The engine of Kalman filter & smoother & em updates.
+#
 # Its object is names "uniss_obj", it stores all the required information
-# in the State-space world. The user's "uniModel" is for user interface, and its 
-# detailed information is stored in uniss_obj".
+# in the state-space world. 
+# The user's "uniModel" is for user interface, and its detailed information 
+# is stored in "uniss_obj".
+# --------------------------------------------------
 
 # define the UNISS model
-# (prepare all required information) in log form
+# prepare all required information in log form
 specify_uniss <- function(...) {
   # read input information
   args <- list(...)
