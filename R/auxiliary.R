@@ -2,7 +2,7 @@
 # They should be invisible to package users
 
 # Define a Univariate State-Space Model
-spec_unimodel <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
+spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   uniModel <- list()
   
   # error control
@@ -59,15 +59,6 @@ spec_unimodel <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
     }
   }
   
-  # decide if each variable requires fitting
-  if (fit == FALSE) {
-    if (anyNA(unlist(uniModel$par))) {
-      na_check <- lapply(uniModel$par, anyNA)
-      na_par <- names(na_check[na_check == TRUE])
-      msg <- c("If fit = FALSE, ", paste(na_par, collapse = ", "), " must have no NAs.")
-      stop(msg)
-    }
-  }
   uniModel$fit_request <- list()
   for (name in all_pars_name) {
     if (anyNA(uniModel$par[[name]])) {

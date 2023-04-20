@@ -21,8 +21,6 @@
 #' The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 #'
 #' @param data Matrix of intraday signal of size n_bin * n_day without any missing values.
-#' @param fit Logical value indicating whether the model needs to be fitted (default is \code{FALSE}). 
-#'            If \code{FLASE}, all parameters should be assigned values via \code{fixed.pars}.
 #' @param fixed.pars List of parameters' fixed values. The allowed parameters are listed below,
 #'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
 #'                           \item{\code{"a_mu"}: \eqn{a^{\mu}}{a.\mu}} of size 1 ;
@@ -68,10 +66,10 @@
 #' @importFrom magrittr %>%
 #' 
 #' @export
-uniModelFit <- function(data, fit = TRUE, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = NULL) {
+uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = NULL) {
   
   # Define a Univariate State-Space Model
-  uniModel <- spec_unimodel(fit, fixed.pars, init.pars)
+  uniModel <- spec_unimodel(fixed.pars, init.pars)
 
   # error control
   if (!is.matrix(data)) stop("data must be a matrix.")
