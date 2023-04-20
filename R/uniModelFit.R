@@ -65,17 +65,14 @@
 #' 
 #' @importFrom magrittr %>%
 #' 
+#' @import xts
+#' 
 #' @export
 uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = NULL) {
   
   # Define a Univariate State-Space Model
   uniModel <- spec_unimodel(fixed.pars, init.pars)
 
-  # error control
-  if (!is.matrix(data)) stop("data must be a matrix.")
-  if (anyNA(data)) stop("data must have no NA.")
-  is_uniModel(uniModel, nrow(data))
-  
   # check if fit is required
   if (Reduce("+", uniModel$fit_request) == 0) {
     if (verbose > 0) {
@@ -83,6 +80,17 @@ uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0,
     }
     return(uniModel)
   }
+  
+  # error control of data
+  if (!is.xts(data) | !is.matrix(data)) {
+    stop("data must be matrix or xts.")
+  } 
+  if (is.xts(data)) {
+    data <- intraday_xts_to_matrix(data)
+  }
+  if (anyNA(data)) stop("data must have no NA.")
+  is_uniModel(uniModel, nrow(data))
+  
 
   # control list check
   ## initial control values

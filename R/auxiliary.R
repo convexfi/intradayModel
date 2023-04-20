@@ -71,6 +71,38 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   return(uniModel)
 }
 
+# library(xts)
+intraday_xts_to_matrix <- function(data.xts) {
+  contain_NA <- apply.daily(data.xts, function(x) as.integer(any(is.na(x))))
+  index_no_NA_bin <- zoo::index(to.daily(contain_NA[contain_NA == 0]))
+  data.xts <- data.xts[format(index_no_NA_bin, format="%Y-%m-%d")]
+  
+  bins_count <- apply.daily(data.xts, nrow)
+  n_bin <- max(bins_count)
+  index_full_bin <- zoo::index(to.daily(bins_count[bins_count == n_bin]))
+  
+  data.xts <- data.xts[format(index_no_NA_bin, format="%Y-%m-%d")]
+  data.xts <- data.xts[format(index_full_bin, format="%Y-%m-%d")]
+  data.mat <- matrix(data.xts, nrow = n_bin)
+  
+  index_NA_bin <- c()
+  if (sum(contain_NA != 0) > 0) {
+    index_NA_bin <- zoo::index(to.daily(contain_NA[contain_NA != 0]))
+  }
+  index_notfull_bin <- c()
+  if (sum(bins_count != n_bin) > 0) {
+    index_notfull_bin <- zoo::index(to.daily(bins_count[bins_count != n_bin]))
+  }
+  wrong_index <- c(index_NA_bin, index_notfull_bin)
+  if (length(wrong_index) > 0) {
+    cat("Warning in input xts:\n")
+    cat(" Remove trading days with missing bins: ", format(wrong_index), "\n")
+  }
+  
+  return(data.mat)
+}
+
+
 # clean the uniuniModel()'s input args (init.pars/fixed.pars)
 # remove any variable containing NA/inf/non-numeric
 # remove any variable that won't appear in model

@@ -34,8 +34,13 @@
 #' 
 #' @export
 uniModelFilter <- function(data, uniModel) {
-  # error control
-  if (!is.matrix(data)) stop("data must be a matrix.")
+  # error control of data
+  if (!is.xts(data) | !is.matrix(data)) {
+    stop("data must be matrix or xts.")
+  } 
+  if (is.xts(data)) {
+    data <- intraday_xts_to_matrix(data)
+  }
   if (anyNA(data)) stop("data must have no NA.")
   is_uniModel(uniModel, nrow(data))
 
