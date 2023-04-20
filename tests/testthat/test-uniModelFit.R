@@ -1,8 +1,7 @@
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ADBE", {
   data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
+  modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+  modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
   # expected output
   expected_par <- readRDS(test_path("fixtures", "ADBE_expected_par"))
@@ -26,9 +25,8 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ACN", {
   data <- readRDS(test_path("fixtures", "ACN_volume"))[,1:104]
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
+  modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+  modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
   # expected output
   expected_par <- readRDS(test_path("fixtures", "ACN_expected_par"))
@@ -53,10 +51,9 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = CVS", {
   data <- readRDS(test_path("fixtures", "CVS_volume"))[, 1:104]
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
-    
+  modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+  modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
+  
   # expected output
   expected_par <- readRDS(test_path("fixtures", "CVS_expected_par"))
   expected_modelSpec <- list()

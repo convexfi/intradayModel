@@ -1,6 +1,85 @@
 # This is a library of auxiliary functions, which might be useful for other exported functions of this package.
 # They should be invisible to package users
 
+# Define a Univariate State-Space Model
+spec_unimodel <- function(fit = FALSE, fixed.pars = NULL, init.pars = NULL) {
+  uniModel <- list()
+  
+  # error control
+  if (!is.null(init.pars) && !is.list(init.pars)) stop("init.pars must be a list.")
+  if (!is.null(fixed.pars) && !is.list(fixed.pars)) stop("fixed.pars must be a list.")
+  
+  # uniModel class properties
+  all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
+  uniModel$par$"a_eta" <- NA
+  uniModel$par$"a_mu" <- NA
+  uniModel$par$"var_eta" <- NA
+  uniModel$par$"var_mu" <- NA
+  uniModel$par$"r" <- NA
+  uniModel$par$"phi" <- NA
+  uniModel$par$"x0" <- rep(NA, 2)
+  uniModel$par$"V0" <- rep(NA, 3)
+  uniModel$init <- list()
+  
+  # read in input parameters
+  fixed_clean_result <- clean_pars_list(fixed.pars)
+  fixed.pars <- fixed_clean_result$input_list
+  
+  unecessary_init <- intersect(names(init.pars), names(fixed.pars))
+  init.pars <- init.pars[setdiff(names(init.pars), names(fixed.pars))]
+  init_clean_result <- clean_pars_list(init.pars)
+  init.pars <- init_clean_result$input_list
+  
+  # generate warning message
+  if (length(fixed_clean_result$msg) > 0) {
+    cat("Warnings in fixed.pars:\n")
+    for (m in fixed_clean_result$msg) {
+      cat("  ", m, "\n", sep = "")
+    }
+  }
+  if (length(init_clean_result$msg) > 0 | length(unecessary_init) > 0) {
+    cat("Warnings in init.pars:\n")
+    if (!is.null(init_clean_result$msg)) {
+      for (m in init_clean_result$msg) {
+        cat("  ", m, "\n", sep = "")
+      }
+    }
+    if (length(unecessary_init) > 0) {
+      cat("  Elements ", paste(unecessary_init, collapse = ", "),
+          " have already been fixed.\n", sep = "")
+    }
+  }
+  
+  # store inputs in univariate model object
+  for (name in all_pars_name) {
+    if (name %in% names(fixed.pars)) {
+      uniModel$par[[name]] <- fixed.pars[[name]]
+    } else if (name %in% names(init.pars)) {
+      uniModel$init[[name]] <- init.pars[[name]]
+    }
+  }
+  
+  # decide if each variable requires fitting
+  if (fit == FALSE) {
+    if (anyNA(unlist(uniModel$par))) {
+      na_check <- lapply(uniModel$par, anyNA)
+      na_par <- names(na_check[na_check == TRUE])
+      msg <- c("If fit = FALSE, ", paste(na_par, collapse = ", "), " must have no NAs.")
+      stop(msg)
+    }
+  }
+  uniModel$fit_request <- list()
+  for (name in all_pars_name) {
+    if (anyNA(uniModel$par[[name]])) {
+      uniModel$fit_request[[name]] <- TRUE
+    } else {
+      uniModel$fit_request[[name]] <- FALSE
+    }
+  }
+  
+  return(uniModel)
+}
+
 # clean the uniuniModel()'s input args (init.pars/fixed.pars)
 # remove any variable containing NA/inf/non-numeric
 # remove any variable that won't appear in model
