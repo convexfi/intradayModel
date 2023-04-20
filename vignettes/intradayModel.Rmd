@@ -1,0 +1,251 @@
+---
+title: "intradayModel: Modeling and Forecasting Financial Intraday Signals"
+author: |
+  | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
+  | The Hong Kong University of Science and Technology (HKUST)
+date: "`r Sys.Date()`"
+output: 
+  cleanrmd::html_document_clean:
+    theme: "bamboo"
+    mathjax: default
+    toc: true
+    toc_depth: 2
+csl: apalike.csl # springer-socpsych-author-date.csl
+csl-entry-spacing: 1.2em
+bibliography: refs.bib
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Intraday Volume and Volatility: Modeling and Forecasting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteKeyword{State-space Model}
+---
+
+```{r, echo=FALSE}
+library(knitr)
+opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.retina = 2,
+  out.width = "85%",
+  dpi = 96 ,
+  pngquant = "--speed=1"
+)
+knit_hooks$set(pngquant = hook_pngquant)  # brew install pngquant
+options(width=100)
+```
+
+```{css, echo = FALSE}
+/* ensure cleanrmd is centered */
+body {
+  margin: 0 auto;
+  max-width: 750px;
+  padding: 2rem;
+}
+
+/* math is smaller */
+.math {
+  font-size: small;
+}
+```
+
+------------------------------------------------------------------------
+
+> Welcome to the `intradayModel` package! This vignette provides an overview of the package's features and how to use them. `intradayModel` uses state-space models to model and forecast financial intraday signal, with a focus on intraday trading volume. Our team is currently working on expanding the package to include more support for intraday volatility.
+
+# Quick Start
+
+To get started, we load the package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days.
+
+```{r, message = FALSE}
+devtools::load_all()
+data(AAPL_volume)
+AAPL_volume[1:5, 1:5]
+```
+
+Next, we define a univariate state-space model using the `uniModelSpec` function.
+
+```{r}
+model <- uniModelSpec(fit = TRUE)
+```
+
+Then, we use the first 104 trading days to fit the model and the last 20 days to evaluate its forecasting performance. Fitting can be achieved by the `uniModelFit` function.
+
+```{r}
+data <- AAPL_volume
+data_train <- AAPL_volume[, 1:104]
+model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
+```
+
+Once the model is fitted, we use the `uniModelFilter` function to decompose intraday trading signal into daily, seasonal, and intraday dynamic components. This helps us better understand the composition of the intraday signal.
+
+```{r}
+filter_result <- uniModelFilter(data_train, model_fitted)
+filter_result$plot
+```
+
+To see how well our model performs on new data, we use the `uniModelPred` function to do one-step-ahead prediction on the last 20 trading days of the dataset. This function also helps to evaluate the accuracy of the forecast.
+
+```{r}
+predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
+predict_result$measure
+predict_result$plot
+```
+
+Exciting, right? Let's dive in!
+
+&nbsp; 
+
+# Usage of the package
+
+## Preliminary theory
+
+Intraday observations of signals are divided into days, indexed by $t\in\{1,\dots,T\}$. Each day is further divided into bins, indexed by $i\in\{1,\dots,I\}$. To refer to a specific observation, we use the index $\tau = I \times (t-1) + i$.
+
+Our package uses a state-space model to extract several components of intraday signals. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
+
+
+The observed intraday signal can be written in the multiplicative combination of the components [@brownlees2011intra]:
+
+$$
+\large
+\text{intraday signal} = \text{daily} \times \text{seasonal} \times \text{intraday dynamic} \times \text{noise}. \tag{1}
+\small
+$$
+
+Alternatively, by taking the logarithm transform, the intraday signal can be also regarded as an addictive combination of the components:
+
+$$
+\large
+y_{\tau} = \eta_{\tau} + \phi_i + \mu_{t,i} + v_{t,i}. \tag{2}
+\small
+$$
+
+The univariate model proposed by [@chen2016forecasting] is defined on Equation (2) as
+$$
+\large
+\begin{aligned}
+\mathbf{x}_{\tau+1} &= \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},\\
+y_{\tau} &= \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,
+\end{aligned}
+\tag{3}
+\small
+$$
+where
+
+- $\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top$ is the hidden state vector containing the log daily component and the log intraday dynamic component;
+
+- $\mathbf{A}_{\tau} = \left[\begin{array}{l}a_{\tau}^{\eta}&0\\0&a^{\mu}\end{array} \right]$ is the state transition matrix with $a_{\tau}^{\eta} = \begin{cases}a^{\eta}&\tau = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}$
+
+- $\mathbf{C} = [1, 1]$ is the observation matrix;
+
+- $\phi_{\tau}$ is the corresponding element from $\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top$, which is the log seasonal component;
+
+- $\mathbf{w}_{\tau} = \left[\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}\right]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})$ represents the i.i.d. Gaussian noise in the state transition, with a time-varying covariance matrix $\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_\tau^{\eta})^2&0\\0&(\sigma^{\mu})^2\end{array} \right]$ and $\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&\tau = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}$
+
+- $v_\tau \sim \mathcal{N}(0, r)$ is the i.i.d. Gaussian noise in the observation;
+
+- $\mathbf{x}_1$ is the initial state at $\tau = 1$, and it follows $\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0)$.
+
+In this model, $\boldsymbol{\Theta} = \{a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\sigma^{\mu})^2, r, \boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0 \}$ are treated as parameters.
+
+## Datasets
+
+To use this package, you need to reshape the intraday signal as a 2D numeric matrix of size `(n_bin, n_day)` without any missing values, where `n_bin=I` is the number of bins in a day, and `n_day=T` is the number of trading days. To help you get started, we provide two sample datasets: `AAPL_volume` and `GE_volume`. These datasets contain the 15-minute trading volume of AAPL and GE within 124 trading days from 2019-01-02 to 2019-06-28.
+
+```{r}
+data(GE_volume)
+dim(GE_volume)
+GE_volume[1:5, 1:5]
+```
+
+## Model specification
+
+> **uniModelSpec**(fit = FALSE, fixed.pars = NULL, init.pars = NULL)
+
+To define a univariate state-space model, you can use the `uniModelSpec` function. If the model contains unknown parameters, you can set `fit=TRUE`. If you want to fix some parameters to specific values, you can provide a list of values to `fixed.pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init.pars`.
+
+Here is a simple example.
+
+```{r}
+# set fixed value
+fixed.pars <- list()
+fixed.pars$"x0" <- c(13.33, -0.37)
+
+# set initial value 
+init.pars <- list()
+init.pars$"a_eta" <- 1
+
+# define the univariate model
+model <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
+```
+
+
+## Fitting
+
+> **uniModelFit**(data, uniModel, acceleration = FALSE, maxit = 3000, abstol = 1e-4, log.switch = TRUE, verbose = 1)
+
+Once you have specified the model, you can fit it to your data using the `uniModelFit` function. This function uses the expectation-maximization (EM) algorithm described in [@chen2016forecasting]. If `acceleration=TRUE`, the accelerated EM algorithm  [@varadhan2008simple] is applied with possibly lower numerical stability.
+
+You can set the maximum number of iterations using the `maxit` argument and the termination condition via `abstol`. The fitting process stops when either the maximum number of iterations is reached or $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
+
+You can turn on/off logging by setting `log.switch`. If you want to monitor the fitting process, you can set `verbose` to a value greater than 0.
+
+The following code shows how to fit the model to the GE stock.
+
+```{r}
+data <- GE_volume
+data_train <- GE_volume[, 1:104]
+model_fitted <- uniModelFit(data_train, model, acceleration = TRUE, verbose = 2)
+```
+
+## Filtering
+
+> **uniModelFilter**(data, uniModel)
+
+The `uniModelFilter` function in this package allows you to decompose an intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. The seasonal component has the value of $\boldsymbol{\phi}$.
+
+To use this function, input your intraday signal and the fitted model as arguments. This function will produce the three components along with a plot.
+
+```{r}
+filter_result <- uniModelFilter(data_train, model_fitted)
+str(filter_result$components)
+filter_result$plot
+```
+
+## Forecasting
+
+> **uniModelPred**(data, uniModel, out.sample) 
+
+The `uniModelPred` function allows you to predict the intraday signal one-bin-ahead, given your dataset and the fitted model. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
+
+Since fitting a model to some data does not guarantee good prediction on unseen data, `uniModelPred` also evaluates the model's performance with the following measures for you:
+
+- Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$.
+
+- Mean absolute percent error (MAPE): $\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_\tau - y_\tau\rvert}{y_\tau}$.
+
+- Root mean square error (RMSE): $\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_\tau - y_\tau\right)^2}{M}}$.
+
+Here $M$ is the total number of out-of-sample bins. The sample code is given as follows.
+
+```{r}
+predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
+head(predict_result$signal_pred)
+predict_result$measure
+predict_result$plot
+```
+
+&nbsp; 
+
+# Next steps
+
+This guide gives an overview of the package's main features. Check the manual for details on each function, including parameters and examples.
+
+The current version only supports univariate state-space models for intraday trading volume. Soon, we'll add models for intraday volatility and their multivariate versions. We hope you find these resources helpful and that our package will continue to be a valuable tool for your work.
+
+&nbsp; 
+
+# References {.unnumbered}
+

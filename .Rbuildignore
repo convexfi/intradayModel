@@ -1,5 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^R_buildignore$
 ^cran-comments\.md$
 .github
 ^LICENSE$
@@ -7,7 +8,7 @@
 ^README\.html$
 ^README_cache$
 ^README_files$
-^R_buildignore$
+
 ^data-raw$
 ^papers$
 ^vignettes/DesignOfHighOrderPortfolios_cache$
@@ -16,3 +17,5 @@
 ^vignettes/ieee\.csl$
 ^vignettes/refs\.bib$
 ^R/PerformanceAnalytics_copy\.R$
+^doc$
+^Meta$

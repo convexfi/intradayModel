@@ -1,47 +1,43 @@
-Package: fitHeavyTail
-Title: Mean and Covariance Matrix Estimation under Heavy Tails
+Package: intradayModel
+Title: Modeling and Forecasting Financial Intraday Signals
 Version: 0.0.1
-Date: 2022-5-11
-Description: Robust estimation methods for the mean vector, scatter matrix,
-    and covariance matrix (if it exists) from data (possibly containing NAs) 
-    under multivariate heavy-tailed distributions such as angular Gaussian 
-    (via Tyler's method), Cauchy, and Student's t distributions. Additionally, 
-    a factor model structure can be specified for the covariance matrix. The
-    latest revision also includes the multivariate skewed t distribution.
-    The package is based on the papers: Sun, Babu, and Palomar (2014),
-    Sun, Babu, and Palomar (2015), Liu and Rubin (1995), and 
-    Zhou, Liu, Kumar, and Palomar (2019).
+Date: 2023-4-18
+Description: `intradayModel` package uses state-of-the-art state-space models to facilitate the modeling 
+             and forecasting of financial intraday signals. This package currently offers a univariate model 
+             for intraday trading volume, with new features on intraday volatility and multivariate models in development. 
+             It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 Authors@R: c(
-  person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com"),
-  person("Rui", "Zhou", role =  "aut", email = "rzhouae@connect.ust.hk"),
-  person("Xiwen", "Wang", role =  "aut", email = "xwangew@connect.ust.hk")
+  person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
+  person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk"),
+  person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com")
   )
 Maintainer: Daniel P. Palomar <daniel.p.palomar@gmail.com>
-URL: https://CRAN.R-project.org/package=fitHeavyTail,
-     https://github.com/dppalomar/fitHeavyTail,
+URL: https://github.com/convexfi/intradayModeling,
      https://www.danielppalomar.com,
-     https://doi.org/10.1109/TSP.2014.2348944,
-     https://doi.org/10.1109/TSP.2015.2417513
-BugReports: https://github.com/dppalomar/fitHeavyTail/issues
+     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695
+BugReports: https://github.com/convexfi/intradayModeling/issues
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.1
-Depends:
+Depends: R (>= 2.10)
 Imports:
-    ICSNP,
-    mvtnorm,
-    ghyp,
-    numDeriv,
-    stats
+    ggplot2,
+    magrittr,
+    patchwork,
+    reshape2,
+    rlist,
+    wesanderson
 Suggests:
     knitr,
-    ggplot2,
-    prettydoc,
-    reshape2,
     rmarkdown,
     R.rsp,
-    testthat
+    testthat (>= 3.0.0),
+    xts,
+    cleanrmd,
+    devtools
 VignetteBuilder:
     knitr,
     rmarkdown,
     R.rsp
+LazyData: true
+Config/testthat/edition: 3
