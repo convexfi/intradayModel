@@ -9,13 +9,6 @@
 ^README_cache$
 ^README_files$
 
-^data-raw$
 ^papers$
-^vignettes/DesignOfHighOrderPortfolios_cache$
-^vignettes/DesignOfHighOrderPortfolios_files$
-^vignettes/DesignOfHighOrderPortfolios\.Rmd$
 ^vignettes/ieee\.csl$
 ^vignettes/refs\.bib$
-^R/PerformanceAnalytics_copy\.R$
-^doc$
-^Meta$
