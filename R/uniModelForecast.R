@@ -1,4 +1,4 @@
-#' @title Predict One-bin-ahead Financial Intraday Signal via a Univariate State-Space Model  
+#' @title Forecast One-bin-ahead Financial Intraday Signal via a Univariate State-Space Model  
 #'
 #' @description The one-bin-ahead prediction is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
 #'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
@@ -37,9 +37,14 @@
 #' @importFrom utils tail
 #' 
 #' @export
-uniModelPred <- function(data, uniModel, out.sample) {
-  # error control
-  if (!is.matrix(data)) stop("data must be a matrix.")
+uniModelForecast <- function(data, uniModel, out.sample) {
+  # error control of data
+  if (!is.xts(data) & !is.matrix(data)) {
+    stop("data must be matrix or xts.")
+  } 
+  if (is.xts(data)) {
+    data <- intraday_xts_to_matrix(data)
+  }
   if (anyNA(data)) stop("data must have no NA.")
   if (out.sample > ncol(data)) stop("out.sample must be smaller than the number of columns in data matrix.")
   is_uniModel(uniModel, nrow(data))
@@ -58,23 +63,32 @@ uniModelPred <- function(data, uniModel, out.sample) {
   )
   uniss_obj <- do.call(specify_uniss, args)
   Kf <- uniss_kalman(uniss_obj, "filter")
-  y_pred <- Kf$xtt1[1, ] + Kf$xtt1[2, ] + rep(uniss_obj$par$phi, uniss_obj$n_day)
-  y_pred <- utils::tail(y_pred, nrow(data) * out.sample)
-  signal_pred <- exp(y_pred)
   
+  # tidy up components (scale change)
+  components <- list(
+    forecast.daily = exp(Kf$xtt1[1,]),
+    forecast.dynamic = exp(Kf$xtt1[2,]),
+    forecast.seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+  )
+  components.out <- lapply(components, function (c) utils::tail(c, nrow(data) * out.sample))
+  forecast.signal <- components.out$forecast.daily * 
+    components.out$forecast.dynamic * components.out$forecast.seasonal
+
   # error measures
   signal_real <- tail(as.vector(as.matrix(data)), nrow(data) * out.sample)
-  measure <- data.frame(mae = calculate_mae(signal_real, signal_pred),
-                        mape = calculate_mape(signal_real, signal_pred),
-                        rmse = calculate_rmse(signal_real, signal_pred))
-  
-  # plot
-  plot <- plot_prediction(signal_real, signal_pred)
+  error <- list(
+    mae = calculate_mae(signal_real, forecast.signal),
+    mape = calculate_mape(signal_real, forecast.signal),
+    rmse = calculate_rmse(signal_real, forecast.signal)
+  )
 
-  res <- list(signal_pred = signal_pred,
-              signal_real = signal_real,
-              measure = measure,
-              plot = plot)
+  # plot
+  res <- list(
+    real.signal = signal_real,
+    forecast.signal = forecast.signal,
+    components = components.out,
+    error = error
+  )
   
   return(res)
 }
