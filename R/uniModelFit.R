@@ -82,7 +82,7 @@ uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0,
   }
   
   # error control of data
-  if (!is.xts(data) | !is.matrix(data)) {
+  if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
   if (is.xts(data)) {
