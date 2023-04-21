@@ -6,18 +6,32 @@
 \usage{
 uniModelFit(
   data,
-  uniModel,
-  acceleration = FALSE,
-  maxit = 3000,
-  abstol = 1e-04,
-  log.switch = TRUE,
-  verbose = 1
+  fixed.pars = NULL,
+  init.pars = NULL,
+  verbose = 0,
+  control = NULL
 )
 }
 \arguments{
 \item{data}{Matrix of intraday signal of size n_bin * n_day without any missing values.}
 
-\item{uniModel}{Univariate model list object from function \code{uniModelSpec}.}
+\item{fixed.pars}{List of parameters' fixed values. The allowed parameters are listed below,
+\itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
+         \item{\code{"a_mu"}: \eqn{a^{\mu}}{a.\mu}} of size 1 ;
+         \item{\code{"var_eta"}: \eqn{\sigma^{\eta}}{(\sigma.\eta)^2}} of size 1 ;
+         \item{\code{"var_mu"}: \eqn{\sigma^{\mu}}{(\sigma.\mu)^2}} of size 1 ;
+         \item{\code{"r"}: \eqn{r}{r} of size 1 ;}
+         \item{\code{"phi"}: \eqn{\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]} of size \eqn{I} ;}
+         \item{\code{"x0"}: \eqn{\mathbf{x}_0}{x(0)} of size 2 ;}
+         \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)} of size 2 * 2 .}}}
+
+\item{init.pars}{List of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
+If the user does not assign initial values for the unfitted parameters, default ones will be used in \code{uniModelFit}.}
+
+\item{verbose}{An integer specifying the print level of information during the algorithm (default is \code{1}). Possible numbers:
+\itemize{\item{\code{"0"}: no output;}
+    \item{\code{"1"}: show the iteration number and \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||};}
+    \item{\code{"2"}: 1 + show the final parameters.}}}
 
 \item{acceleration}{Logical value indicating whether to use the accelerated EM algorithm. If \code{TRUE}, the accelerated one will be used (default is \code{FALSE}).}
 
@@ -27,11 +41,6 @@ uniModelFit(
 
 \item{log.switch}{Logical value indicating whether to record the history of convergence progress. 
 If \code{TRUE}, the intermediate parameters are recorded during the algorithm (default is \code{TRUE}).}
-
-\item{verbose}{An integer specifying the print level of information during the algorithm (default is \code{1}). Possible numbers:
-\itemize{\item{\code{"0"}: no output;}
-    \item{\code{"1"}: show the iteration number and \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||};}
-    \item{\code{"2"}: 1 + show the final parameters.}}}
 }
 \value{
 A list containing the following elements (if the algorithm converges):
@@ -40,8 +49,24 @@ A list containing the following elements (if the algorithm converges):
         \item{\code{fit_request}}{List of logical values indicating whether the parameters require further fitting.}
 }
 \description{
-The main function for fitting a univaraite state-space model by using expectation-maximization (EM) algorithms. 
-The implementation follows (Chen et al., 2016), and the accelerated scheme is provided in (Varadhan and Roland, 2008).
+The main function for defining and fitting a univaraite state-space model. The model proposed in (Chen et al., 2016) is formulated as
+ \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}{x(\tau+1) = A(\tau) x(\tau) + w(\tau),}
+             \deqn{y_{\tau} = \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,}{y(\tau) = C x(\tau) + \phi(\tau) + v(\tau),}
+             where
+             \itemize{\item{\eqn{\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top}{x(\tau) = [\eta(\tau); \mu(\tau)]} is the hidden state vector containing the log daily component and the log intraday dynamic component;} 
+                      \item{\eqn{\mathbf{A}_{\tau} = \left[\begin{array}{l}a_{\tau}^{\eta}&0\\0&a^{\mu}\end{array} \right]}{A(\tau) = [a.\eta(\tau), 0; 0, a.\mu]} 
+                            is the state transition matrix with \eqn{a_{\tau}^{\eta} = \begin{cases}a^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}}{a.\eta(\tau) = a.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
+                      \item{\eqn{\mathbf{C} = [1, 1]}{C = [1, 1]} is the observation matrix;}
+                      \item{\eqn{\phi_{\tau}}{\phi(\tau)} is the corresponding element from \eqn{\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]}, which is the log seasonal component;}
+                      \item{\eqn{\mathbf{w}_{\tau} = [\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})}{w(\tau) = [\epsilon.\eta(\tau); \epsilon.\mu(\tau)] ~ N(0, Q(\tau))} 
+                            represents the i.i.d. Gaussian noise in the state transition, with a time-varying covariance matrix 
+                            \eqn{\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_{\tau}^{\eta})^2&0\\ 0&(\sigma^{\mu})^2\end{array} \right]}{Q(\tau) = [(\sigma.\eta(\tau))^2, 0; 0, (\sigma.\mu)^2]} 
+                            and \eqn{\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&t = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}}{\sigma.\eta(\tau) = \sigma.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
+                       \item{\eqn{v_\tau \sim \mathcal{N}(0, r)}{v(\tau) ~ N(0, r)} is the i.i.d. Gaussian noise in the observation;}
+                       \item{\eqn{\mathbf{x}_1}{x(1)} is the initial state at \eqn{\tau = 1}{\tau = 1}, and it follows \eqn{\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0).}{N(x(0), V(0))}}.}
+            In the model, \eqn{\boldsymbol{\theta} = \left\{a^{\eta},a^{\mu},\sigma^{\eta},\sigma^{\mu},r,\boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0\right\}}{\Theta = {a.\eta, a.\mu, (\sigma.\eta)^2, (\sigma.\mu)^2, r, \phi, x(0), V(0)}} 
+            are treated as parameters.
+The model is fitted by expectation-maximization (EM) algorithms. The implementation follows (Chen et al., 2016), and the accelerated scheme is provided in (Varadhan and Roland, 2008).
 The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 }
 \examples{

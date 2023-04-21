@@ -67,7 +67,7 @@ AAPL_volume[1:5, 1:5]
 Next, we define a univariate state-space model using the `uniModelSpec` function.
 
 ```{r}
-model <- uniModelSpec(fit = TRUE)
+# model <- uniModelSpec(fit = TRUE)
 ```
 
 Then, we use the first 104 trading days to fit the model and the last 20 days to evaluate its forecasting performance. Fitting can be achieved by the `uniModelFit` function.
@@ -75,22 +75,25 @@ Then, we use the first 104 trading days to fit the model and the last 20 days to
 ```{r}
 data <- AAPL_volume
 data_train <- AAPL_volume[, 1:104]
-model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
+model_fitted <- uniModelFit(data_train, verbose = 1, control = list(acceleration = TRUE))
 ```
 
 Once the model is fitted, we use the `uniModelFilter` function to decompose intraday trading signal into daily, seasonal, and intraday dynamic components. This helps us better understand the composition of the intraday signal.
 
 ```{r}
-filter_result <- uniModelFilter(data_train, model_fitted)
-filter_result$plot
+smooth_result <- uniModelSmooth(data_train, model_fitted)
+str(smooth_result)
+plot_components(smooth_result)
+plot_performance(smooth_result)
 ```
 
 To see how well our model performs on new data, we use the `uniModelPred` function to do one-step-ahead prediction on the last 20 trading days of the dataset. This function also helps to evaluate the accuracy of the forecast.
 
 ```{r}
-predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
-predict_result$measure
-predict_result$plot
+forecast_result <- uniModelForecast(data, model_fitted, out.sample = 20)
+str(forecast_result)
+plot_components(forecast_result)
+plot_performance(forecast_result)
 ```
 
 Exciting, right? Let's dive in!
@@ -178,7 +181,7 @@ init.pars <- list()
 init.pars$"a_eta" <- 1
 
 # define the univariate model
-model <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
+# model <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
 ```
 
 
@@ -197,7 +200,7 @@ The following code shows how to fit the model to the GE stock.
 ```{r}
 data <- GE_volume
 data_train <- GE_volume[, 1:104]
-model_fitted <- uniModelFit(data_train, model, acceleration = TRUE, verbose = 2)
+model_fitted <- uniModelFit(data_train, verbose = 2, control = list(acceleration = TRUE))
 ```
 
 ## Filtering
@@ -209,9 +212,10 @@ The `uniModelFilter` function in this package allows you to decompose an intrada
 To use this function, input your intraday signal and the fitted model as arguments. This function will produce the three components along with a plot.
 
 ```{r}
-filter_result <- uniModelFilter(data_train, model_fitted)
-str(filter_result$components)
-filter_result$plot
+smooth_result <- uniModelSmooth(data_train, model_fitted)
+str(smooth_result)
+plot_components(smooth_result)
+plot_performance(smooth_result)
 ```
 
 ## Forecasting
@@ -231,10 +235,10 @@ Since fitting a model to some data does not guarantee good prediction on unseen 
 Here $M$ is the total number of out-of-sample bins. The sample code is given as follows.
 
 ```{r}
-predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
-head(predict_result$signal_pred)
-predict_result$measure
-predict_result$plot
+forecast_result <- uniModelForecast(data, model_fitted, out.sample = 20)
+str(forecast_result)
+plot_components(forecast_result)
+plot_performance(forecast_result)
 ```
 
 &nbsp; 

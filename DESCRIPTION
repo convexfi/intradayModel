@@ -18,15 +18,14 @@ URL: https://github.com/convexfi/intradayModeling,
 BugReports: https://github.com/convexfi/intradayModeling/issues
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Depends: R (>= 2.10)
 Imports:
     ggplot2,
     magrittr,
     patchwork,
     reshape2,
-    rlist,
-    wesanderson
+    rlist
 Suggests:
     knitr,
     rmarkdown,
