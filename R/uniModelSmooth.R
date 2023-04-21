@@ -1,4 +1,4 @@
-#' @title Decompose Financial Intraday Signal via a Univariate State-Space Model 
+#' @title Smoothing Financial Intraday Signal via a Univariate State-Space Model 
 #'
 #' @description A model with all parameters fixed can be used to decompose the financial intraday signal into daily, seasonal, 
 #'              and intraday dynamic components. The daily component and intraday dynamic component at time \eqn{\tau} are the smoothed state estimate 
@@ -33,9 +33,9 @@
 #' filter_result <- uniModelFilter(AAPL_volume, model_fitted)
 #' 
 #' @export
-uniModelFilter <- function(data, uniModel) {
+uniModelSmooth <- function(data, uniModel) {
   # error control of data
-  if (!is.xts(data) | !is.matrix(data)) {
+  if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
   if (is.xts(data)) {
@@ -58,17 +58,13 @@ uniModelFilter <- function(data, uniModel) {
   )
   uniss_obj <- do.call(specify_uniss, args)
   Kf <- uniss_kalman(uniss_obj, "smoother")
-
-  components <- list(
-    "daily" = Kf$xtT[1, ],
-    "dynamic" = Kf$xtT[2, ],
-    "seasonal" = rep(uniss_obj$par$phi, uniss_obj$n_day)
-  )
   
   # add decomposition plot
-  plot <- plot_decomposition(data, components)
-  res <- list(components = components,
-              plot = plot)
+  res <- list(
+    "smooth.log_daily" = Kf$xtT[1,],
+    "smooth.log_dynamic" = Kf$xtT[2,],
+    "smooth.log_seasonal" = rep(uniss_obj$par$phi, uniss_obj$n_day)
+  )
   
   return(res)
 }
