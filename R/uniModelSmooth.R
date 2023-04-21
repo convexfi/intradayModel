@@ -59,11 +59,19 @@ uniModelSmooth <- function(data, uniModel) {
   uniss_obj <- do.call(specify_uniss, args)
   Kf <- uniss_kalman(uniss_obj, "smoother")
   
-  # add decomposition plot
+  # tidy up components (scale change)
+  components <- list(
+    smooth.daily = exp(Kf$xtT[1,]),
+    smooth.dynamic = exp(Kf$xtT[2,]),
+    smooth.seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+  )
+  smooth.signal <- components$smooth.daily * 
+    components$smooth.dynamic * components$smooth.seasonal
+  
   res <- list(
-    "smooth.log_daily" = Kf$xtT[1,],
-    "smooth.log_dynamic" = Kf$xtT[2,],
-    "smooth.log_seasonal" = rep(uniss_obj$par$phi, uniss_obj$n_day)
+    real.signal = as.vector(data),
+    smooth.signal = smooth.signal,
+    components = components
   )
   
   return(res)
