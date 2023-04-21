@@ -1,25 +1,26 @@
-#' @import wesanderson
 #' @import patchwork 
 #' @import ggplot2
 #' @importFrom magrittr %>%
-plot_decomposition <- function(data, filter_result) {
-  i <- signal <- daily <-  seasonal <- dynamic <- NULL
-  data <- as.matrix(data) # convert df to matrix
-  plt_data_log <- 
+plot_components <- function(smooth_forecast_result) {
+  i <- original <- daily <-  seasonal <- dynamic <- NULL
+  components <- smooth_forecast_result[["components"]]
+  
+  plt_data <-
     data.frame(
-      signal = log(as.vector(data)),
-      daily = filter_result$daily,
-      seasonal = filter_result$seasonal,
-      dynamic = filter_result$dynamic,
-      i = 1:length(data)
+      original = smooth_forecast_result$real.signal,
+      daily = components[[grep("daily", names(components))]],
+      seasonal = components[[grep("seasonal", names(components))]],
+      dynamic = components[[grep("dynamic", names(components))]]
     )
+  plt_data_log <- log(plt_data)
+  plt_data_log$i <- plt_data$i <- c(1: nrow(plt_data))
   
   text_size = 10
   p1 <- plt_data_log %>%
     ggplot() +
-    geom_line(aes(x = i, y= signal), alpha = 0.8, color = "steelblue", size = 0.4) +
+    geom_line(aes(x = i, y= original), alpha = 0.8, color = "steelblue", size = 0.4) +
     xlab(expression(tau)) +
-    ylab("Intraday\nSignal") +
+    ylab("Original") +
     theme_bw() +
     theme(
       axis.title = element_text(size = text_size, face = "bold"),
@@ -102,28 +103,41 @@ plot_decomposition <- function(data, filter_result) {
   return(fig)
 }
 
-#' @import wesanderson
 #' @import ggplot2
 #' @importFrom magrittr %>%
-plot_prediction <- function(signal_real, signal_pred) {
-  i <- real <- pred <- NULL
-  signal <- type <- NULL
-  plt_data_log <- 
+plot_performance <- function(smooth_forecast_result) {
+  # i <- real <- pred <- NULL
+  # signal <- type <- NULL
+  
+  # determine type
+  if (sum(grepl("smooth", names(smooth_forecast_result)))) {
+    type <- "smooth"
+    title <- "Smoothing result (log scale)"
+  } else {
+    type <- "forecast"
+    title <- "One-bin-ahead prediction (log scale)"
+  }
+  
+  plt_data <-
     data.frame(
-      real = log(signal_real),
-      pred = log(signal_pred),
-      i = 1:length(signal_real)
-    ) %>%
+      real = smooth_forecast_result$real.signal,
+      output = smooth_forecast_result[[grep(type, names(smooth_forecast_result))]]
+    )
+  plt_data_log <- log(plt_data)
+  plt_data_log$i <- plt_data$i <- c(1: nrow(plt_data))
+
+
+  plt_reshape <- plt_data_log %>%
     reshape2::melt(
       id.vars = c("i"),
-      variable.name = "type", value.name = "signal"
+      variable.name = "variable", value.name = "value"
     ) 
-  
+
   text_size = 14
-  p <- plt_data_log %>%
+  plt_reshape %>%
     ggplot() +
-    geom_line(aes(x = i, y = signal, color = type), alpha = 0.8, size = 0.4) +
-    scale_colour_manual(values = c(real = "steelblue", pred = "#FD6467")) +
+    geom_line(aes(x = i, y = value, color = variable), alpha = 0.8, size = 0.4) +
+    scale_colour_manual(values = c(real = "steelblue", output = "#FD6467"), labels = c("real", type)) +
     xlab(expression(tau)) +
     ylab("Intraday Signal") +
     theme_bw() +
@@ -137,10 +151,8 @@ plot_prediction <- function(signal_real, signal_pred) {
       plot.title = element_text(size=18, face = "bold", hjust = 0.5),
       axis.text.x=element_blank()
     ) + 
-    plot_annotation(title = "One-bin-ahead prediction (log scale)",
+    plot_annotation(title = title,
                     theme =  theme(plot.title = element_text(size=16, face = "bold", hjust = 0.5)))
-  
-  return(p)
 }
 
 
