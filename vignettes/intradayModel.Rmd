@@ -40,7 +40,7 @@ options(width=100)
 /* ensure cleanrmd is centered */
 body {
   margin: 0 auto;
-  max-width: 750px;
+  max-width: 1000px;
   padding: 2rem;
 }
 
