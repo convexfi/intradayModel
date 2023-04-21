@@ -98,8 +98,9 @@ uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0,
                         log.switch = TRUE)
   if (is.list(control)) {
     for (prop in c("acceleration", "maxit", "abstol", "log.switch")) {
-      if (prop %in% control)
-      control_final[[prop]] <- control[[prop]]
+      if (prop %in% names(control)) {
+        control_final[[prop]] <- control[[prop]]
+      }
     }
   }
   
