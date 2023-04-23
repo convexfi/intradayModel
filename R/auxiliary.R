@@ -71,6 +71,16 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   return(uniModel)
 }
 
+clean_data <- function(data){
+  if (is.xts(data)) {
+    data <- intraday_xts_to_matrix(data)
+  }
+  else {
+    data <- data[,!apply(data, 2, anyNA)]
+  }
+  return (data)
+}
+
 # library(xts)
 intraday_xts_to_matrix <- function(data.xts) {
   contain_NA <- apply.daily(data.xts, function(x) as.integer(any(is.na(x))))
