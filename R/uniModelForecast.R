@@ -69,7 +69,7 @@ uniModelForecast <- function(data, uniModel, out.sample) {
     forecast.dynamic = exp(Kf$xtt1[2,]),
     forecast.seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  components.out <- lapply(components, function (c) utils::tail(c, nrow(data) * out.sample))
+  components.out <- lapply(components, function (c) tail(c, nrow(data) * out.sample))
   forecast.signal <- components.out$forecast.daily * 
     components.out$forecast.dynamic * components.out$forecast.seasonal
 
@@ -81,7 +81,7 @@ uniModelForecast <- function(data, uniModel, out.sample) {
     rmse = calculate_rmse(signal_real, forecast.signal)
   )
 
-  # plot
+  # result
   res <- list(
     real.signal = signal_real,
     forecast.signal = forecast.signal,

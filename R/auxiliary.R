@@ -88,12 +88,11 @@ clean_data <- function(data){
   return (data)
 }
 
-# library(xts)
 # Process xts data
 # remove any day containing missing bins/NA
 # convert the data to matrix
 intraday_xts_to_matrix <- function(data.xts) {
-  contain_NA <- apply.daily(data.xts, function(x) as.integer(any(is.na(x))))
+  contain_NA <- xts::apply.daily(data.xts, function(x) as.integer(any(is.na(x))))
   index_no_NA_bin <- zoo::index(to.daily(contain_NA[contain_NA == 0]))
   data.xts <- data.xts[format(index_no_NA_bin, format="%Y-%m-%d")]
   

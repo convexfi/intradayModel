@@ -65,7 +65,6 @@
 #'                   }
 #' 
 #' @importFrom magrittr %>%
-#' 
 #' @import xts
 #' 
 #' @export
