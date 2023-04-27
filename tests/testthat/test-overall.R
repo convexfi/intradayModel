@@ -1,10 +1,9 @@
 test_that("package, stock = GE", {
+  skip_on_cran()
   data(GE_volume)
   
   data <- GE_volume
   data_train <- GE_volume[, 1:104]
-  modelSpec.fit <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-  modelSpec.fit_acc <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
   
   modelSpec.fit <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   modelSpec.fit_acc <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
@@ -46,7 +45,7 @@ test_that("package, stock = GE", {
   
   expect_equal(predict_result$forecast.signal, expected_res$volume_pred, tolerance = 1e-2)
   expect_equal(predict_result_acc$forecast.signal, expected_res$volume_pred, tolerance = 1e-2)
-  expect_equal(as.vector(as.matrix(predict_result$error)), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-2)
+  expect_equal(as.vector(as.matrix(predict_result$error)), as.vector(as.matrix(expect_modelerror)), tolerance = 1e-2)
   expect_equal(as.vector(as.matrix(predict_result_acc$error)), as.vector(as.matrix(expect_modelerror)), tolerance = 1e-2)
   
 })

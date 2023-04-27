@@ -1,4 +1,5 @@
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ADBE", {
+  skip_on_cran()
   data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
   modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
@@ -24,6 +25,7 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
 })
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = ACN", {
+  skip_on_cran()
   data <- readRDS(test_path("fixtures", "ACN_volume"))[,1:104]
   modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
@@ -50,6 +52,7 @@ test_that("uniModelFit from raw (after zero constraint and initial noise), stock
 })
 
 test_that("uniModelFit from raw (after zero constraint and initial noise), stock = CVS", {
+  skip_on_cran()
   data <- readRDS(test_path("fixtures", "CVS_volume"))[, 1:104]
   modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))

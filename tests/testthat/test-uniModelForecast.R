@@ -1,4 +1,5 @@
 test_that("uniModelForecast, stock = ADBE", {
+  skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "ADBE_volume"))
   data <- data.pred[,1:104]
 
@@ -22,6 +23,7 @@ test_that("uniModelForecast, stock = ADBE", {
 })
 
 test_that("uniModelForecast, ACN", {
+  skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "ACN_volume"))
   data <- data.pred[,1:104]
   
@@ -45,6 +47,7 @@ test_that("uniModelForecast, ACN", {
 })
 
 test_that("uniModelForecast, stock = CVS", {
+  skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "CVS_volume"))
   data <- data.pred[,1:104]
   
