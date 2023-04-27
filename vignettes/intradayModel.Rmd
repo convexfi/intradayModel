@@ -64,36 +64,30 @@ data(AAPL_volume)
 AAPL_volume[1:5, 1:5]
 ```
 
-Next, we define a univariate state-space model using the `uniModelSpec` function.
-
-```{r}
-# model <- uniModelSpec(fit = TRUE)
-```
-
-Then, we use the first 104 trading days to fit the model and the last 20 days to evaluate its forecasting performance. Fitting can be achieved by the `uniModelFit` function.
+Next, we fit a univariate state-space model using the `uniModelFit` function. To be specific,  we use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
 
 ```{r}
 data <- AAPL_volume
 data_train <- AAPL_volume[, 1:104]
-model_fitted <- uniModelFit(data_train, verbose = 1, control = list(acceleration = TRUE))
+model_fitted <- uniModelFit(data_train, fixed.pars = NULL, init.pars = NULL, verbose = 1, control = list(acceleration = TRUE))
 ```
 
-Once the model is fitted, we use the `uniModelFilter` function to decompose intraday trading signal into daily, seasonal, and intraday dynamic components. This helps us better understand the composition of the intraday signal.
+Once the model is fitted, we can estimate the hidden components of the intraday signal based on all observations, which is called **smoothing**. By calling the `uniModelSmooth` function, we obtain daily, seasonal, and intraday dynamic components. This procedure helps us better identify the underlying information of the intraday signal.
 
 ```{r}
 smooth_result <- uniModelSmooth(data_train, model_fitted)
 str(smooth_result)
-plot_components(smooth_result)
-plot_performance(smooth_result)
+plot_components(smooth_result) # plot smoothed hidden components
+plot_performance(smooth_result) # plot fitting result
 ```
 
-To see how well our model performs on new data, we use the `uniModelPred` function to do one-step-ahead prediction on the last 20 trading days of the dataset. This function also helps to evaluate the accuracy of the forecast.
+To see how well our model performs on new data, we use the `uniModelForecast` function to do one-bin-ahead prediction on the out-of-sample dataset of 20 days.
 
 ```{r}
 forecast_result <- uniModelForecast(data, model_fitted, out.sample = 20)
 str(forecast_result)
-plot_components(forecast_result)
-plot_performance(forecast_result)
+plot_components(forecast_result) # plot forecast hidden components
+plot_performance(forecast_result) # plot forecast result
 ```
 
 Exciting, right? Let's dive in!
@@ -155,15 +149,21 @@ In this model, $\boldsymbol{\Theta} = \{a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\
 
 ## Datasets
 
-To use this package, you need to reshape the intraday signal as a 2D numeric matrix of size `(n_bin, n_day)` without any missing values, where `n_bin=I` is the number of bins in a day, and `n_day=T` is the number of trading days. To help you get started, we provide two sample datasets: `AAPL_volume` and `GE_volume`. These datasets contain the 15-minute trading volume of AAPL and GE within 124 trading days from 2019-01-02 to 2019-06-28.
+To use this package, you have two choices of data types:
 
-```{r}
-data(GE_volume)
-dim(GE_volume)
-GE_volume[1:5, 1:5]
+- a 2D numeric matrix of size `(n_bin, n_day)`;
+
+- an xts object.
+
+To help you get started, we provide two sample datasets: a matrix-type `AAPL_volume` and an xts-type `FDX_volume_xts`. 
+
+```{r, warning=FALSE}
+data(FDX_volume_xts)
+head(FDX_volume_xts)
+tail(FDX_volume_xts)
 ```
 
-## Model specification
+## Fitting
 
 > **uniModelSpec**(fit = FALSE, fixed.pars = NULL, init.pars = NULL)
 
@@ -187,19 +187,17 @@ init.pars$"a_eta" <- 1
 
 ## Fitting
 
-> **uniModelFit**(data, uniModel, acceleration = FALSE, maxit = 3000, abstol = 1e-4, log.switch = TRUE, verbose = 1)
+> **uniModelFit**(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = list(acceleration = FALSE, maxit = 3000, abstol = 1e-4, log.switch = TRUE))
 
-Once you have specified the model, you can fit it to your data using the `uniModelFit` function. This function uses the expectation-maximization (EM) algorithm described in [@chen2016forecasting]. If `acceleration=TRUE`, the accelerated EM algorithm  [@varadhan2008simple] is applied with possibly lower numerical stability.
+To fit a univariate state-space model, you can use the `uniModelFit` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed.pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init.pars`. `verbose` controls the level of print. Further control options can be set via `control`. 
 
-You can set the maximum number of iterations using the `maxit` argument and the termination condition via `abstol`. The fitting process stops when either the maximum number of iterations is reached or $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
-
-You can turn on/off logging by setting `log.switch`. If you want to monitor the fitting process, you can set `verbose` to a value greater than 0.
+The fitting process stops when either the maximum number of iterations is reached or the termination criteria is met $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
 
 The following code shows how to fit the model to the GE stock.
 
-```{r}
-data <- GE_volume
-data_train <- GE_volume[, 1:104]
+```{r, warning=FALSE}
+data <- FDX_volume_xts
+data_train <- FDX_volume_xts['2019-07-01/2019-11-30']
 model_fitted <- uniModelFit(data_train, verbose = 2, control = list(acceleration = TRUE))
 ```
 
