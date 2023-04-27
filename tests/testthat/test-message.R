@@ -84,7 +84,8 @@ test_that("spec_unimodel message", {
   warning_message <- paste("Warnings in fixed.pars:\n","  Elements a_mu, x0 are invalid [(]check number/dimension/PSD[)].\n",
                            "Warnings in init.pars:\n","  Elements xxx are not allowed in parameter list.\n",
                            "  Elements x0 are invalid [(]check number/dimension/PSD[)].\n","  Elements V0 have already been fixed." ,sep = "")
-  expect_output(spec_unimodel(init.pars = init.pars, fixed.pars = fixed.pars), warning_message)
+  # expect_output(spec_unimodel(init.pars = init.pars, fixed.pars = fixed.pars), warning_message)
+  expect_warning(spec_unimodel(init.pars = init.pars, fixed.pars = fixed.pars), warning_message)
   
 })
 
@@ -119,6 +120,9 @@ test_that("uniModelFit message", {
 test_that("clean_data message", {
   data_error_test <- GE_volume
   data_error_test[1,1] <- NA
-  expect_output(clean_data(data_error_test), "Warning in input matrix:\n Remove trading days with missing bins:  2019-01-02")
+  data_error_test[2,3] <- NA
+  expect_warning(clean_data(data_error_test),"For input matrix:\n Remove trading days with missing bins: 2019-01-02, 2019-01-04.\n")
   
+  data("FDX_volume_xts")
+  expect_warning(clean_data(FDX_volume_xts),"For input xts:\n Remove trading days with missing bins: 2019-07-03, 2019-11-29, 2019-12-24.\n")
 })

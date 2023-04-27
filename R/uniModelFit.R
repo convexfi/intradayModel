@@ -75,7 +75,6 @@ uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0,
   } 
   data <- clean_data(data)
   
-  
   # Define a Univariate State-Space Model
   uniModel <- spec_unimodel(fixed.pars, init.pars)
   is_uniModel(uniModel, nrow(data))
