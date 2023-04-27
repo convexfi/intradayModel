@@ -12,7 +12,7 @@ output:
     toc_depth: 2
 csl: apalike.csl # springer-socpsych-author-date.csl
 csl-entry-spacing: 1.2em
-bibliography: refs.bib
+bibliography: reference.bib
 link-citations: yes
 vignette: >
   %\VignetteIndexEntry{Intraday Volume and Volatility: Modeling and Forecasting}
@@ -60,7 +60,7 @@ To get started, we load the package and some sample data: the 15-minute intraday
 
 ```{r, message = FALSE}
 devtools::load_all()
-data(AAPL_volume)
+data("AAPL_volume")
 AAPL_volume[1:5, 1:5]
 ```
 
