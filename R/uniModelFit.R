@@ -54,15 +54,13 @@
 #' Varadhan, R., and Roland, C. (2008). Simple and globally convergent methods for accelerating the convergence of any EM algorithm. 
 #' Scandinavian Journal of Statistics, 35(2), 335–353.
 #' 
-#' @seealso \code{\link{uniModelSpec}}
-#' 
 #' @examples 
-#' # fit the model to AAPL_volume
-#' \dontrun{ 
+#' \dontrun{
 #' data(GE_volume)
-#' model_fitted <- uniModelFit(GE_volume, fixed.pars = list("x0" = c(10,0)), control = list(acceleration = TRUE, 
-#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE))
-#'                   }
+#' model_fitted <- uniModelFit(GE_volume, fixed.pars = list("x0" = c(10,0)), 
+#'                             control = list(acceleration = TRUE, 
+#'                             maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+#' }                  
 #' 
 #' @importFrom magrittr %>%
 #' @import xts

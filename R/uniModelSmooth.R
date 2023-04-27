@@ -22,14 +22,13 @@
 #' @references
 #' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
 #' 
-#' @seealso \code{\link{uniModelSpec}}
 #' 
 #' @examples
-#' # filter AAPL_volume
+#' \dontrun{
 #' data(GE_volume)
-#' model_fitted <- uniModelFit(GE_volume, model, acceleration = TRUE, 
-#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' model_fitted <- uniModelFit(GE_volume, control = list(acceleration = TRUE))
 #' smooth_result <- uniModelSmooth(GE_volume, model_fitted)
+#' }
 #' 
 #' @export
 uniModelSmooth <- function(data, uniModel) {

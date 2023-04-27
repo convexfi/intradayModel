@@ -22,16 +22,17 @@
 #'         \item{\code{measure}}{MAE, MAPE, RMSE of out-of-sample prediction performance.}
 #'         \item{\code{plot}}{Plot of the prediction and real values.}
 #' 
-#' @seealso \code{\link{uniModelSpec}}
 #' 
 #' @examples
-#' # One-bin-ahead prediction on the last 20 days of AAPL_volume
+#' \dontrun{
+#'  # One-bin-ahead prediction on the last 20 days of GE_volume
 #' data(GE_volume)
 #' data <- GE_volume
 #' data_train <- GE_volume[, 1:104]
 #' 
 #' model_fitted <- uniModelFit(data_train, control = list(acceleration = TRUE))
 #' predict_result <- uniModelForecast(data, model_fitted, out.sample = 20)
+#' }
 #' 
 #' @importFrom utils tail
 #' 
