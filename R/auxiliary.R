@@ -76,7 +76,13 @@ clean_data <- function(data){
     data <- intraday_xts_to_matrix(data)
   }
   else {
+    n_day <- ncol(data)
     data <- data[,!apply(data, 2, anyNA)]
+    index_NA_bin <- colnames(data[,apply(data, 2, anyNA)])
+    if (length(index_NA_bin) > 0) {
+      cat("Warning in input matrix:\n")
+      cat(" Remove trading days with missing bins: ", format(index_NA_bin), "\n")
+    }
   }
   return (data)
 }
@@ -106,7 +112,7 @@ intraday_xts_to_matrix <- function(data.xts) {
   wrong_index <- c(index_NA_bin, index_notfull_bin)
   if (length(wrong_index) > 0) {
     cat("Warning in input xts:\n")
-    cat(" Remove trading days with missing bins: ", format(wrong_index), "\n")
+    cat(" Remove trading days with missing bins: ", sort(format(wrong_index)), "\n")
   }
   
   return(data.mat)
