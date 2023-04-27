@@ -42,7 +42,8 @@ test_that("uniModelForecast/Smooth works", {
   fixed.pars$"x0" <- matrix(0,2)
   fixed.pars$"phi" <- matrix(2, n_bin)
   modelSpec <- spec_unimodel(fixed.pars = fixed.pars)
-  expect_error(uniModelSmooth(data, modelSpec), regexp = "All parameters must be optimally fitted. Parameters a_eta, var_mu, r, V0 are not optimally fitted.")
+  expect_error(uniModelSmooth(data, modelSpec), 
+               regexp = "All parameters must be optimally fitted. Parameters a_eta, var_mu, r, V0 are not optimally fitted.")
   
 
   fixed.pars$"r" <- 1
@@ -50,7 +51,8 @@ test_that("uniModelForecast/Smooth works", {
   fixed.pars$"var_mu" <- 4
   fixed.pars$"V0" <- c(1,0,0,1)
   modelSpec <- spec_unimodel(fixed.pars = fixed.pars)
-  expect_error(uniModelForecast(data, modelSpec, 300), regexp = "out.sample must be smaller than the number of columns in data matrix.")
+  expect_error(uniModelForecast(data, modelSpec, 300), 
+               regexp = "out.sample must be smaller than the number of columns in data matrix.")
   
 })
 

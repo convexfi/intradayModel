@@ -71,6 +71,8 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   return(uniModel)
 }
 
+# Remove anyday containing NA/missing bins
+# unify the data to matrix
 clean_data <- function(data){
   if (is.xts(data)) {
     data <- intraday_xts_to_matrix(data)
@@ -87,6 +89,9 @@ clean_data <- function(data){
 }
 
 # library(xts)
+# Process xts data
+# remove any day containing missing bins/NA
+# convert the data to matrix
 intraday_xts_to_matrix <- function(data.xts) {
   contain_NA <- apply.daily(data.xts, function(x) as.integer(any(is.na(x))))
   index_no_NA_bin <- zoo::index(to.daily(contain_NA[contain_NA == 0]))

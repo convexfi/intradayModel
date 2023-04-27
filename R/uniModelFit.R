@@ -58,10 +58,11 @@
 #' 
 #' @examples 
 #' # fit the model to AAPL_volume
-#' data(AAPL_volume)
-#' model <- uniModelSpec(fit = TRUE)
-#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, 
-#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+#' \dontrun{ 
+#' data(GE_volume)
+#' model_fitted <- uniModelFit(GE_volume, fixed.pars = list("x0" = c(10,0)), control = list(acceleration = TRUE, 
+#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+#'                   }
 #' 
 #' @importFrom magrittr %>%
 #' 

@@ -26,13 +26,12 @@
 #' 
 #' @examples
 #' # One-bin-ahead prediction on the last 20 days of AAPL_volume
-#' data("AAPL_volume")
-#' data <- AAPL_volume
-#' data_train <- AAPL_volume[, 1:104]
+#' data(GE_volume)
+#' data <- GE_volume
+#' data_train <- GE_volume[, 1:104]
 #' 
-#' model <- uniModelSpec(fit = TRUE)
-#' model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
-#' predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
+#' model_fitted <- uniModelFit(data_train, control = list(acceleration = TRUE))
+#' predict_result <- uniModelForecast(data, model_fitted, out.sample = 20)
 #' 
 #' @importFrom utils tail
 #' 
