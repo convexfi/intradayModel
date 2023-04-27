@@ -1,13 +1,13 @@
-test_that("uniModelPred, stock = ADBE", {
+test_that("uniModelForecast, stock = ADBE", {
   data.pred <- readRDS(test_path("fixtures", "ADBE_volume"))
   data <- data.pred[,1:104]
 
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
+  # modelSpec <- uniModelSpec(fit = TRUE)
+  modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+  modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
-  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
+  log_volume_pred <- log(uniModelForecast(data.pred, modelSpec.fit, out.sample = 20)$forecast.signal)
+  log_volume_pred_acc <- log(uniModelForecast(data.pred, modelSpec.fit_acc, out.sample = 20)$forecast.signal)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -21,16 +21,16 @@ test_that("uniModelPred, stock = ADBE", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
-test_that("uniModelPred, ACN", {
+test_that("uniModelForecast, ACN", {
   data.pred <- readRDS(test_path("fixtures", "ACN_volume"))
   data <- data.pred[,1:104]
   
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-  modelSpec.fit_acc <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
+  # modelSpec <- uniModelSpec(fit = TRUE)
+  modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+  modelSpec.fit_acc <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
-  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
+  log_volume_pred <- log(uniModelForecast(data.pred, modelSpec.fit, out.sample = 20)$forecast.signal)
+  log_volume_pred_acc <- log(uniModelForecast(data.pred, modelSpec.fit_acc, out.sample = 20)$forecast.signal)
   log_volume_real <- log(tail(as.vector(as.matrix(data.pred)), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -44,18 +44,18 @@ test_that("uniModelPred, ACN", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
-test_that("uniModelPred, stock = CVS", {
+test_that("uniModelForecast, stock = CVS", {
   data.pred <- readRDS(test_path("fixtures", "CVS_volume"))
   data <- data.pred[,1:104]
   
-  modelSpec <- uniModelSpec(fit = TRUE)
-  modelSpec.fit <- uniModelFit(data, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+  # modelSpec <- uniModelSpec(fit = TRUE)
+  modelSpec.fit <- uniModelFit(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   
-  modelSpec_v2 <- uniModelSpec(fit = TRUE, init.pars = list(a_mu = 0))
-  modelSpec.fit_acc <- uniModelFit(data, modelSpec_v2, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE)
+  # modelSpec_v2 <- uniModelSpec(fit = TRUE, init.pars = list(a_mu = 0))
+  modelSpec.fit_acc <- uniModelFit(data, init.pars = list(a_mu = 0), control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(uniModelPred(data.pred, modelSpec.fit, out.sample = 20)$signal_pred)
-  log_volume_pred_acc <- log(uniModelPred(data.pred, modelSpec.fit_acc, out.sample = 20)$signal_pred)
+  log_volume_pred <- log(uniModelForecast(data.pred, modelSpec.fit, out.sample = 20)$forecast.signal)
+  log_volume_pred_acc <- log(uniModelForecast(data.pred, modelSpec.fit_acc, out.sample = 20)$forecast.signal)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)

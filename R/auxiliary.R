@@ -76,9 +76,8 @@ clean_data <- function(data){
     data <- intraday_xts_to_matrix(data)
   }
   else {
-    n_day <- ncol(data)
+    index_NA_bin <- colnames(data)[apply(data, 2, anyNA)]
     data <- data[,!apply(data, 2, anyNA)]
-    index_NA_bin <- colnames(data[,apply(data, 2, anyNA)])
     if (length(index_NA_bin) > 0) {
       cat("Warning in input matrix:\n")
       cat(" Remove trading days with missing bins: ", format(index_NA_bin), "\n")
