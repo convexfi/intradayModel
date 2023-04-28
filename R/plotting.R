@@ -174,12 +174,12 @@ plot_performance <- function(smooth_forecast_result) {
     theme_bw() +
     theme(
       axis.title = element_text(size = text_size, face = "bold"),
-      legend.position = c(.8, .9),
-      legend.justification = c(0, 1),
+      legend.position = "bottom",
+      # legend.justification = c(0, 1),
       legend.text = element_text(size = text_size, face = "bold"),
       legend.title = element_blank(),
-      legend.key.size = unit(1, "cm"),
-      plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+      # legend.key.size = unit(1, "cm"),
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
       axis.text.x = element_blank()
     ) +
     plot_annotation(
