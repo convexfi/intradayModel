@@ -170,7 +170,7 @@ The fitting process stops when either the maximum number of iterations is reache
 
 The following code shows how to fit the model to the FDX stock.
 
-```{r, warning=FALSE}
+```{r}
 # set fixed value
 fixed.pars <- list()
 fixed.pars$"x0" <- c(13.33, -0.37)
