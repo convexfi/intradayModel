@@ -1,8 +1,8 @@
 #' @title Forecast One-bin-ahead Financial Intraday Signal via a Univariate State-Space Model  
 #'
-#' @description The one-bin-ahead prediction is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
-#'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
-#'              Three measures are used to evaluate the prediction performance:
+#' @description The one-bin-ahead forecast is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample forecast.
+#'              Three measures are used to evaluate the forecasting performance:
 #'              \itemize{\item{Mean absolute error (MAE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
 #'                       \item{Mean absolute percent error (MAPE):
@@ -12,16 +12,21 @@
 #'              }
 #'              where \eqn{M} is the total number of out-of-sample bins.
 #'
-#' @param data Matrix of intraday signal of size n_bin * n_day without any missing values.
-#' @param uniModel Univariate model list object with all parameters fixed.
-#' @param out.sample  Number of days from the end of the dataset for out-of-sample prediction.
+#' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
+#' @param uniModel A univariate model list object from function \code{uniModelFit}.
+#' @param out.sample  Number of days from the end of the dataset for out-of-sample forecast.
 #'
 #' @return A list containing the following elements:
-#'         \item{\code{signal_pred}}{One-bin-ahead prediction of intraday signal.}
-#'         \item{\code{signal_real}}{Real out-of-sample intraday signal.}
-#'         \item{\code{measure}}{MAE, MAPE, RMSE of out-of-sample prediction performance.}
-#'         \item{\code{plot}}{Plot of the prediction and real values.}
-#' 
+#'         \item{\code{real.signal}}{A vector of real intraday signal;}
+#'         \item{\code{forecast.signal}}{A vector of forecast intraday signal;}
+#'         \item{\code{components}}{A list of the three forecast components:
+#'              \itemize{ \item{\code{forecast.daily}}
+#'                        \item{\code{forecast.seasonal}}
+#'                        \item{\code{forecast.dynamic}}}}   
+#'         \item{\code{error}}{A list of three error measures:
+#'              \itemize{ \item{\code{mae}}
+#'                        \item{\code{mape}}
+#'                        \item{\code{rmse}}}}
 #' 
 #' @examples
 #' \dontrun{

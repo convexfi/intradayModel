@@ -56,44 +56,35 @@ body {
 
 # Quick Start
 
-To get started, we load the package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days.
+To get started, we load our package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days.
 
 ```{r, message = FALSE}
-devtools::load_all()
-data("AAPL_volume")
-AAPL_volume[1:5, 1:5]
+library(intradayModel)
+data(AAPL_volume)
+AAPL_volume[1:5, 1:5] # print the head of data
 ```
 
-Next, we define a univariate state-space model using the `uniModelSpec` function.
+Next, we fit a univariate state-space model using `uniModelFit` function. To be specific, we use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
 
 ```{r}
-# model <- uniModelSpec(fit = TRUE)
+AAPL_fit <- AAPL_volume[, 1:104]
+model_fitted <- uniModelFit(AAPL_fit)
 ```
 
-Then, we use the first 104 trading days to fit the model and the last 20 days to evaluate its forecasting performance. Fitting can be achieved by the `uniModelFit` function.
+Once the model is fitted, we can estimate the hidden components of any intraday signal based on all its observations, which is called **smoothing**. By calling `uniModelSmooth` function, we obtain daily, seasonal, and intraday dynamic components. This procedure helps us better identify the underlying information of the intraday signal.
 
 ```{r}
-data <- AAPL_volume
-data_train <- AAPL_volume[, 1:104]
-model_fitted <- uniModelFit(data_train, verbose = 1, control = list(acceleration = TRUE))
+smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
+plot_components(smooth_result) # plot smoothed hidden components
+plot_performance(smooth_result) # plot smoothed result
 ```
 
-Once the model is fitted, we use the `uniModelFilter` function to decompose intraday trading signal into daily, seasonal, and intraday dynamic components. This helps us better understand the composition of the intraday signal.
+To see how well our model performs on new data, we use `uniModelForecast` function to do one-bin-ahead forecast on the out-of-sample dataset of 20 days.
 
 ```{r}
-smooth_result <- uniModelSmooth(data_train, model_fitted)
-str(smooth_result)
-plot_components(smooth_result)
-plot_performance(smooth_result)
-```
-
-To see how well our model performs on new data, we use the `uniModelPred` function to do one-step-ahead prediction on the last 20 trading days of the dataset. This function also helps to evaluate the accuracy of the forecast.
-
-```{r}
-forecast_result <- uniModelForecast(data, model_fitted, out.sample = 20)
-str(forecast_result)
-plot_components(forecast_result)
-plot_performance(forecast_result)
+forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+plot_components(forecast_result) # plot forecast hidden components
+plot_performance(forecast_result) # plot forecast result
 ```
 
 Exciting, right? Let's dive in!
@@ -109,7 +100,7 @@ Intraday observations of signals are divided into days, indexed by $t\in\{1,\dot
 Our package uses a state-space model to extract several components of intraday signals. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
 
 
-The observed intraday signal can be written in the multiplicative combination of the components [@brownlees2011intra]:
+The observed intraday signal can be written in a multiplicative combination of the components [@brownlees2011intra]:
 
 $$
 \large
@@ -117,7 +108,7 @@ $$
 \small
 $$
 
-Alternatively, by taking the logarithm transform, the intraday signal can be also regarded as an addictive combination of the components:
+Alternatively, by taking the logarithm transform, the intraday signal can be also regarded as an addictive combination of these components:
 
 $$
 \large
@@ -155,23 +146,31 @@ In this model, $\boldsymbol{\Theta} = \{a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\
 
 ## Datasets
 
-To use this package, you need to reshape the intraday signal as a 2D numeric matrix of size `(n_bin, n_day)` without any missing values, where `n_bin=I` is the number of bins in a day, and `n_day=T` is the number of trading days. To help you get started, we provide two sample datasets: `AAPL_volume` and `GE_volume`. These datasets contain the 15-minute trading volume of AAPL and GE within 124 trading days from 2019-01-02 to 2019-06-28.
+Two data classes of intraday signal are supported:
 
-```{r}
-data(GE_volume)
-dim(GE_volume)
-GE_volume[1:5, 1:5]
+- a 2D numeric matrix of size `(n_bin, n_day)`;
+
+- an xts object.
+
+To help you get started, we provide two sample datasets: a matrix-class `AAPL_volume` and an xts-class `FDX_volume_xts`. Here, we elaborate on the later one.
+
+```{r, warning=FALSE}
+data(FDX_volume_xts)
+head(FDX_volume_xts)
+tail(FDX_volume_xts)
 ```
 
-## Model specification
+## Fitting
 
-> **uniModelSpec**(fit = FALSE, fixed.pars = NULL, init.pars = NULL)
+> **uniModelFit**(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = NULL)
 
-To define a univariate state-space model, you can use the `uniModelSpec` function. If the model contains unknown parameters, you can set `fit=TRUE`. If you want to fix some parameters to specific values, you can provide a list of values to `fixed.pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init.pars`.
+To fit a univariate state-space model, you should use `uniModelFit` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed.pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init.pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
 
-Here is a simple example.
+The fitting process stops when either the maximum number of iterations is reached or the termination criteria is met $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
 
-```{r}
+The following code shows how to fit the model to the FDX stock.
+
+```{r, warning=FALSE}
 # set fixed value
 fixed.pars <- list()
 fixed.pars$"x0" <- c(13.33, -0.37)
@@ -180,51 +179,39 @@ fixed.pars$"x0" <- c(13.33, -0.37)
 init.pars <- list()
 init.pars$"a_eta" <- 1
 
-# define the univariate model
-# model <- uniModelSpec(fit = TRUE, fixed.pars = fixed.pars, init.pars = init.pars)
+FDX_fit <- FDX_volume_xts['2019-07-01/2019-11-30']
+model_fitted <- uniModelFit(FDX_fit, verbose = 2, control = list(acceleration = TRUE))
 ```
 
+One observation is that the trading days with missing bins because of early close,  2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving Day), have been automatically removed.
 
-## Fitting
+## Smoothing
 
-> **uniModelFit**(data, uniModel, acceleration = FALSE, maxit = 3000, abstol = 1e-4, log.switch = TRUE, verbose = 1)
+> **uniModelSmooth**(data, uniModel)
 
-Once you have specified the model, you can fit it to your data using the `uniModelFit` function. This function uses the expectation-maximization (EM) algorithm described in [@chen2016forecasting]. If `acceleration=TRUE`, the accelerated EM algorithm  [@varadhan2008simple] is applied with possibly lower numerical stability.
+`uniModelSmooth` function allows you to smooth on a dataset based on all its observations. It decomposes the intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
 
-You can set the maximum number of iterations using the `maxit` argument and the termination condition via `abstol`. The fitting process stops when either the maximum number of iterations is reached or $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
-
-You can turn on/off logging by setting `log.switch`. If you want to monitor the fitting process, you can set `verbose` to a value greater than 0.
-
-The following code shows how to fit the model to the GE stock.
+To use this function, input the intraday signal you want to smooth and the fitted model as arguments.
 
 ```{r}
-data <- GE_volume
-data_train <- GE_volume[, 1:104]
-model_fitted <- uniModelFit(data_train, verbose = 2, control = list(acceleration = TRUE))
-```
-
-## Filtering
-
-> **uniModelFilter**(data, uniModel)
-
-The `uniModelFilter` function in this package allows you to decompose an intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. The seasonal component has the value of $\boldsymbol{\phi}$.
-
-To use this function, input your intraday signal and the fitted model as arguments. This function will produce the three components along with a plot.
-
-```{r}
-smooth_result <- uniModelSmooth(data_train, model_fitted)
+smooth_result <- uniModelSmooth(FDX_fit, model_fitted)
 str(smooth_result)
+```
+
+Functions `plot_components` and `plot_performance` visualize the smoothed components and the smoothing performance.
+
+```{r}
 plot_components(smooth_result)
 plot_performance(smooth_result)
 ```
 
 ## Forecasting
 
-> **uniModelPred**(data, uniModel, out.sample) 
+> **uniModelForecast**(data, uniModel, out.sample) 
 
-The `uniModelPred` function allows you to predict the intraday signal one-bin-ahead, given your dataset and the fitted model. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
+`uniModelForecast` function allows you to forecast the intraday signal one-bin-ahead, given a dataset and a fitted model. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
 
-Since fitting a model to some data does not guarantee good prediction on unseen data, `uniModelPred` also evaluates the model's performance with the following measures for you:
+Since fitting a model to some data does not guarantee good prediction on unseen data, `uniModelForecast` helps to evaluate the model's performance with the following measures:
 
 - Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$.
 
@@ -235,8 +222,13 @@ Since fitting a model to some data does not guarantee good prediction on unseen 
 Here $M$ is the total number of out-of-sample bins. The sample code is given as follows.
 
 ```{r}
-forecast_result <- uniModelForecast(data, model_fitted, out.sample = 20)
+forecast_result <- uniModelForecast(FDX_volume_xts, model_fitted, out.sample = 20)
 str(forecast_result)
+```
+
+Functions `plot_components` and `plot_performance` visualize the one-bin-ahead forecast components and the forecasting performance.
+
+```{r}
 plot_components(forecast_result)
 plot_performance(forecast_result)
 ```
@@ -251,5 +243,5 @@ The current version only supports univariate state-space models for intraday tra
 
 &nbsp; 
 
-# References {.unnumbered}
+# References {-}
 

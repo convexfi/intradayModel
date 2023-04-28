@@ -5,19 +5,17 @@
 #'              conditioned on all the data, and denoted by \eqn{\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}{E[ x(\tau) | y(\tau), \tau = 1, ... , N ]}, 
 #'              where \eqn{N} is the total number of bins in the dataset. The seasonal component has the value of 
 #'              \eqn{\boldsymbol{\phi}}{\phi}.
-#'              
-#'              This function will produce the above three components with a plot.
 #'
-#' @param data Matrix of intraday signal of size n_bin * n_day without any missing values.
-#' @param uniModel Univariate model list object with all parameters fixed.
+#' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
+#' @param uniModel A univariate model list object from function \code{uniModelFit}.
 #'
 #' @return A list containing the following elements:
-#'        \item{\code{components}}{A list of the three components:
-#'              \itemize{ \item{\code{daily}: Daily component;}
-#'                        \item{\code{seasonal}: Seasonal component;}
-#'                        \item{\code{dynamic}}: Intraday dynamic component.}}
-#'        \item{\code{plot}}{A plot of the original signal and the three components.}
-#'        
+#'        \item{\code{real.signal}}{A vector of real intraday signal;}
+#'        \item{\code{smooth.signal}}{A vector of smoothed intraday signal;}
+#'        \item{\code{components}}{A list of the three smoothed components:
+#'              \itemize{ \item{\code{smooth.daily}}
+#'                        \item{\code{smooth.seasonal}}
+#'                        \item{\code{smooth.dynamic}}}}        
 #' 
 #' @references
 #' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.

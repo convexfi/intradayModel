@@ -1,6 +1,13 @@
+#' @title Plot Components of Smoothing/Forecasting Result 
+#' 
+#' @description Plot the components of smoothing/forecasting result in one figure.
+#' 
+#' @param smooth_forecast_result Smoothing/forecasting result from function \code{uniModelSmooth} or \code{uniModelForecast}.
+
 #' @import patchwork
 #' @import ggplot2
 #' @importFrom magrittr %>%
+#' @export
 plot_components <- function(smooth_forecast_result) {
   i <- original <- daily <- seasonal <- dynamic <- NULL
   components <- smooth_forecast_result[["components"]]
@@ -103,6 +110,12 @@ plot_components <- function(smooth_forecast_result) {
     )
 }
 
+#' @title Plot Smoothing/Forecasting Performance
+#' 
+#' @description Compares the real signal with the smoothed/forecast signal in one plot.
+#' 
+#' @param smooth_forecast_result Smoothing/forecasting result from function \code{uniModelSmooth} or \code{uniModelForecast}.
+
 #' @import ggplot2
 #' @importFrom magrittr %>%
 plot_performance <- function(smooth_forecast_result) {
@@ -114,7 +127,7 @@ plot_performance <- function(smooth_forecast_result) {
     title <- "Smoothing result (log scale)"
   } else {
     type <- "forecast"
-    title <- "One-bin-ahead prediction (log scale)"
+    title <- "One-bin-ahead forecast (log scale)"
   }
 
   plt_data <-
