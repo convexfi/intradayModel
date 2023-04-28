@@ -1,6 +1,8 @@
 #' @import patchwork
 #' @import ggplot2
 #' @importFrom magrittr %>%
+#' @export plot_components
+#' @export plot_performance
 plot_components <- function(smooth_forecast_result) {
   i <- original <- daily <- seasonal <- dynamic <- NULL
   components <- smooth_forecast_result[["components"]]
