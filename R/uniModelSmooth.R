@@ -23,9 +23,9 @@
 #' 
 #' @examples
 #' \dontrun{
-#' data(GE_volume)
-#' model_fitted <- uniModelFit(GE_volume, control = list(acceleration = TRUE))
-#' smooth_result <- uniModelSmooth(GE_volume, model_fitted)
+#' data(AAPL_volume)
+#' model_fitted <- uniModelFit(AAPL_volume, control = list(acceleration = TRUE))
+#' smooth_result <- uniModelSmooth(AAPL_volume, model_fitted)
 #' }
 #' 
 #' @export

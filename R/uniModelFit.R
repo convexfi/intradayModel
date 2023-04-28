@@ -57,9 +57,8 @@
 #' 
 #' @examples 
 #' \dontrun{
-#' data(GE_volume)
-#' model_fitted <- uniModelFit(GE_volume, fixed.pars = list("x0" = c(10,0)), 
-#'                             control = list(acceleration = TRUE, 
+#' data(AAPL_volume)
+#' model_fitted <- uniModelFit(AAPL_volume, verbose = 1, control = list(acceleration = TRUE, 
 #'                             maxit = 1000, abstol = 1e-4, log.switch = TRUE))
 #' }                  
 #' 

@@ -7,6 +7,14 @@
 #' @import patchwork
 #' @import ggplot2
 #' @importFrom magrittr %>%
+#' @examples
+#' \dontrun{
+#'  # Plot smoothed components of AAPL
+#' data(AAPL_volume)
+#' model_fitted <- uniModelFit(AAPL_volume, control = list(acceleration = TRUE))
+#' smooth_result <- uniModelSmooth(AAPL_volume, model_fitted)
+#' plot_components(smooth_result)
+#' }
 #' @export
 plot_components <- function(smooth_forecast_result) {
   i <- original <- daily <- seasonal <- dynamic <- NULL
@@ -118,6 +126,17 @@ plot_components <- function(smooth_forecast_result) {
 
 #' @import ggplot2
 #' @importFrom magrittr %>%
+#' @examples
+#' \dontrun{
+#'  # Plot forecast performance on AAPL
+#' data(AAPL_volume)
+#' AAPL_fit <- AAPL_volume[, 1:104]
+#' 
+#' model_fitted <- uniModelFit(AAPL_fit, control = list(acceleration = TRUE))
+#' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+#' plot_performance(forecast_result)
+#' }
+#' @export
 plot_performance <- function(smooth_forecast_result) {
   i <- value <- variable <- NULL
 

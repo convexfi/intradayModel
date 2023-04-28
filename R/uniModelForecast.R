@@ -31,12 +31,11 @@
 #' @examples
 #' \dontrun{
 #'  # One-bin-ahead prediction on the last 20 days of GE_volume
-#' data(GE_volume)
-#' data <- GE_volume
-#' data_train <- GE_volume[, 1:104]
+#' data(AAPL_volume)
+#' AAPL_fit <- AAPL_volume[, 1:104]
 #' 
-#' model_fitted <- uniModelFit(data_train, control = list(acceleration = TRUE))
-#' predict_result <- uniModelForecast(data, model_fitted, out.sample = 20)
+#' model_fitted <- uniModelFit(AAPL_fit, control = list(acceleration = TRUE))
+#' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
 #' }
 #' 
 #' @importFrom utils tail
