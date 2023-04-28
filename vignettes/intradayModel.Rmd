@@ -245,5 +245,5 @@ The current version only supports univariate state-space models for intraday tra
 
 &nbsp; 
 
-# References {.unnumbered}
+# References {-}
 
