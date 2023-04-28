@@ -31,24 +31,52 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   init.pars <- init_clean_result$input_list
   
   # generate warning message
+  msg <- c()
   if (length(fixed_clean_result$msg) > 0) {
-    cat("Warnings in fixed.pars:\n")
+    msg <- append(msg,"Warnings in fixed.pars:\n")
+    # cat("Warnings in fixed.pars:\n")
     for (m in fixed_clean_result$msg) {
-      cat("  ", m, "\n", sep = "")
+      msg <- append(msg, paste("  ", m, "\n", sep = ""))
+      # cat("  ", m, "\n", sep = "")
     }
   }
   if (length(init_clean_result$msg) > 0 | length(unecessary_init) > 0) {
-    cat("Warnings in init.pars:\n")
+    msg <- append(msg,"Warnings in init.pars:\n")
+    # cat("Warnings in init.pars:\n")
     if (!is.null(init_clean_result$msg)) {
       for (m in init_clean_result$msg) {
-        cat("  ", m, "\n", sep = "")
+        msg <- append(msg, paste("  ", m, "\n", sep = ""))
+        # cat("  ", m, "\n", sep = "")
       }
     }
     if (length(unecessary_init) > 0) {
-      cat("  Elements ", paste(unecessary_init, collapse = ", "),
-          " have already been fixed.\n", sep = "")
+      msg <- append(msg, paste("  Elements ", paste(unecessary_init, collapse = ", "),
+                               " have already been fixed.\n", sep = ""))
+      # cat("  Elements ", paste(unecessary_init, collapse = ", "),
+      #     " have already been fixed.\n", sep = "")
     }
   }
+  if (length(msg) > 0){
+    warning(msg)
+  }
+  # if (length(fixed_clean_result$msg) > 0) {
+  #   cat("Warnings in fixed.pars:\n")
+  #   for (m in fixed_clean_result$msg) {
+  #     cat("  ", m, "\n", sep = "")
+  #   }
+  # }
+  # if (length(init_clean_result$msg) > 0 | length(unecessary_init) > 0) {
+  #   cat("Warnings in init.pars:\n")
+  #   if (!is.null(init_clean_result$msg)) {
+  #     for (m in init_clean_result$msg) {
+  #       cat("  ", m, "\n", sep = "")
+  #     }
+  #   }
+  #   if (length(unecessary_init) > 0) {
+  #     cat("  Elements ", paste(unecessary_init, collapse = ", "),
+  #         " have already been fixed.\n", sep = "")
+  #   }
+  # }
   
   # store inputs in univariate model object
   for (name in all_pars_name) {
@@ -71,9 +99,30 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   return(uniModel)
 }
 
-# library(xts)
+# Remove anyday containing NA/missing bins
+# unify the data to matrix
+clean_data <- function(data){
+  if (is.xts(data)) {
+    data <- intraday_xts_to_matrix(data)
+  }
+  else {
+    index_NA_bin <- colnames(data)[apply(data, 2, anyNA)]
+    data <- data[,!apply(data, 2, anyNA)]
+    if (length(index_NA_bin) > 0) {
+      msg <- paste("For input matrix:\n"," Remove trading days with missing bins: ", toString(index_NA_bin), ".\n", sep = "")
+      warning(msg)
+      # cat("Warning in input matrix:\n")
+      # cat(" Remove trading days with missing bins: ", format(index_NA_bin), "\n")
+    }
+  }
+  return (data)
+}
+
+# Process xts data
+# remove any day containing missing bins/NA
+# convert the data to matrix
 intraday_xts_to_matrix <- function(data.xts) {
-  contain_NA <- apply.daily(data.xts, function(x) as.integer(any(is.na(x))))
+  contain_NA <- xts::apply.daily(data.xts, function(x) as.integer(any(is.na(x))))
   index_no_NA_bin <- zoo::index(to.daily(contain_NA[contain_NA == 0]))
   data.xts <- data.xts[format(index_no_NA_bin, format="%Y-%m-%d")]
   
@@ -95,8 +144,10 @@ intraday_xts_to_matrix <- function(data.xts) {
   }
   wrong_index <- c(index_NA_bin, index_notfull_bin)
   if (length(wrong_index) > 0) {
-    cat("Warning in input xts:\n")
-    cat(" Remove trading days with missing bins: ", format(wrong_index), "\n")
+    msg <- paste("For input xts:\n"," Remove trading days with missing bins: ", toString(sort(format(wrong_index))), ".\n", sep = "")
+    warning(msg)
+    # cat("Warning in input xts:\n")
+    # cat(" Remove trading days with missing bins: ", sort(format(wrong_index)), "\n")
   }
   
   return(data.mat)

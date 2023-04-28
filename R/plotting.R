@@ -119,8 +119,7 @@ plot_components <- function(smooth_forecast_result) {
 #' @import ggplot2
 #' @importFrom magrittr %>%
 plot_performance <- function(smooth_forecast_result) {
-  # i <- real <- pred <- NULL
-  # signal <- type <- NULL
+  i <- value <- variable <- NULL
 
   # determine type
   if (sum(grepl("smooth", names(smooth_forecast_result)))) {

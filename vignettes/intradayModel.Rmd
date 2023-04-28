@@ -12,7 +12,7 @@ output:
     toc_depth: 2
 csl: apalike.csl # springer-socpsych-author-date.csl
 csl-entry-spacing: 1.2em
-bibliography: refs.bib
+bibliography: reference.bib
 link-citations: yes
 vignette: >
   %\VignetteIndexEntry{Intraday Volume and Volatility: Modeling and Forecasting}

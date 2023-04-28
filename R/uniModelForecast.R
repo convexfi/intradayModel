@@ -27,17 +27,17 @@
 #'              \itemize{ \item{\code{mae}}
 #'                        \item{\code{mape}}
 #'                        \item{\code{rmse}}}}
-
 #' 
 #' @examples
-#' # One-bin-ahead prediction on the last 20 days of AAPL_volume
-#' data("AAPL_volume")
-#' data <- AAPL_volume
-#' data_train <- AAPL_volume[, 1:104]
+#' \dontrun{
+#'  # One-bin-ahead prediction on the last 20 days of GE_volume
+#' data(GE_volume)
+#' data <- GE_volume
+#' data_train <- GE_volume[, 1:104]
 #' 
-#' model <- uniModelSpec(fit = TRUE)
-#' model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
-#' predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
+#' model_fitted <- uniModelFit(data_train, control = list(acceleration = TRUE))
+#' predict_result <- uniModelForecast(data, model_fitted, out.sample = 20)
+#' }
 #' 
 #' @importFrom utils tail
 #' 
@@ -47,11 +47,9 @@ uniModelForecast <- function(data, uniModel, out.sample) {
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
-  if (is.xts(data)) {
-    data <- intraday_xts_to_matrix(data)
-  }
-  if (anyNA(data)) stop("data must have no NA.")
+  data <- clean_data(data)
   if (out.sample > ncol(data)) stop("out.sample must be smaller than the number of columns in data matrix.")
+  
   is_uniModel(uniModel, nrow(data))
 
   # check if fit is necessary
@@ -75,7 +73,7 @@ uniModelForecast <- function(data, uniModel, out.sample) {
     forecast.dynamic = exp(Kf$xtt1[2,]),
     forecast.seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  components.out <- lapply(components, function (c) utils::tail(c, nrow(data) * out.sample))
+  components.out <- lapply(components, function (c) tail(c, nrow(data) * out.sample))
   forecast.signal <- components.out$forecast.daily * 
     components.out$forecast.dynamic * components.out$forecast.seasonal
 
@@ -87,7 +85,7 @@ uniModelForecast <- function(data, uniModel, out.sample) {
     rmse = calculate_rmse(signal_real, forecast.signal)
   )
 
-  # plot
+  # result
   res <- list(
     real.signal = signal_real,
     forecast.signal = forecast.signal,

@@ -16,7 +16,7 @@ URL: https://github.com/convexfi/intradayModeling,
      https://www.danielppalomar.com,
      https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695
 BugReports: https://github.com/convexfi/intradayModeling/issues
-License: GPL-3
+License: Apache License (== 2.0)
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Depends: R (>= 2.10)
@@ -25,13 +25,15 @@ Imports:
     magrittr,
     patchwork,
     reshape2,
-    rlist
+    rlist,
+    utils,
+    xts,
+    zoo
 Suggests:
     knitr,
     rmarkdown,
     R.rsp,
     testthat (>= 3.0.0),
-    xts,
     cleanrmd,
     devtools
 VignetteBuilder:

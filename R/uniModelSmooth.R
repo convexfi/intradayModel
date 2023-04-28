@@ -22,12 +22,11 @@
 #' 
 #' 
 #' @examples
-#' # filter AAPL_volume
-#' data(AAPL_volume)
-#' model <- uniModelSpec(fit = TRUE)
-#' model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, 
-#'                   maxit = 1000, abstol = 1e-4, log.switch = TRUE)
-#' filter_result <- uniModelFilter(AAPL_volume, model_fitted)
+#' \dontrun{
+#' data(GE_volume)
+#' model_fitted <- uniModelFit(GE_volume, control = list(acceleration = TRUE))
+#' smooth_result <- uniModelSmooth(GE_volume, model_fitted)
+#' }
 #' 
 #' @export
 uniModelSmooth <- function(data, uniModel) {
@@ -35,10 +34,8 @@ uniModelSmooth <- function(data, uniModel) {
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
-  if (is.xts(data)) {
-    data <- intraday_xts_to_matrix(data)
-  }
-  if (anyNA(data)) stop("data must have no NA.")
+  data <- clean_data(data)
+  
   is_uniModel(uniModel, nrow(data))
 
   # if model isn't optimally fitted (no convergence), it cannot filter

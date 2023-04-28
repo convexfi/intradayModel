@@ -6,10 +6,9 @@
 #' It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 #' 
 #' @section Functions:
-#' \code{\link{uniModelSpec}},
 #' \code{\link{uniModelFit}}, 
-#' \code{\link{uniModelPred}}, 
-#' \code{\link{uniModelFilter}}
+#' \code{\link{uniModelForecast}}, 
+#' \code{\link{uniModelSmooth}}
 #'
 #' @section Data:
 #' \code{\link{AAPL_volume}},
