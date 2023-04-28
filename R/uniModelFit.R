@@ -31,22 +31,22 @@
 #'                           \item{\code{"x0"}: \eqn{\mathbf{x}_0}{x(0)} of size 2 ;}
 #'                           \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)} of size 2 * 2 .}}
 #' @param init.pars List of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
-#'                  If the user does not assign initial values for the unfitted parameters, default ones will be used in \code{uniModelFit}.
-#' @param verbose An integer specifying the print level of information during the algorithm (default is \code{1}). Possible numbers:
+#'                  If the user does not assign initial values for the unfitted parameters, default ones will be used.
+#' @param verbose An integer specifying the print level of information during the algorithm (default \code{1}). Possible numbers:
 #'                \itemize{\item{\code{"0"}: no output;}
 #'                    \item{\code{"1"}: show the iteration number and \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||};}
-#'                    \item{\code{"2"}: 1 + show the final parameters.}}
+#'                    \item{\code{"2"}: 1 + show the obtained parameters.}}
 #' @param control List of control values of EM algorithm:
 #'                 \itemize{\item{\code{acceleration}: TRUE/FALSE indicating whether to use the accelerated EM algorithm (default TRUE);}
 #'                    \item{\code{maxit}: Maximum number of iterations (default \code{3000});}
-#'                    \item{\code{abstol}: Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default is \code{1e-4})}
+#'                    \item{\code{abstol}: Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default \code{1e-4})}
 #'                    \item{\code{log.switch}: TRUE/FALSE indicating whether to record the history of convergence progress (defalut TRUE).}}    
 #'
 #' @return A list containing the following elements (if the algorithm converges):
 #'         \item{\code{par}}{List of parameters' fitted values.}
-#'         \item{\code{init}}{List of unfitted parameters' initial values defined by users.}
+#'         \item{\code{init}}{List of valid initial values from users.}
 #'         \item{\code{par_log}}{List of intermediate parameters' values if \code{log.switch = TRUE}.} 
-#'         \item{\code{fit_request}}{List of logical values indicating whether the parameters require further fitting.}
+#'         \item{\code{fit_request}}{List of logical values indicating whether each parameter requires further fitting.}
 #'                                
 #' 
 #' @references
@@ -89,7 +89,6 @@ uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0,
   }
   if (anyNA(data)) stop("data must have no NA.")
   is_uniModel(uniModel, nrow(data))
-  
 
   # control list check
   ## initial control values
