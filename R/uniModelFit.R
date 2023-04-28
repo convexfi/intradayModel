@@ -94,7 +94,7 @@ uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0,
 
   # control list check
   ## initial control values
-  control_final <- list(acceleration = FALSE, maxit = 3000, abstol = 1e-4,
+  control_final <- list(acceleration = TRUE, maxit = 3000, abstol = 1e-4,
                         log.switch = TRUE)
   if (is.list(control)) {
     for (prop in c("acceleration", "maxit", "abstol", "log.switch")) {
