@@ -187,7 +187,7 @@ support for intraday volatility.</p>
 covering 124 trading days.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(intradayModel)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(AAPL_volume)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>AAPL_volume[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>AAPL_volume[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># print the head of data</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 09:30 AM   10142172    3434769   20852127   15463747   14719388</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 09:45 AM    5691840   19751251   13374784    9962816    9515796</span></span>
@@ -201,7 +201,7 @@ forecasting performance.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>AAPL_fit <span class="ot">&lt;-</span> AAPL_volume[, <span class="dv">1</span><span class="sc">:</span><span class="dv">104</span>]</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>model_fitted <span class="ot">&lt;-</span> <span class="fu">uniModelFit</span>(AAPL_fit)</span></code></pre></div>
 <p>Once the model is fitted, we can estimate the hidden components of
-the intraday signal based on all observations, which is called
+any intraday signal based on all its observations, which is called
 <strong>smoothing</strong>. By calling <code>uniModelSmooth</code>
 function, we obtain daily, seasonal, and intraday dynamic components.
 This procedure helps us better identify the underlying information of
@@ -233,7 +233,7 @@ intraday signals. These components include the daily component, which
 adjusts the mean level of the time series; the seasonal component, which
 captures the U-shaped intraday periodic pattern; and the intraday
 dynamic component, which represents movements within a day.</p>
-<p>The observed intraday signal can be written in the multiplicative
+<p>The observed intraday signal can be written in a multiplicative
 combination of the components <span class="citation" data-cites="brownlees2011intra">(<a href="#ref-brownlees2011intra" role="doc-biblioref">Brownlees et al., 2011</a>)</span>:</p>
 <p><span class="math display">\[
 \large
@@ -242,7 +242,8 @@ combination of the components <span class="citation" data-cites="brownlees2011in
 \small
 \]</span></p>
 <p>Alternatively, by taking the logarithm transform, the intraday signal
-can be also regarded as an addictive combination of the components:</p>
+can be also regarded as an addictive combination of these
+components:</p>
 <p><span class="math display">\[
 \large
 y_{\tau} = \eta_{\tau} + \phi_i + \mu_{t,i} + v_{t,i}. \tag{2}
@@ -294,14 +295,14 @@ state at <span class="math inline">\(\tau = 1\)</span>, and it follows
 \boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0 \}\)</span> are treated as
 parameters.</p>
 <h2 id="datasets">Datasets</h2>
-<p>To use this package, you have two choices of data types:</p>
+<p>Two data classes of intraday signal are supported:</p>
 <ul>
 <li><p>a 2D numeric matrix of size <code>(n_bin, n_day)</code>;</p></li>
 <li><p>an xts object.</p></li>
 </ul>
 <p>To help you get started, we provide two sample datasets: a
-matrix-type <code>AAPL_volume</code> and an xts-type
-<code>FDX_volume_xts</code>. Here, we elaborate on the xts input.</p>
+matrix-class <code>AAPL_volume</code> and an xts-class
+<code>FDX_volume_xts</code>. Here, we elaborate on the later one.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(FDX_volume_xts)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(FDX_volume_xts)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     FDX.Volume</span></span>
@@ -324,13 +325,14 @@ matrix-type <code>AAPL_volume</code> and an xts-type
 <p><strong>uniModelFit</strong>(data, fixed.pars = NULL, init.pars =
 NULL, verbose = 0, control = NULL)</p>
 </blockquote>
-<p>To fit a univariate state-space model, you can use
+<p>To fit a univariate state-space model, you should use
 <code>uniModelFit</code> function. If you want to fix some parameters to
 specific values, you can provide a list of values to
 <code>fixed.pars</code>. If you have prior knowledge of the initial
 values for the unfitted parameters, you can provide it through
-<code>init.pars</code>. <code>verbose</code> controls the level of
-print. More control options can be set via <code>control</code>.</p>
+<code>init.pars</code>. Besides, <code>verbose</code> controls the level
+of print, and more control options can be set via
+<code>control</code>.</p>
 <p>The fitting process stops when either the maximum number of
 iterations is reached or the termination criteria is met <span class="math inline">\(\|\Delta \boldsymbol{\Theta}_i\| \le
 \text{abstol}\)</span>.</p>
@@ -366,23 +368,23 @@ iterations is reached or the termination criteria is met <span class="math inlin
 <span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ x0     : num [1:2] 10.899 -0.303</span></span>
 <span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ V0     : num [1:2, 1:2] 6.76e-06 -6.90e-07 -6.90e-07 9.07e-06</span></span>
 <span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---------------------------</span></span></code></pre></div>
-<p>The trading days with missing bins at 2019-07-03 (Independence Day)
-and 2019-11-29 (Thanksgiving Day) because of early close have been
-automatically removed.</p>
+<p>One observation is that the trading days with missing bins because of
+early close, 2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving
+Day), have been automatically removed.</p>
 <h2 id="smoothing">Smoothing</h2>
 <blockquote>
 <p><strong>uniModelSmooth</strong>(data, uniModel)</p>
 </blockquote>
-<p><code>uniModelSmooth</code> function allows you to decompose an
-intraday trading signal into its daily, seasonal, and intraday dynamic
+<p><code>uniModelSmooth</code> function allows you to smooth on a
+dataset based on all its observations. It decomposes the intraday
+trading signal into its daily, seasonal, and intraday dynamic
 components. The daily component and intraday dynamic component at time
 <span class="math inline">\(\tau\)</span> are the smoothed state
 estimate conditioned on all the data, and denoted by <span class="math inline">\(\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]\)</span>,
 where <span class="math inline">\(N\)</span> is the total number of bins
-in the dataset. The seasonal component has the value of <span class="math inline">\(\boldsymbol{\phi}\)</span>.</p>
+in the dataset. Besides, the seasonal component has the value of <span class="math inline">\(\boldsymbol{\phi}\)</span>.</p>
 <p>To use this function, input the intraday signal you want to smooth
-and the fitted model as arguments. This function will produce the three
-components.</p>
+and the fitted model as arguments.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>smooth_result <span class="ot">&lt;-</span> <span class="fu">uniModelSmooth</span>(FDX_fit, model_fitted)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in input xts:</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Remove trading days with missing bins:  2019-11-29 2019-07-03</span></span>
@@ -406,8 +408,8 @@ smoothing performance.</p>
 <p><strong>uniModelForecast</strong>(data, uniModel, out.sample)</p>
 </blockquote>
 <p><code>uniModelForecast</code> function allows you to forecast the
-intraday signal one-bin-ahead, given your dataset and the fitted model.
-The one-bin-ahead prediction is mathematically denoted by <span class="math inline">\(\hat{y}_{\tau+1} =
+intraday signal one-bin-ahead, given a dataset and a fitted model. The
+one-bin-ahead prediction is mathematically denoted by <span class="math inline">\(\hat{y}_{\tau+1} =
 \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]\)</span>. You need to
 indicate how many days from the end of the dataset to keep for
 out-of-sample prediction.</p>
