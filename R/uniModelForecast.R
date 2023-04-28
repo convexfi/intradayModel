@@ -2,7 +2,7 @@
 #'
 #' @description The one-bin-ahead forecast is mathematically denoted by \eqn{\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
 #'              Given the dataset, you need to indicate how many days from the end of the dataset to keep for out-of-sample forecast.
-#'              Three measures are used to evaluate the prediction performance:
+#'              Three measures are used to evaluate the forecasting performance:
 #'              \itemize{\item{Mean absolute error (MAE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
 #'                       \item{Mean absolute percent error (MAPE):

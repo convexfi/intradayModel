@@ -128,7 +128,7 @@ plot_performance <- function(smooth_forecast_result) {
     title <- "Smoothing result (log scale)"
   } else {
     type <- "forecast"
-    title <- "One-bin-ahead prediction (log scale)"
+    title <- "One-bin-ahead forecast (log scale)"
   }
 
   plt_data <-
