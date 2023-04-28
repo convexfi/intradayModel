@@ -12,23 +12,23 @@ intraday, algorithmic, and high-frequency trading.
 ## Installation
 
 The package can be installed from
-[GitHub](https://github.com/convexfi/intradayModeling):
+[GitHub](https://github.com/convexfi/intradayModel):
 
 ``` r
 # install development version from GitHub
-devtools::install_github("convexfi/intradayModeling")
+devtools::install_github("convexfi/intradayModel")
 ```
 
 ## Quick Start
 
-To get started, we load the package and some sample data: the 15-minute
+To get started, we load our package and some sample data: the 15-minute
 intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
 124 trading days.
 
 ``` r
 devtools::load_all()
 data(AAPL_volume)
-AAPL_volume[1:5, 1:5]
+AAPL_volume[1:5, 1:5] # print the head of data
 #>          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08
 #> 09:30 AM   10142172    3434769   20852127   15463747   14719388
 #> 09:45 AM    5691840   19751251   13374784    9962816    9515796
@@ -37,59 +37,50 @@ AAPL_volume[1:5, 1:5]
 #> 10:30 AM    4587159   18041115    8686059    7130980    5479852
 ```
 
-Next, we define a univariate state-space model using the `uniModelSpec`
-function.
+Next, we fit a univariate state-space model using `uniModelFit`
+function. To be specific, we use the first 104 trading days for fitting,
+and the last 20 days for evaluation of forecasting performance.
 
 ``` r
-model <- uniModelSpec(fit = TRUE)
+AAPL_fit <- AAPL_volume[, 1:104]
+model_fitted <- uniModelFit(AAPL_fit)
 ```
 
-Then, we use the first 104 trading days to fit the model and the last 20
-days to evaluate its forecasting performance. Fitting can be achieved by
-the `uniModelFit` function.
+Once the model is fitted, we can estimate the hidden components of any
+intraday signal based on all its observations, which is called
+**smoothing**. By calling `uniModelSmooth` function, we obtain daily,
+seasonal, and intraday dynamic components. This procedure helps us
+better identify the underlying information of the intraday signal.
 
 ``` r
-data <- AAPL_volume
-data_train <- AAPL_volume[, 1:104]
-model_fitted <- uniModelFit(data_train, model, acceleration = TRUE)
-#> iter:5 diff:0.002868503
-#> iter:10 diff:0.001158477
-#> iter:15 diff:0.001227848
-#> iter:20 diff:0.0007639725
-#> iter:25 diff:0.0005357166
-#> iter:30 diff:0.0002927454
-#> iter:35 diff:0.0005428917
-#> iter:40 diff:0.0001707282
-#> iter:45 diff:0.0002356185
-#> Success! abstol test passed at 47 iterations.
+smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
+plot_components(smooth_result) # plot smoothed hidden components
 ```
 
-Once the model is fitted, we use the `uniModelFilter` function to
-decompose intraday trading signal into daily, seasonal, and intraday
-dynamic components. This helps us better understand the composition of
-the intraday signal.
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="75%" style="display: block; margin: auto;" />
 
 ``` r
-filter_result <- uniModelFilter(data_train, model_fitted)
-filter_result$plot
+plot_performance(smooth_result) # plot smoothed result
 ```
 
-<img src="man/figures/README-quick-start-filter-1.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-5-2.png" width="75%" style="display: block; margin: auto;" />
 
-To see how well our model performs on new data, we use the
-`uniModelPred` function to do one-step-ahead prediction on the last 20
-trading days of the dataset. This function also helps to evaluate the
-accuracy of the forecast.
+To see how well our model performs on new data, we use
+`uniModelForecast` function to do one-bin-ahead forecast on the
+out-of-sample dataset of 20 days.
 
 ``` r
-predict_result <- uniModelPred(data, model_fitted, out.sample = 20)
-predict_result$measure
-#>        mae      mape    rmse
-#> 1 630877.9 0.2083228 1418145
-predict_result$plot
+forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+plot_components(forecast_result) # plot forecast hidden components
 ```
 
-<img src="man/figures/README-quick-start-pred-1.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="75%" style="display: block; margin: auto;" />
+
+``` r
+plot_performance(forecast_result) # plot forecast result
+```
+
+<img src="man/figures/README-unnamed-chunk-6-2.png" width="75%" style="display: block; margin: auto;" />
 
 ## Contributing
 
@@ -106,10 +97,10 @@ If you made use of this software please consider citing:
 
 ## Links
 
-Package: [GitHub](https://github.com/convexfi/intradayModeling)
+Package: [GitHub](https://github.com/convexfi/intradayModel)
 
 README file:
-[GitHub-readme](https://github.com/convexfi/intradayModeling/blob/master/README.md).
+[GitHub-readme](https://github.com/convexfi/intradayModel/blob/master/README.md).
 
 Vignette:
-[GitHub-vignette](https://htmlpreview.github.io/?https://github.com/convexfi/intradayModeling/blob/master/vignettes/intradayModel.html).
+[GitHub-vignette](https://htmlpreview.github.io/?https://github.com/convexfi/intradayModel/blob/master/vignettes/intradayModel.html).
