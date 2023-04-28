@@ -1,0 +1,31 @@
+citHeader("To cite 'intradayModel' in publications, please use:")
+
+citEntry(entry = "Manual",
+         title        = "{intradayModel: Modeling and Forecasting Financial Intraday Signals}",
+         author       = personList(as.person("S. Xiu"),
+                                   as.person("Y. Yu"),
+                                   as.person("D. P. Palomar")),
+         note         = "R package version 0.0.1",
+         year         = "2023",
+         url          = "https://CRAN.R-project.org/package=intradayModel",
+         textVersion  =
+           paste("S. Xiu, Y. Yu and D. P. Palomar (2023).",
+                 "intradayModel: Modeling and Forecasting Financial Intraday Signals.",
+                 "R package version 0.0.1.",
+                 "https://CRAN.R-project.org/package=intradayModel")
+)
+
+citEntry(entry = "Article",
+         title        = "Forecasting Intraday Trading Volume: A Kalman Filter Approach",
+         author       = personList(as.person("R. Chen"),
+                                   as.person("Y. Feng"),
+                                   as.person("D. P. Palomar")),
+         journal      = "Available at SSRN",
+         year         = "2016",
+         url          = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695",
+         textVersion  =
+           paste("R. Chen, Y. Feng and D. P. Palomar (2016).",
+                 "Forecasting Intraday Trading Volume: A Kalman Filter Approach.",
+                 "Available at SSRN.",
+                 "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695")
+)

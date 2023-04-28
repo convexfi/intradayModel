@@ -19,6 +19,12 @@ The package can be installed from
 devtools::install_github("convexfi/intradayModel")
 ```
 
+Please cite **intradayModel** in publications:
+
+``` r
+citation("intradayModel")
+```
+
 ## Quick Start
 
 To get started, we load our package and some sample data: the 15-minute
@@ -57,13 +63,13 @@ smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
 plot_components(smooth_result) # plot smoothed hidden components
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="75%" style="display: block; margin: auto;" />
 
 ``` r
 plot_performance(smooth_result) # plot smoothed result
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-2.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-2.png" width="75%" style="display: block; margin: auto;" />
 
 To see how well our model performs on new data, we use
 `uniModelForecast` function to do one-bin-ahead forecast on the
@@ -74,13 +80,13 @@ forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="75%" style="display: block; margin: auto;" />
 
 ``` r
 plot_performance(forecast_result) # plot forecast result
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-2.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-7-2.png" width="75%" style="display: block; margin: auto;" />
 
 ## Contributing
 

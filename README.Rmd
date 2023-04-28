@@ -33,6 +33,11 @@ The package can be installed from [GitHub](https://github.com/convexfi/intradayM
 devtools::install_github("convexfi/intradayModel")
 ```
 
+Please cite **intradayModel** in publications:
+```{r, eval=FALSE}
+citation("intradayModel")
+```
+
 ## Quick Start
 To get started, we load our package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days.
 
