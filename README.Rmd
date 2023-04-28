@@ -56,7 +56,7 @@ model_fitted <- uniModelFit(AAPL_fit)
 
 Once the model is fitted, we can estimate the hidden components of any intraday signal based on all its observations, which is called **smoothing**. By calling `uniModelSmooth` function, we obtain daily, seasonal, and intraday dynamic components. This procedure helps us better identify the underlying information of the intraday signal.
 
-```{r}
+```{r smooth_plot}
 smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
 plot_components(smooth_result) # plot smoothed hidden components
 plot_performance(smooth_result) # plot smoothed result
@@ -64,7 +64,7 @@ plot_performance(smooth_result) # plot smoothed result
 
 To see how well our model performs on new data, we use `uniModelForecast` function to do one-bin-ahead forecast on the out-of-sample dataset of 20 days.
 
-```{r}
+```{r forecast_plot}
 forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 plot_performance(forecast_result) # plot forecast result
