@@ -36,10 +36,8 @@ uniModelSmooth <- function(data, uniModel) {
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
-  if (is.xts(data)) {
-    data <- intraday_xts_to_matrix(data)
-  }
-  if (anyNA(data)) stop("data must have no NA.")
+  data <- clean_data(data)
+  
   is_uniModel(uniModel, nrow(data))
 
   # if model isn't optimally fitted (no convergence), it cannot filter

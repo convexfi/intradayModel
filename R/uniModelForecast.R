@@ -42,11 +42,9 @@ uniModelForecast <- function(data, uniModel, out.sample) {
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
-  if (is.xts(data)) {
-    data <- intraday_xts_to_matrix(data)
-  }
-  if (anyNA(data)) stop("data must have no NA.")
+  data <- clean_data(data)
   if (out.sample > ncol(data)) stop("out.sample must be smaller than the number of columns in data matrix.")
+  
   is_uniModel(uniModel, nrow(data))
 
   # check if fit is necessary
