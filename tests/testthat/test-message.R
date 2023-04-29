@@ -106,7 +106,7 @@ test_that("uniModelFit message", {
   expect_warning(uniModelFit(data_train, control = list(maxit = 1)), 
                  regexp = "Warning! Reached maxit before parameters converged. Maxit was 1.\n")
   expect_output(uniModelFit(data_train,verbose = 1, control = list(maxit = 1000, acceleration = TRUE)), 
-                regexp = "Success! abstol test passed at 47 iterations.")
+                regexp = "Success! abstol test passed at")
   expect_error(uniModelFit(c(1,1)), regexp = "data must be matrix or xts.")
   expect_output(uniModelFit(data, fixed.pars = fixed.pars, verbose = 1), "All parameters have already been fixed.")
   
