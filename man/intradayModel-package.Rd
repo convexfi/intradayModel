@@ -12,16 +12,17 @@ It is a valuable tool for anyone interested in exploring intraday, algorithmic, 
 }
 \section{Functions}{
 
-\code{\link{uniModelSpec}},
 \code{\link{uniModelFit}}, 
-\code{\link{uniModelPred}}, 
-\code{\link{uniModelFilter}}
+\code{\link{uniModelForecast}}, 
+\code{\link{uniModelSmooth}}
+\code{\link{plot_components}}
+\code{\link{plot_performance}}
 }
 
 \section{Data}{
 
 \code{\link{AAPL_volume}},
-\code{\link{GE_volume}}
+\code{\link{FDX_volume_xts}}
 }
 
 \section{Help}{

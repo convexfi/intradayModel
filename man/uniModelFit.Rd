@@ -13,7 +13,7 @@ uniModelFit(
 )
 }
 \arguments{
-\item{data}{Matrix of intraday signal of size n_bin * n_day without any missing values.}
+\item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
 
 \item{fixed.pars}{List of parameters' fixed values. The allowed parameters are listed below,
 \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
@@ -26,27 +26,25 @@ uniModelFit(
          \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)} of size 2 * 2 .}}}
 
 \item{init.pars}{List of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
-If the user does not assign initial values for the unfitted parameters, default ones will be used in \code{uniModelFit}.}
+If the user does not assign initial values for the unfitted parameters, default ones will be used.}
 
-\item{verbose}{An integer specifying the print level of information during the algorithm (default is \code{1}). Possible numbers:
+\item{verbose}{An integer specifying the print level of information during the algorithm (default \code{1}). Possible numbers:
 \itemize{\item{\code{"0"}: no output;}
     \item{\code{"1"}: show the iteration number and \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||};}
-    \item{\code{"2"}: 1 + show the final parameters.}}}
+    \item{\code{"2"}: 1 + show the obtained parameters.}}}
 
-\item{acceleration}{Logical value indicating whether to use the accelerated EM algorithm. If \code{TRUE}, the accelerated one will be used (default is \code{FALSE}).}
-
-\item{maxit}{Maximum number of iterations (default is \code{3000}).}
-
-\item{abstol}{Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default is \code{1e-4}).}
-
-\item{log.switch}{Logical value indicating whether to record the history of convergence progress. 
-If \code{TRUE}, the intermediate parameters are recorded during the algorithm (default is \code{TRUE}).}
+\item{control}{List of control values of EM algorithm:
+\itemize{\item{\code{acceleration}: TRUE/FALSE indicating whether to use the accelerated EM algorithm (default TRUE);}
+   \item{\code{maxit}: Maximum number of iterations (default \code{3000});}
+   \item{\code{abstol}: Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default \code{1e-4})}
+   \item{\code{log.switch}: TRUE/FALSE indicating whether to record the history of convergence progress (defalut TRUE).}}}
 }
 \value{
 A list containing the following elements (if the algorithm converges):
         \item{\code{par}}{List of parameters' fitted values.}
+        \item{\code{init}}{List of valid initial values from users.}
         \item{\code{par_log}}{List of intermediate parameters' values if \code{log.switch = TRUE}.} 
-        \item{\code{fit_request}}{List of logical values indicating whether the parameters require further fitting.}
+        \item{\code{fit_request}}{List of logical values indicating whether each parameter requires further fitting.}
 }
 \description{
 The main function for defining and fitting a univaraite state-space model. The model proposed in (Chen et al., 2016) is formulated as
@@ -70,11 +68,11 @@ The model is fitted by expectation-maximization (EM) algorithms. The implementat
 The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 }
 \examples{
-# fit the model to AAPL_volume
+\dontrun{
 data(AAPL_volume)
-model <- uniModelSpec(fit = TRUE)
-model_fitted <- uniModelFit(AAPL_volume, model, acceleration = TRUE, 
-                  maxit = 1000, abstol = 1e-4, log.switch = TRUE)
+model_fitted <- uniModelFit(AAPL_volume, verbose = 1, control = list(acceleration = TRUE, 
+                            maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+}                  
 
 }
 \references{
@@ -82,7 +80,4 @@ Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume:
 
 Varadhan, R., and Roland, C. (2008). Simple and globally convergent methods for accelerating the convergence of any EM algorithm. 
 Scandinavian Journal of Statistics, 35(2), 335–353.
-}
-\seealso{
-\code{\link{uniModelSpec}}
 }
