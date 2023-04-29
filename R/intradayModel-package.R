@@ -9,10 +9,12 @@
 #' \code{\link{uniModelFit}}, 
 #' \code{\link{uniModelForecast}}, 
 #' \code{\link{uniModelSmooth}}
+#' \code{\link{plot_components}}
+#' \code{\link{plot_performance}}
 #'
 #' @section Data:
 #' \code{\link{AAPL_volume}},
-#' \code{\link{GE_volume}}
+#' \code{\link{FDX_volume_xts}}
 #'
 #' @section Help:
 #' For a quick help see the README file:
