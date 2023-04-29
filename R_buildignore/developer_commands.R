@@ -1,3 +1,6 @@
+# install basic package for vignette
+install.packages("cleanrmd", "R.rsp")
+
 ##
 ## User installation
 ##
@@ -33,11 +36,15 @@ devtools::test()
 # CRAN check and submission (https://r-pkgs.org/release.html)
 #  checklist: https://kalimu.github.io/post/checklist-for-r-package-submission-to-cran/
 devtools::check()  # run_dont_test = TRUE
-devtools::check(args = c('--ignore-vignettes'), build_args = c('--no-build-vignettes'))
 rcmdcheck::rcmdcheck()  # build_args = "--run-donttest"
-rcmdcheck::rcmdcheck(args = c('--ignore-vignettes'), build_args = c('--no-build-vignettes'))
 devtools::build()
+
+# Alternatives to the above three that ignore vignettes
+devtools::check(args = c('--ignore-vignettes'), build_args = c('--no-build-vignettes'))
+rcmdcheck::rcmdcheck(args = c('--ignore-vignettes'), build_args = c('--no-build-vignettes'))
 devtools::build(args = c('--no-build-vignettes'))
+
+
 #devtools::revdep(pkg = "intradayModel")  # to check reverse dependencies
 #devtools::check_win_release()  #to check under windows
 

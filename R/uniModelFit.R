@@ -69,7 +69,8 @@
 #' model_fitted <- uniModelFit(AAPL_volume, fixed.pars = fixed.pars, init.pars = init.pars)
 #' 
 #' # Fit model with other control options
-#' model_fitted <- uniModelFit(AAPL_volume, verbose = 2, control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log.switch = FALSE))
+#' model_fitted <- uniModelFit(AAPL_volume, verbose = 2, 
+#'   control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log.switch = FALSE))
 #' }                  
 #' 
 #' @importFrom magrittr %>%

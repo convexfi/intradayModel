@@ -18,7 +18,7 @@
 #'
 #' @section Help:
 #' For a quick help see the README file:
-#' \href{https://github.com/convexfi/intradayModeling/blob/master/README.md}{GitHub-README}.
+#' \href{https://github.com/convexfi/intradayModel/blob/master/README.md}{GitHub-README}.
 #'
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
