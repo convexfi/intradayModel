@@ -1,7 +1,7 @@
-data(GE_volume)
+data(AAPL_volume)
 
 test_that("is_uniModel works", {
-  data <- GE_volume
+  data <- AAPL_volume
   n_bin <- 26
   fixed.pars <- list()
   fixed.pars$"a_mu" <- 1
@@ -34,7 +34,7 @@ test_that("is_uniModel works", {
 })
 
 test_that("uniModelForecast/Smooth works", {
-  data <- GE_volume
+  data <- AAPL_volume
   n_bin <- 26
   fixed.pars <- list()
   fixed.pars$"a_mu" <- 1
@@ -90,8 +90,8 @@ test_that("spec_unimodel message", {
 })
 
 test_that("uniModelFit message", {
-  data <- GE_volume
-  data_train <- GE_volume[, 1:104]
+  data <- AAPL_volume
+  data_train <- AAPL_volume[, 1:104]
   data_error_test <- data_train
   data_error_test[1,1] <- NA
   fixed.pars <- list(
@@ -106,7 +106,7 @@ test_that("uniModelFit message", {
   expect_warning(uniModelFit(data_train, control = list(maxit = 1)), 
                  regexp = "Warning! Reached maxit before parameters converged. Maxit was 1.\n")
   expect_output(uniModelFit(data_train,verbose = 1, control = list(maxit = 1000, acceleration = TRUE)), 
-                regexp = "Success! abstol test passed at 22 iterations.")
+                regexp = "Success! abstol test passed at 47 iterations.")
   expect_error(uniModelFit(c(1,1)), regexp = "data must be matrix or xts.")
   expect_output(uniModelFit(data, fixed.pars = fixed.pars, verbose = 1), "All parameters have already been fixed.")
   
@@ -118,7 +118,7 @@ test_that("uniModelFit message", {
 })
 
 test_that("clean_data message", {
-  data_error_test <- GE_volume
+  data_error_test <- AAPL_volume
   data_error_test[1,1] <- NA
   data_error_test[2,3] <- NA
   expect_warning(clean_data(data_error_test),"For input matrix:\n Remove trading days with missing bins: 2019-01-02, 2019-01-04.\n")

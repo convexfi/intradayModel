@@ -30,7 +30,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#'  # One-bin-ahead prediction on the last 20 days of GE_volume
+#'  # One-bin-ahead prediction on the last 20 days of AAPL_volume
 #' data(AAPL_volume)
 #' AAPL_fit <- AAPL_volume[, 1:104]
 #' 

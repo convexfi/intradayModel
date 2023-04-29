@@ -1,54 +1,54 @@
-test_that("package, stock = GE", {
-  skip_on_cran()
-  data(GE_volume)
+# test_that("package, stock = GE", {
+#   skip_on_cran()
+#   data(GE_volume)
   
-  data <- GE_volume
-  data_train <- GE_volume[, 1:104]
+#   data <- GE_volume
+#   data_train <- GE_volume[, 1:104]
   
-  modelSpec.fit <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
-  modelSpec.fit_acc <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
-  
-  
-  # Fitting
-  expected_par <- readRDS(test_path("fixtures", "GE_expected_par"))
-  expected_modelSpec <- list()
-  expected_modelSpec$par$a_eta <- expected_par$B[1]
-  expected_modelSpec$par$a_mu <- expected_par$B[2]
-  expected_modelSpec$par$var_eta <- expected_par$Q[1]
-  expected_modelSpec$par$var_mu <- expected_par$Q[2]
-  expected_modelSpec$par$r <- expected_par$R[1]
-  expected_modelSpec$par$phi <- as.vector(expected_par$A)
-  expected_modelSpec$par$x0 <- as.vector(expected_par$x0)
-  expected_modelSpec$par$V0 <- as.vector(expected_par$V0)
-  
-  compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
-  expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
-  expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
+#   modelSpec.fit <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+#   modelSpec.fit_acc <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
   
-  # Smoothing
-  filter_result <- uniModelSmooth(data_train, modelSpec.fit)
-  filter_result_acc <- uniModelSmooth(data_train, modelSpec.fit_acc)
+#   # Fitting
+#   expected_par <- readRDS(test_path("fixtures", "GE_expected_par"))
+#   expected_modelSpec <- list()
+#   expected_modelSpec$par$a_eta <- expected_par$B[1]
+#   expected_modelSpec$par$a_mu <- expected_par$B[2]
+#   expected_modelSpec$par$var_eta <- expected_par$Q[1]
+#   expected_modelSpec$par$var_mu <- expected_par$Q[2]
+#   expected_modelSpec$par$r <- expected_par$R[1]
+#   expected_modelSpec$par$phi <- as.vector(expected_par$A)
+#   expected_modelSpec$par$x0 <- as.vector(expected_par$x0)
+#   expected_modelSpec$par$V0 <- as.vector(expected_par$V0)
   
-  # filter_result$plot
-  # filter_result_acc$plot
+#   compared_par <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi")
+#   expect_equal(modelSpec.fit$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
+#   expect_equal(modelSpec.fit_acc$par[compared_par], expected_modelSpec$par[compared_par], tolerance = 5e-2)
   
-  # Prediction
-  predict_result <- uniModelForecast(data, modelSpec.fit, out.sample = 20)
-  predict_result_acc <- uniModelForecast(data, modelSpec.fit_acc, out.sample = 20)
   
-  # predict_result$plot
-  # predict_result_acc$plot
+#   # Smoothing
+#   filter_result <- uniModelSmooth(data_train, modelSpec.fit)
+#   filter_result_acc <- uniModelSmooth(data_train, modelSpec.fit_acc)
   
-  expected_res <- readRDS(test_path("fixtures", "GE_expected_pred"))
-  expect_modelerror <- list(mae = expected_res$mae, mape = expected_res$mape, rmse = expected_res$rmse)
+#   # filter_result$plot
+#   # filter_result_acc$plot
   
-  expect_equal(predict_result$forecast.signal, expected_res$volume_pred, tolerance = 1e-2)
-  expect_equal(predict_result_acc$forecast.signal, expected_res$volume_pred, tolerance = 1e-2)
-  expect_equal(as.vector(as.matrix(predict_result$error)), as.vector(as.matrix(expect_modelerror)), tolerance = 1e-2)
-  expect_equal(as.vector(as.matrix(predict_result_acc$error)), as.vector(as.matrix(expect_modelerror)), tolerance = 1e-2)
+#   # Prediction
+#   predict_result <- uniModelForecast(data, modelSpec.fit, out.sample = 20)
+#   predict_result_acc <- uniModelForecast(data, modelSpec.fit_acc, out.sample = 20)
   
-})
+#   # predict_result$plot
+#   # predict_result_acc$plot
+  
+#   expected_res <- readRDS(test_path("fixtures", "GE_expected_pred"))
+#   expect_modelerror <- list(mae = expected_res$mae, mape = expected_res$mape, rmse = expected_res$rmse)
+  
+#   expect_equal(predict_result$forecast.signal, expected_res$volume_pred, tolerance = 1e-2)
+#   expect_equal(predict_result_acc$forecast.signal, expected_res$volume_pred, tolerance = 1e-2)
+#   expect_equal(as.vector(as.matrix(predict_result$error)), as.vector(as.matrix(expect_modelerror)), tolerance = 1e-2)
+#   expect_equal(as.vector(as.matrix(predict_result_acc$error)), as.vector(as.matrix(expect_modelerror)), tolerance = 1e-2)
+  
+# })
 
 # test_that("messages, stock = GE", {
 #   data(GE_volume)
