@@ -21,7 +21,7 @@ vignette: >
   %\VignetteKeyword{State-space Model}
 ---
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 library(knitr)
 opts_chunk$set(
   collapse = TRUE,
