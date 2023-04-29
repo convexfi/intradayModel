@@ -10,7 +10,7 @@
 #' @param uniModel A univariate model list object from function \code{uniModelFit}.
 #'
 #' @return A list containing the following elements:
-#'        \item{\code{real.signal}}{A vector of real intraday signal;}
+#'        \item{\code{original.signal}}{A vector of original intraday signal;}
 #'        \item{\code{smooth.signal}}{A vector of smoothed intraday signal;}
 #'        \item{\code{components}}{A list of the three smoothed components:
 #'              \itemize{ \item{\code{smooth.daily}}
@@ -23,8 +23,9 @@
 #' 
 #' @examples
 #' \dontrun{
+#' 
 #' data(AAPL_volume)
-#' model_fitted <- uniModelFit(AAPL_volume, control = list(acceleration = TRUE))
+#' model_fitted <- uniModelFit(AAPL_volume)
 #' smooth_result <- uniModelSmooth(AAPL_volume, model_fitted)
 #' }
 #' 
@@ -63,7 +64,7 @@ uniModelSmooth <- function(data, uniModel) {
     components$smooth.dynamic * components$smooth.seasonal
   
   res <- list(
-    real.signal = as.vector(data),
+    original.signal = as.vector(data),
     smooth.signal = smooth.signal,
     components = components
   )

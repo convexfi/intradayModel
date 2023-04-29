@@ -57,9 +57,19 @@
 #' 
 #' @examples 
 #' \dontrun{
+#' 
 #' data(AAPL_volume)
-#' model_fitted <- uniModelFit(AAPL_volume, verbose = 1, control = list(acceleration = TRUE, 
-#'                             maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+#' 
+#' # Fit model with no prior knowledge
+#' model_fitted <- uniModelFit(AAPL_volume)
+#' 
+#' # Fit model with fixed.pars and init.pars
+#' fixed.pars <- list(a_mu = 0.5, var_mu = 0.03)
+#' init.pars <- list(a_eta = 0.5)
+#' model_fitted <- uniModelFit(AAPL_volume, fixed.pars = fixed.pars, init.pars = init.pars)
+#' 
+#' # Fit model with other control options
+#' model_fitted <- uniModelFit(AAPL_volume, verbose = 2, control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log.switch = FALSE))
 #' }                  
 #' 
 #' @importFrom magrittr %>%

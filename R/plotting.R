@@ -1,4 +1,4 @@
-#' @title Plot Components of Smoothing/Forecasting Result 
+#' @title Plot Smoothed/Forecast Components 
 #' 
 #' @description Plot the components of smoothing/forecasting result in one figure.
 #' 
@@ -9,11 +9,18 @@
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
-#'  # Plot smoothed components of AAPL
+#' 
 #' data(AAPL_volume)
-#' model_fitted <- uniModelFit(AAPL_volume, control = list(acceleration = TRUE))
-#' smooth_result <- uniModelSmooth(AAPL_volume, model_fitted)
+#' AAPL_fit <- AAPL_volume[, 1:104]
+#' 
+#' # Obtain smoothing and forecasting result
+#' model_fitted <- uniModelFit(AAPL_fit)
+#' smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
+#' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+#' 
+#' # Plot smoothed and forecast components
 #' plot_components(smooth_result)
+#' plot_components(forecast_result)
 #' }
 #' @export
 plot_components <- function(smooth_forecast_result) {
@@ -22,7 +29,7 @@ plot_components <- function(smooth_forecast_result) {
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$real.signal,
+      original = smooth_forecast_result$original.signal,
       daily = components[[grep("daily", names(components))]],
       seasonal = components[[grep("seasonal", names(components))]],
       dynamic = components[[grep("dynamic", names(components))]]
@@ -120,7 +127,7 @@ plot_components <- function(smooth_forecast_result) {
 
 #' @title Plot Smoothing/Forecasting Performance
 #' 
-#' @description Compares the real signal with the smoothed/forecast signal in one plot.
+#' @description Compares the original signal with the smoothed/forecast signal in one plot.
 #' 
 #' @param smooth_forecast_result Smoothing/forecasting result from function \code{uniModelSmooth} or \code{uniModelForecast}.
 
@@ -128,12 +135,17 @@ plot_components <- function(smooth_forecast_result) {
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
-#'  # Plot forecast performance on AAPL
+#' 
 #' data(AAPL_volume)
 #' AAPL_fit <- AAPL_volume[, 1:104]
 #' 
-#' model_fitted <- uniModelFit(AAPL_fit, control = list(acceleration = TRUE))
+#' # Obtain smoothing and forecasting result
+#' model_fitted <- uniModelFit(AAPL_fit)
+#' smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
 #' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+#' 
+#' # Plot smoothing and forecasting performance
+#' plot_performance(smooth_result)
 #' plot_performance(forecast_result)
 #' }
 #' @export
@@ -151,7 +163,7 @@ plot_performance <- function(smooth_forecast_result) {
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$real.signal,
+      original = smooth_forecast_result$original.signal,
       output = smooth_forecast_result[[grep(type, names(smooth_forecast_result))]]
     )
   plt_data_log <- log(plt_data)
@@ -168,7 +180,7 @@ plot_performance <- function(smooth_forecast_result) {
   plt_reshape %>%
     ggplot() +
     geom_line(aes(x = i, y = value, color = variable), alpha = 0.8, size = 0.4) +
-    scale_colour_manual(values = c(real = "steelblue", output = "#FD6467"), labels = c("real", type)) +
+    scale_colour_manual(values = c(original = "steelblue", output = "#FD6467"), labels = c("original", type)) +
     xlab(expression(tau)) +
     ylab("Intraday Signal") +
     theme_bw() +

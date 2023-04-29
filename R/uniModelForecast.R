@@ -17,7 +17,7 @@
 #' @param out.sample  Number of days from the end of the dataset for out-of-sample forecast.
 #'
 #' @return A list containing the following elements:
-#'         \item{\code{real.signal}}{A vector of real intraday signal;}
+#'         \item{\code{original.signal}}{A vector of original intraday signal;}
 #'         \item{\code{forecast.signal}}{A vector of forecast intraday signal;}
 #'         \item{\code{components}}{A list of the three forecast components:
 #'              \itemize{ \item{\code{forecast.daily}}
@@ -30,11 +30,14 @@
 #' 
 #' @examples
 #' \dontrun{
-#'  # One-bin-ahead prediction on the last 20 days of AAPL_volume
-#' data(AAPL_volume)
-#' AAPL_fit <- AAPL_volume[, 1:104]
 #' 
-#' model_fitted <- uniModelFit(AAPL_fit, control = list(acceleration = TRUE))
+#' data(AAPL_volume)
+#' 
+#' # Fit on the first 104 days
+#' AAPL_fit <- AAPL_volume[, 1:104]
+#' model_fitted <- uniModelFit(AAPL_fit)
+#' 
+#' # forecast on last 20 days
 #' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
 #' }
 #' 
@@ -86,7 +89,7 @@ uniModelForecast <- function(data, uniModel, out.sample) {
 
   # result
   res <- list(
-    real.signal = signal_real,
+    original.signal = signal_real,
     forecast.signal = forecast.signal,
     components = components.out,
     error = error
