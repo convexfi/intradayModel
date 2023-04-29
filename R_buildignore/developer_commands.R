@@ -40,8 +40,10 @@ devtools::build()
 devtools::build(args = c('--no-build-vignettes'))
 #devtools::revdep(pkg = "intradayModel")  # to check reverse dependencies
 #devtools::check_win_release()  #to check under windows
+
 #R CMD build . --resave-data  # this is to generate tarball
 #R CMD check intradayModel_0.0.1.tar.gz --as-cran --run-donttest  # this is before submission to CRAN
-#R CMD install intradayModeling_0.0.1.tar.gz
+# (on mac) R CMD install intradayModel_0.0.1.tar.gz
+# (on win) Rcmd INSTALL intradayModel_0.0.1.tar.gz
 # check Mac builder at: https://mac.r-project.org/macbuilder/submit.html
 #submit the tarball directly via the webform: https://cran.r-project.org/submit.html
