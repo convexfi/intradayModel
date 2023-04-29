@@ -151,7 +151,7 @@ plot_performance <- function(smooth_forecast_result) {
 
   plt_data <-
     data.frame(
-      real = smooth_forecast_result$real.signal,
+      original = smooth_forecast_result$real.signal,
       output = smooth_forecast_result[[grep(type, names(smooth_forecast_result))]]
     )
   plt_data_log <- log(plt_data)
