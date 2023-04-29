@@ -41,8 +41,12 @@ citation("intradayModel")
 ## Quick Start
 To get started, we load our package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days.
 
+```{r, include=FALSE}
+devtools::load_all(".")
+```
+
 ```{r, message = FALSE}
-devtools::load_all()
+library(intradayModel)
 data(AAPL_volume)
 AAPL_volume[1:5, 1:5] # print the head of data
 ```

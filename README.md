@@ -32,7 +32,7 @@ intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
 124 trading days.
 
 ``` r
-devtools::load_all()
+library(intradayModel)
 data(AAPL_volume)
 AAPL_volume[1:5, 1:5] # print the head of data
 #>          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08
