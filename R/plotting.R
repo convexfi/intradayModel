@@ -131,7 +131,7 @@ plot_components <- function(smooth_forecast_result) {
 #'
 #' @param smooth_forecast_result Smoothing/forecasting result from \code{uniModelSmooth} or \code{uniModelForecast}.
 #'
-#' @return A \code{patchwork} object composed of 1 patches.
+#' @return A \code{patchwork} object composed of 1 patch.
 #'
 #' @import ggplot2
 #' @importFrom magrittr %>%

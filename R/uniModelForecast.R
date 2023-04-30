@@ -6,7 +6,7 @@
 #'              \itemize{\item{Mean absolute error (MAE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
 #'                       \item{Mean absolute percent error (MAPE):
-#'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{y_{\tau}},}{\sum (|y*(\tau) - y(\tau)| / y(\tau)) / M} ;}
+#'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_{\tau} - y_{\tau}\rvert}{y_{\tau}}}{\sum (|y*(\tau) - y(\tau)| / y(\tau)) / M} ;}
 #'                       \item{Root mean square error (RMSE):
 #'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} ,}
 #'              }
