@@ -1,10 +1,10 @@
 citHeader("To cite 'intradayModel' in publications, please use:")
 
-citEntry(entry = "Manual",
-         title        = "{intradayModel: Modeling and Forecasting Financial Intraday Signals}",
-         author       = personList(as.person("S. Xiu"),
-                                   as.person("Y. Yu"),
-                                   as.person("D. P. Palomar")),
+bibentry(bibtype = "Manual",
+         title        = "intradayModel: Modeling and Forecasting Financial Intraday Signals",
+         author       = c(person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
+                          person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk"),
+                          person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com")),
          note         = "R package version 0.0.1",
          year         = "2023",
          url          = "https://CRAN.R-project.org/package=intradayModel",
@@ -15,11 +15,11 @@ citEntry(entry = "Manual",
                  "https://CRAN.R-project.org/package=intradayModel")
 )
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
          title        = "Forecasting Intraday Trading Volume: A Kalman Filter Approach",
-         author       = personList(as.person("R. Chen"),
-                                   as.person("Y. Feng"),
-                                   as.person("D. P. Palomar")),
+         author       = c(person("Ren", "Chen"),
+                          person("Yiyong", "Feng"),
+                          person(c("Daniel", "P."), "Palomar")),
          journal      = "Available at SSRN",
          year         = "2016",
          url          = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695",
