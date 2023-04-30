@@ -6,7 +6,7 @@ Description: `intradayModel` package uses state-of-the-art state-space models to
 Authors@R: c(
   person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
   person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk"),
-  person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com")
+  person(c("Daniel", "P."), "Palomar", role = c("cre", "aut", "cph"), email = "daniel.p.palomar@gmail.com")
   )
 Maintainer: Daniel P. Palomar <daniel.p.palomar@gmail.com>
 URL: https://github.com/convexfi/intradayModel,
