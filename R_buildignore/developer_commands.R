@@ -1,5 +1,5 @@
 # install basic package for vignette
-install.packages("cleanrmd", "R.rsp")
+install.packages(c("cleanrmd", "R.rsp"))
 
 ##
 ## User installation
@@ -52,5 +52,10 @@ devtools::build(args = c('--no-build-vignettes'))
 #R CMD check intradayModel_0.0.1.tar.gz --as-cran --run-donttest  # this is before submission to CRAN
 # (on mac) R CMD install intradayModel_0.0.1.tar.gz
 # (on win) Rcmd INSTALL intradayModel_0.0.1.tar.gz
+
 # check Mac builder at: https://mac.r-project.org/macbuilder/submit.html
+# or with devtools::check_mac_release()
+# check Windows and Linux builder: https://builder.r-hub.io/
+# or with rhub::check_for_cran()
+
 #submit the tarball directly via the webform: https://cran.r-project.org/submit.html
