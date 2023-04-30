@@ -1,23 +1,25 @@
-#' @title Plot Smoothed/Forecast Components 
-#' 
+#' @title Plot Smoothed/Forecast Components
+#'
 #' @description Plot the components of smoothing/forecasting result in one figure.
-#' 
-#' @param smooth_forecast_result Smoothing/forecasting result from function \code{uniModelSmooth} or \code{uniModelForecast}.
-
+#'
+#' @param smooth_forecast_result Smoothing/forecasting result from \code{uniModelSmooth} or \code{uniModelForecast}.
+#'
+#' @return A \code{patchwork} object composed of 4 patches.
+#'
 #' @import patchwork
 #' @import ggplot2
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
-#' 
+#'
 #' data(AAPL_volume)
 #' AAPL_fit <- AAPL_volume[, 1:104]
-#' 
+#'
 #' # Obtain smoothing and forecasting result
 #' model_fitted <- uniModelFit(AAPL_fit)
 #' smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
 #' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
-#' 
+#'
 #' # Plot smoothed and forecast components
 #' plot_components(smooth_result)
 #' plot_components(forecast_result)
@@ -51,7 +53,6 @@ plot_components <- function(smooth_forecast_result) {
       legend.box.just = "left",
       legend.margin = margin(8, 8, 8, 8),
       legend.text = element_text(size = text_size, face = "bold"),
-      # legend.title = element_blank(),
       legend.key.size = unit(1, "cm"),
       plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
       axis.title.x = element_blank(),
@@ -71,7 +72,6 @@ plot_components <- function(smooth_forecast_result) {
       legend.box.just = "left",
       legend.margin = margin(8, 8, 8, 8),
       legend.text = element_text(size = text_size, face = "bold"),
-      # legend.title = element_blank(),
       legend.key.size = unit(1, "cm"),
       plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
       axis.title.x = element_blank(),
@@ -91,7 +91,6 @@ plot_components <- function(smooth_forecast_result) {
       legend.box.just = "left",
       legend.margin = margin(8, 8, 8, 8),
       legend.text = element_text(size = text_size, face = "bold"),
-      # legend.title = element_blank(),
       legend.key.size = unit(1, "cm"),
       plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
       axis.title.x = element_blank(),
@@ -113,37 +112,40 @@ plot_components <- function(smooth_forecast_result) {
       legend.box.just = "left",
       legend.margin = margin(8, 8, 8, 8),
       legend.text = element_text(size = text_size, face = "bold"),
-      # legend.title = element_blank(),
       legend.key.size = unit(1, "cm"),
       plot.title = element_text(size = 18, face = "bold", hjust = 0.5)
     )
 
-  p1 / p2 / p3 / p4 +
+  p <- p1 / p2 / p3 / p4 +
     plot_annotation(
       title = "Decomposition of intraday signal (log scale)",
       theme = theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
     )
+
+  return(p)
 }
 
 #' @title Plot Smoothing/Forecasting Performance
-#' 
+#'
 #' @description Compares the original signal with the smoothed/forecast signal in one plot.
-#' 
-#' @param smooth_forecast_result Smoothing/forecasting result from function \code{uniModelSmooth} or \code{uniModelForecast}.
-
+#'
+#' @param smooth_forecast_result Smoothing/forecasting result from \code{uniModelSmooth} or \code{uniModelForecast}.
+#'
+#' @return A \code{patchwork} object composed of 1 patches.
+#'
 #' @import ggplot2
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
-#' 
+#'
 #' data(AAPL_volume)
 #' AAPL_fit <- AAPL_volume[, 1:104]
-#' 
+#'
 #' # Obtain smoothing and forecasting result
 #' model_fitted <- uniModelFit(AAPL_fit)
 #' smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
 #' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
-#' 
+#'
 #' # Plot smoothing and forecasting performance
 #' plot_performance(smooth_result)
 #' plot_performance(forecast_result)
@@ -177,7 +179,7 @@ plot_performance <- function(smooth_forecast_result) {
     )
 
   text_size <- 14
-  plt_reshape %>%
+  p <- plt_reshape %>%
     ggplot() +
     geom_line(aes(x = i, y = value, color = variable), alpha = 0.8, size = 0.4) +
     scale_colour_manual(values = c(original = "steelblue", output = "#FD6467"), labels = c("original", type)) +
@@ -187,10 +189,8 @@ plot_performance <- function(smooth_forecast_result) {
     theme(
       axis.title = element_text(size = text_size, face = "bold"),
       legend.position = "bottom",
-      # legend.justification = c(0, 1),
       legend.text = element_text(size = text_size, face = "bold"),
       legend.title = element_blank(),
-      # legend.key.size = unit(1, "cm"),
       plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
       axis.text.x = element_blank()
     ) +
@@ -198,4 +198,6 @@ plot_performance <- function(smooth_forecast_result) {
       title = title,
       theme = theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
     )
+
+  return(p)
 }
