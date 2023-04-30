@@ -6,13 +6,13 @@
 #'              where
 #'              \itemize{\item{\eqn{\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top}{x(\tau) = [\eta(\tau); \mu(\tau)]} is the hidden state vector containing the log daily component and the log intraday dynamic component;} 
 #'                       \item{\eqn{\mathbf{A}_{\tau} = \left[\begin{array}{cc}a_{\tau}^{\eta}&0\\0&a^{\mu}\end{array} \right]}{A(\tau) = [a.\eta(\tau), 0; 0, a.\mu]} 
-#'                             is the state transition matrix with \eqn{a_{\tau}^{\eta} = \left\{\begin{array}{cc}a^{\eta} & t = kI, k = 1,2,\dots\\0 & \textrm{otherwise};\end{array}\right.}{a.\eta(\tau) = a.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
+#'                             is the state transition matrix with \eqn{a_{\tau}^{\eta} = \left\{\begin{array}{cl}a^{\eta} & t = kI, k = 1,2,\dots\\0 & \textrm{otherwise};\end{array}\right.}{a.\eta(\tau) = a.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
 #'                       \item{\eqn{\mathbf{C} = [1, 1]}{C = [1, 1]} is the observation matrix;}
 #'                       \item{\eqn{\phi_{\tau}}{\phi(\tau)} is the corresponding element from \eqn{\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]}, which is the log seasonal component;}
 #'                       \item{\eqn{\mathbf{w}_{\tau} = [\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})}{w(\tau) = [\epsilon.\eta(\tau); \epsilon.\mu(\tau)] ~ N(0, Q(\tau))} 
 #'                             represents the i.i.d. Gaussian noise in the state transition, with a time-varying covariance matrix 
 #'                             \eqn{\mathbf{Q}_{\tau} = \left[\begin{array}{cc}(\sigma_{\tau}^{\eta})^2&0\\ 0&(\sigma^{\mu})^2\end{array} \right]}{Q(\tau) = [(\sigma.\eta(\tau))^2, 0; 0, (\sigma.\mu)^2]} 
-#'                             and \eqn{\sigma_\tau^{\eta} = \left\{\begin{array}{cc} \sigma^{\eta} & t = kI, k = 1,2,\dots\\0 & \textrm{otherwise};\end{array}\right.}{\sigma.\eta(\tau) = \sigma.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
+#'                             and \eqn{\sigma_\tau^{\eta} = \left\{\begin{array}{cl} \sigma^{\eta} & t = kI, k = 1,2,\dots\\0 & \textrm{otherwise};\end{array}\right.}{\sigma.\eta(\tau) = \sigma.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
 #'                        \item{\eqn{v_\tau \sim \mathcal{N}(0, r)}{v(\tau) ~ N(0, r)} is the i.i.d. Gaussian noise in the observation;}
 #'                        \item{\eqn{\mathbf{x}_1}{x(1)} is the initial state at \eqn{\tau = 1}{\tau = 1}, and it follows \eqn{\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0)}{N(x(0), V(0))}}.}
 #'             In the model, \eqn{\boldsymbol{\theta} = \left\{a^{\eta},a^{\mu},\sigma^{\eta},\sigma^{\mu},r,\boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0\right\}}{\Theta = {a.\eta, a.\mu, (\sigma.\eta)^2, (\sigma.\mu)^2, r, \phi, x(0), V(0)}} 
