@@ -2,7 +2,7 @@
 #'
 #' @description A model with all parameters fixed can be used to decompose the financial intraday signal into daily, seasonal, 
 #'              and intraday dynamic components. The daily component and intraday dynamic component at time \eqn{\tau} are the smoothed state estimate 
-#'              conditioned on all the data, and denoted by \eqn{\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}{E[ x(\tau) | y(\tau), \tau = 1, ... , N ]}, 
+#'              conditioned on all the data, and denoted by \eqn{E[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]}{E[ x(\tau) | y(\tau), \tau = 1, ... , N ]}, 
 #'              where \eqn{N} is the total number of bins in the dataset. The seasonal component has the value of 
 #'              \eqn{\boldsymbol{\phi}}{\phi}.
 #'
