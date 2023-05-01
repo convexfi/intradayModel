@@ -58,18 +58,18 @@
 #' @examples 
 #' \dontrun{
 #' 
-#' data(AAPL_volume)
+#' data(aapl_volume)
 #' 
 #' # Fit model with no prior knowledge
-#' model_fitted <- uniModelFit(AAPL_volume)
+#' unimodel_obj <- fit_unimodel(aapl_volume)
 #' 
 #' # Fit model with fixed.pars and init.pars
 #' fixed.pars <- list(a_mu = 0.5, var_mu = 0.03)
 #' init.pars <- list(a_eta = 0.5)
-#' model_fitted <- uniModelFit(AAPL_volume, fixed.pars = fixed.pars, init.pars = init.pars)
+#' unimodel_obj <- fit_unimodel(aapl_volume, fixed.pars = fixed.pars, init.pars = init.pars)
 #' 
 #' # Fit model with other control options
-#' model_fitted <- uniModelFit(AAPL_volume, verbose = 2, 
+#' unimodel_obj <- fit_unimodel(aapl_volume, verbose = 2, 
 #'   control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log.switch = FALSE))
 #' }                  
 #' 
@@ -77,7 +77,7 @@
 #' @import xts
 #' 
 #' @export
-uniModelFit <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = NULL) {
+fit_unimodel <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = NULL) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")

@@ -5,8 +5,8 @@
 #   data <- GE_volume
 #   data_train <- GE_volume[, 1:104]
   
-#   modelSpec.fit <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
-#   modelSpec.fit_acc <- uniModelFit(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
+#   modelSpec.fit <- fit_unimodel(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
+#   modelSpec.fit_acc <- fit_unimodel(data_train, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
   
 #   # Fitting
@@ -27,15 +27,15 @@
   
   
 #   # Smoothing
-#   filter_result <- uniModelSmooth(data_train, modelSpec.fit)
-#   filter_result_acc <- uniModelSmooth(data_train, modelSpec.fit_acc)
+#   filter_result <- smooth_unimodel(data_train, modelSpec.fit)
+#   filter_result_acc <- smooth_unimodel(data_train, modelSpec.fit_acc)
   
 #   # filter_result$plot
 #   # filter_result_acc$plot
   
 #   # Prediction
-#   predict_result <- uniModelForecast(data, modelSpec.fit, out.sample = 20)
-#   predict_result_acc <- uniModelForecast(data, modelSpec.fit_acc, out.sample = 20)
+#   predict_result <- forecast_unimodel(data, modelSpec.fit, out.sample = 20)
+#   predict_result_acc <- forecast_unimodel(data, modelSpec.fit_acc, out.sample = 20)
   
 #   # predict_result$plot
 #   # predict_result_acc$plot
@@ -79,14 +79,14 @@
 #   data_error_test <- data_train
 #   data_error_test[1,1] <- NA
 # 
-#   expect_warning(uniModelFit(data_train, modelSpec, maxit = 1), regexp = "Warning! Reached maxit before parameters converged. Maxit was 1.\n")
-#   expect_output(uniModelFit(data_train, modelSpec, maxit = 1000, acceleration = TRUE, verbose = 0), regexp = "Success! abstol test passed at 22 iterations.")
-#   expect_error(uniModelFit(c(1,1), modelSpec), regexp = "data must be a matrix.")
-#   expect_error(uniModelFit(data_error_test, modelSpec), regexp = "data must have no NA.")
+#   expect_warning(fit_unimodel(data_train, modelSpec, maxit = 1), regexp = "Warning! Reached maxit before parameters converged. Maxit was 1.\n")
+#   expect_output(fit_unimodel(data_train, modelSpec, maxit = 1000, acceleration = TRUE, verbose = 0), regexp = "Success! abstol test passed at 22 iterations.")
+#   expect_error(fit_unimodel(c(1,1), modelSpec), regexp = "data must be a matrix.")
+#   expect_error(fit_unimodel(data_error_test, modelSpec), regexp = "data must have no NA.")
 # 
-#   modelSpec.fit_acc <- uniModelFit(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE, verbose = 0)
+#   modelSpec.fit_acc <- fit_unimodel(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE, verbose = 0)
 # 
-#   expect_output(uniModelFit(data_train, modelSpec.fit_acc), "All parameters have already been fixed.")
+#   expect_output(fit_unimodel(data_train, modelSpec.fit_acc), "All parameters have already been fixed.")
 # 
 #   n_bin <- 26
 #   fixed.pars <- list()
@@ -98,23 +98,23 @@
 # 
 #   ## missing component
 #   modelSpec_check1 <- modelSpec_check[c("par", "init")]
-#   expect_error(uniModelFit(data_train, modelSpec_check1), "Elements fit_request are missing from the model.\n")
+#   expect_error(fit_unimodel(data_train, modelSpec_check1), "Elements fit_request are missing from the model.\n")
 # 
 #   ## missing element
 #   modelSpec_check2 <- modelSpec_check
 #   modelSpec_check2$par[["x0"]] <- NULL
-#   expect_error(uniModelFit(data_train, modelSpec_check2),"Elements x0 are missing from uniModel[$]par.\n")
+#   expect_error(fit_unimodel(data_train, modelSpec_check2),"Elements x0 are missing from uniModel[$]par.\n")
 # 
 #   ## fitted paramenter with NA
 #   modelSpec_check3 <- modelSpec_check
 #   modelSpec_check3$fit_request[["a_eta"]] <- FALSE
-#   expect_error(uniModelFit(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
+#   expect_error(fit_unimodel(data_train, modelSpec_check3), "a_eta must be numeric, have no NAs, and no Infs.\n")
 # 
 #   ## fit_request not boolean
 #   modelSpec_check3$fit_request[["a_eta"]] <- Inf
-#   expect_error(uniModelFit(data_train, modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
+#   expect_error(fit_unimodel(data_train, modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
 #   modelSpec_check3$fit_request[["a_eta"]] <- NA
-#   expect_error(uniModelFit(data_train, modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
+#   expect_error(fit_unimodel(data_train, modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
 #   
 #   ## wrong dimension/lenghth
 #   modelSpec_check4 <- modelSpec_check
@@ -122,7 +122,7 @@
 #   modelSpec_check4$par[["var_eta"]] <- array(c(1,2))
 #   modelSpec_check4$par[["phi"]] <- matrix(2, 25)
 #   error_message <- paste("Length of uniModel[$]par[$]var_eta is wrong.\n")
-#   expect_error(uniModelFit(data_train, modelSpec_check4), error_message)
+#   expect_error(fit_unimodel(data_train, modelSpec_check4), error_message)
 # 
 #   # Filtering
 #   expect_error(uniModelFilter(data, modelSpec), regexp = "All parameters must be optimally fitted. Parameters a_eta, a_mu, var_eta, var_mu, r, phi, x0, V0 are not optimally fitted.")

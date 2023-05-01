@@ -13,7 +13,7 @@
 #'              where \eqn{M} is the total number of out-of-sample bins.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param uniModel A univariate model list object from function \code{uniModelFit}.
+#' @param uniModel A univariate model list object from function \code{fit_unimodel}.
 #' @param out.sample  Number of days from the end of the dataset for out-of-sample forecast.
 #'
 #' @return A list containing the following elements:
@@ -31,20 +31,20 @@
 #' @examples
 #' \dontrun{
 #' 
-#' data(AAPL_volume)
+#' data(aapl_volume)
 #' 
 #' # Fit on the first 104 days
-#' AAPL_fit <- AAPL_volume[, 1:104]
-#' model_fitted <- uniModelFit(AAPL_fit)
+#' aapl_volume_fit <- aapl_volume[, 1:104]
+#' unimodel_obj <- fit_unimodel(aapl_volume_fit)
 #' 
 #' # forecast on last 20 days
-#' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
 #' }
 #' 
 #' @importFrom utils tail
 #' 
 #' @export
-uniModelForecast <- function(data, uniModel, out.sample) {
+forecast_unimodel <- function(data, uniModel, out.sample) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")

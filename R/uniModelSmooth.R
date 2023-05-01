@@ -7,7 +7,7 @@
 #'              \eqn{\boldsymbol{\phi}}{\phi}.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param uniModel A univariate model list object from function \code{uniModelFit}.
+#' @param uniModel A univariate model list object from function \code{fit_unimodel}.
 #'
 #' @return A list containing the following elements:
 #'        \item{\code{original.signal}}{A vector of original intraday signal;}
@@ -24,13 +24,13 @@
 #' @examples
 #' \dontrun{
 #' 
-#' data(AAPL_volume)
-#' model_fitted <- uniModelFit(AAPL_volume)
-#' smooth_result <- uniModelSmooth(AAPL_volume, model_fitted)
+#' data(aapl_volume)
+#' unimodel_obj <- fit_unimodel(aapl_volume)
+#' smooth_result <- smooth_unimodel(aapl_volume, unimodel_obj)
 #' }
 #' 
 #' @export
-uniModelSmooth <- function(data, uniModel) {
+smooth_unimodel <- function(data, uniModel) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")

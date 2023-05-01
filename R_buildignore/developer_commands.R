@@ -13,7 +13,7 @@ install.packages("intradayModel")
 # Getting help
 library(intradayModel)
 help(package = "intradayModel")
-?uniModelFit
+?fit_unimodel
 citation("intradayModel")
 vignette(package = "intradayModel")
 

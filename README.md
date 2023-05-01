@@ -33,8 +33,8 @@ intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
 
 ``` r
 library(intradayModel)
-data(AAPL_volume)
-AAPL_volume[1:5, 1:5] # print the head of data
+data(aapl_volume)
+aapl_volume[1:5, 1:5] # print the head of data
 #>          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08
 #> 09:30 AM   10142172    3434769   20852127   15463747   14719388
 #> 09:45 AM    5691840   19751251   13374784    9962816    9515796
@@ -43,23 +43,23 @@ AAPL_volume[1:5, 1:5] # print the head of data
 #> 10:30 AM    4587159   18041115    8686059    7130980    5479852
 ```
 
-Next, we fit a univariate state-space model using `uniModelFit`
+Next, we fit a univariate state-space model using `fit_unimodel`
 function. To be specific, we use the first 104 trading days for fitting,
 and the last 20 days for evaluation of forecasting performance.
 
 ``` r
-AAPL_fit <- AAPL_volume[, 1:104]
-model_fitted <- uniModelFit(AAPL_fit)
+aapl_volume_fit <- aapl_volume[, 1:104]
+unimodel_obj <- fit_unimodel(aapl_volume_fit)
 ```
 
 Once the model is fitted, we can estimate the hidden components of any
 intraday signal based on all its observations, which is called
-**smoothing**. By calling `uniModelSmooth` function, we obtain daily,
+**smoothing**. By calling `smooth_unimodel` function, we obtain daily,
 seasonal, and intraday dynamic components. This procedure helps us
 better identify the underlying information of the intraday signal.
 
 ``` r
-smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
+smooth_result <- smooth_unimodel(aapl_volume_fit, unimodel_obj)
 plot_components(smooth_result) # plot smoothed hidden components
 ```
 
@@ -72,11 +72,11 @@ plot_performance(smooth_result) # plot smoothed result
 <img src="man/figures/README-smooth_plot-2.png" width="75%" style="display: block; margin: auto;" />
 
 To see how well our model performs on new data, we use
-`uniModelForecast` function to do one-bin-ahead forecast on the
+`forecast_unimodel` function to do one-bin-ahead forecast on the
 out-of-sample dataset of 20 days.
 
 ``` r
-forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 ```
 

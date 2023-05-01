@@ -5,7 +5,7 @@
 #'
 #' @docType data
 #'
-#' @usage data(AAPL_volume)
+#' @usage data(aapl_volume)
 #'
 #' @format A 26 * 124 matrix.
 #'
@@ -13,4 +13,4 @@
 #'
 #' @keywords dataset
 #'
-"AAPL_volume"
+"aapl_volume"

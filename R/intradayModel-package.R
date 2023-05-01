@@ -6,15 +6,15 @@
 #' It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 #' 
 #' @section Functions:
-#' \code{\link{uniModelFit}}, 
-#' \code{\link{uniModelForecast}}, 
-#' \code{\link{uniModelSmooth}}
-#' \code{\link{plot_components}}
+#' \code{\link{fit_unimodel}}, 
+#' \code{\link{forecast_unimodel}}, 
+#' \code{\link{smooth_unimodel}},
+#' \code{\link{plot_components}},
 #' \code{\link{plot_performance}}
 #'
 #' @section Data:
-#' \code{\link{AAPL_volume}},
-#' \code{\link{FDX_volume_xts}}
+#' \code{\link{aapl_volume}},
+#' \code{\link{fdx_volume}}
 #'
 #' @section Help:
 #' For a quick help see the README file:

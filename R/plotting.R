@@ -2,7 +2,7 @@
 #'
 #' @description Plot the components of smoothing/forecasting result in one figure.
 #'
-#' @param smooth_forecast_result Smoothing/forecasting result from \code{uniModelSmooth} or \code{uniModelForecast}.
+#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_unimodel} or \code{forecast_unimodel}.
 #'
 #' @return A \code{patchwork} object composed of 4 patches.
 #'
@@ -12,13 +12,13 @@
 #' @examples
 #' \dontrun{
 #'
-#' data(AAPL_volume)
-#' AAPL_fit <- AAPL_volume[, 1:104]
+#' data(aapl_volume)
+#' aapl_volume_fit <- aapl_volume[, 1:104]
 #'
 #' # Obtain smoothing and forecasting result
-#' model_fitted <- uniModelFit(AAPL_fit)
-#' smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
-#' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+#' unimodel_obj <- fit_unimodel(aapl_volume_fit)
+#' smooth_result <- smooth_unimodel(aapl_volume_fit, unimodel_obj)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
 #'
 #' # Plot smoothed and forecast components
 #' plot_components(smooth_result)
@@ -129,7 +129,7 @@ plot_components <- function(smooth_forecast_result) {
 #'
 #' @description Compares the original signal with the smoothed/forecast signal in one plot.
 #'
-#' @param smooth_forecast_result Smoothing/forecasting result from \code{uniModelSmooth} or \code{uniModelForecast}.
+#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_unimodel} or \code{forecast_unimodel}.
 #'
 #' @return A \code{patchwork} object composed of 1 patch.
 #'
@@ -138,13 +138,13 @@ plot_components <- function(smooth_forecast_result) {
 #' @examples
 #' \dontrun{
 #'
-#' data(AAPL_volume)
-#' AAPL_fit <- AAPL_volume[, 1:104]
+#' data(aapl_volume)
+#' aapl_volume_fit <- aapl_volume[, 1:104]
 #'
 #' # Obtain smoothing and forecasting result
-#' model_fitted <- uniModelFit(AAPL_fit)
-#' smooth_result <- uniModelSmooth(AAPL_fit, model_fitted)
-#' forecast_result <- uniModelForecast(AAPL_volume, model_fitted, out.sample = 20)
+#' unimodel_obj <- fit_unimodel(aapl_volume_fit)
+#' smooth_result <- smooth_unimodel(aapl_volume_fit, unimodel_obj)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
 #'
 #' # Plot smoothing and forecasting performance
 #' plot_performance(smooth_result)
