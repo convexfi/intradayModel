@@ -1,6 +1,6 @@
 data(aapl_volume)
 
-test_that("is_uniModel works", {
+test_that("is_unimodel works", {
   data <- aapl_volume
   n_bin <- 26
   fixed.pars <- list()
@@ -11,26 +11,26 @@ test_that("is_uniModel works", {
   modelSpec <- spec_unimodel(fixed.pars = fixed.pars)
   
   modelSpec_check1 <- modelSpec[c("par", "init")]
-  expect_error(is_uniModel(modelSpec_check1), "Elements fit_request are missing from the model.\n")
+  expect_error(is_unimodel(modelSpec_check1), "Elements fit_request are missing from the model.\n")
   
   modelSpec_check2 <- modelSpec
   modelSpec_check2$par[["x0"]] <- NULL
-  expect_error(is_uniModel(modelSpec_check2),"Elements x0 are missing from uniModel[$]par.\n")
+  expect_error(is_unimodel(modelSpec_check2),"Elements x0 are missing from unimodel[$]par.\n")
   
   modelSpec_check3 <- modelSpec
   modelSpec_check3$fit_request[["var_eta"]] <- TRUE
-  expect_error(is_uniModel(modelSpec_check3), "uniModel[$]par[$]var_eta and uniModel[$]fit_request[$]var_eta are conflicted.\n")
+  expect_error(is_unimodel(modelSpec_check3), "unimodel[$]par[$]var_eta and unimodel[$]fit_request[$]var_eta are conflicted.\n")
   modelSpec_check3$fit_request[["a_eta"]] <- Inf
-  expect_error(is_uniModel(modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
+  expect_error(is_unimodel(modelSpec_check3), "Elements in unimodel[$]fit_request must be TRUE/FALSE.\n")
   modelSpec_check3$fit_request[["a_eta"]] <- NA
-  expect_error(is_uniModel(modelSpec_check3), "Elements in uniModel[$]fit_request must be TRUE/FALSE.\n")
+  expect_error(is_unimodel(modelSpec_check3), "Elements in unimodel[$]fit_request must be TRUE/FALSE.\n")
   
   
   modelSpec_check4 <- modelSpec
   modelSpec_check4$par[["x0"]] <- 1
   modelSpec_check4$par[["var_eta"]] <- array(c(1,2))
-  error_message <- paste("Length of uniModel[$]par[$]var_eta is wrong.\n")
-  expect_error(is_uniModel(modelSpec_check4, 25), error_message)
+  error_message <- paste("Length of unimodel[$]par[$]var_eta is wrong.\n")
+  expect_error(is_unimodel(modelSpec_check4, 25), error_message)
 })
 
 test_that("forecast_unimodel/Smooth works", {

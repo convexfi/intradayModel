@@ -7,7 +7,7 @@
 #'              \eqn{\boldsymbol{\phi}}{\phi}.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param uniModel A "\code{unimodel}" object from function \code{fit_unimodel}.
+#' @param unimodel A "\code{unimodel}" object from function \code{fit_unimodel}.
 #'
 #' @return A list containing the following elements:
 #'        \item{\code{original.signal}}{A vector of original intraday signal;}
@@ -30,26 +30,26 @@
 #' }
 #' 
 #' @export
-smooth_unimodel <- function(data, uniModel) {
+smooth_unimodel <- function(data, unimodel) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
   data <- clean_data(data)
   
-  is_uniModel(uniModel, nrow(data))
+  is_unimodel(unimodel, nrow(data))
 
   # if model isn't optimally fitted (no convergence), it cannot filter
-  if (Reduce("+", uniModel$fit_request) != 0) {
+  if (Reduce("+", unimodel$fit_request) != 0) {
     msg <- c("All parameters must be optimally fitted. ",
-             "Parameters ", paste(names(uniModel$fit_request[uniModel$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
+             "Parameters ", paste(names(unimodel$fit_request[unimodel$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
     stop(msg)
   }
 
   # filter using UNISS (our own Kalman)
   args <- list(
     data = log(data),
-    uniModel = uniModel
+    unimodel = unimodel
   )
   uniss_obj <- do.call(specify_uniss, args)
   Kf <- uniss_kalman(uniss_obj, "smoother")

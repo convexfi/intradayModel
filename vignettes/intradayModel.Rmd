@@ -187,7 +187,7 @@ One observation is that the trading days with missing bins because of early clos
 
 ## Smoothing
 
-> **smooth_unimodel**(data, uniModel)
+> **smooth_unimodel**(data, unimodel)
 
 `smooth_unimodel` function allows you to smooth on a dataset based on all its observations. It decomposes the intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
 
@@ -207,7 +207,7 @@ plot_performance(smooth_result)
 
 ## Forecasting
 
-> **forecast_unimodel**(data, uniModel, out.sample) 
+> **forecast_unimodel**(data, unimodel, out.sample) 
 
 `forecast_unimodel` function allows you to forecast the intraday signal one-bin-ahead, given a dataset and a fitted model. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
 

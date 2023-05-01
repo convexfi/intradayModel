@@ -3,7 +3,6 @@ test_that("forecast_unimodel, stock = ADBE", {
   data.pred <- readRDS(test_path("fixtures", "ADBE_volume"))
   data <- data.pred[,1:104]
 
-  # modelSpec <- uniModelSpec(fit = TRUE)
   modelSpec.fit <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   modelSpec.fit_acc <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
@@ -26,8 +25,7 @@ test_that("forecast_unimodel, ACN", {
   skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "ACN_volume"))
   data <- data.pred[,1:104]
-  
-  # modelSpec <- uniModelSpec(fit = TRUE)
+
   modelSpec.fit <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   modelSpec.fit_acc <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
@@ -50,11 +48,9 @@ test_that("forecast_unimodel, stock = CVS", {
   skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "CVS_volume"))
   data <- data.pred[,1:104]
-  
-  # modelSpec <- uniModelSpec(fit = TRUE)
+
   modelSpec.fit <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE))
   
-  # modelSpec_v2 <- uniModelSpec(fit = TRUE, init.pars = list(a_mu = 0))
   modelSpec.fit_acc <- fit_unimodel(data, init.pars = list(a_mu = 0), control = list(maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE))
   
   log_volume_pred <- log(forecast_unimodel(data.pred, modelSpec.fit, out.sample = 20)$forecast.signal)

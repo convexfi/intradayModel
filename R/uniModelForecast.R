@@ -13,7 +13,7 @@
 #'              where \eqn{M} is the total number of out-of-sample bins.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param uniModel A "\code{unimodel}" object from function \code{fit_unimodel}.
+#' @param unimodel A "\code{unimodel}" object from function \code{fit_unimodel}.
 #' @param out.sample  Number of days from the end of the dataset for out-of-sample forecast.
 #'
 #' @return A list containing the following elements:
@@ -44,7 +44,7 @@
 #' @importFrom utils tail
 #' 
 #' @export
-forecast_unimodel <- function(data, uniModel, out.sample) {
+forecast_unimodel <- function(data, unimodel, out.sample) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
@@ -52,19 +52,19 @@ forecast_unimodel <- function(data, uniModel, out.sample) {
   data <- clean_data(data)
   if (out.sample > ncol(data)) stop("out.sample must be smaller than the number of columns in data matrix.")
   
-  is_uniModel(uniModel, nrow(data))
+  is_unimodel(unimodel, nrow(data))
 
   # check if fit is necessary
-  if (Reduce("+", uniModel$fit_request) != 0) {
+  if (Reduce("+", unimodel$fit_request) != 0) {
     msg <- c("All parameters must be fitted.\n ",
-             "Parameter ", paste(names(uniModel$fit_request[uniModel$fit_request == TRUE]), collapse = ", "), " is not fitted.")
+             "Parameter ", paste(names(unimodel$fit_request[unimodel$fit_request == TRUE]), collapse = ", "), " is not fitted.")
     stop(msg)
   }
 
   # one-step ahead prediction using UNISS (our own Kalman)
   args <- list(
     data = log(data),
-    uniModel = uniModel
+    unimodel = unimodel
   )
   uniss_obj <- do.call(specify_uniss, args)
   Kf <- uniss_kalman(uniss_obj, "filter")

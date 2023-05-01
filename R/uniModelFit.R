@@ -85,15 +85,15 @@ fit_unimodel <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0
   data <- clean_data(data)
   
   # Define a Univariate State-Space Model
-  uniModel <- spec_unimodel(fixed.pars, init.pars)
-  is_uniModel(uniModel, nrow(data))
+  unimodel <- spec_unimodel(fixed.pars, init.pars)
+  is_unimodel(unimodel, nrow(data))
 
   # check if fit is required
-  if (Reduce("+", uniModel$fit_request) == 0) {
+  if (Reduce("+", unimodel$fit_request) == 0) {
     if (verbose > 0) {
       cat("All parameters have already been fixed.\n")
     }
-    return(uniModel)
+    return(unimodel)
   }
 
   # control list check
@@ -108,10 +108,10 @@ fit_unimodel <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0
     }
   }
   
-  # specify uniss-format model (uniModel is outer interface, uniss is inner obj)
+  # specify uniss-format model (unimodel is outer interface, uniss is inner obj)
   args <- list(
     data = log(data),
-    uniModel = uniModel
+    unimodel = unimodel
   )
   uniss_obj <- do.call(specify_uniss, args)
   
@@ -126,30 +126,30 @@ fit_unimodel <- function(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0
   } else {
     em_result <- do.call(uniss_em_alg_acc, args)
   }
-  uniModel$par_log <- em_result$par_log
+  unimodel$par_log <- em_result$par_log
   
   if (length(em_result$warning_msg) > 0) {
     warning(em_result$warning_msg)
   }
   
-  # update uniModel list object
-  uniModel$par <- em_result$uniss_obj$par
+  # update unimodel list object
+  unimodel$par <- em_result$uniss_obj$par
   if (em_result$convergence) {
-    uniModel$fit_request[] <- FALSE
-    uniModel$init <- list()
+    unimodel$fit_request[] <- FALSE
+    unimodel$init <- list()
   }
   
   # verbose
   if (verbose >= 2) {
     cat("--- obtained parameters ---\n")
-    par_visual <- lapply(uniModel$par, as.numeric)
+    par_visual <- lapply(unimodel$par, as.numeric)
     par_visual$V0 <- matrix(c(par_visual$V0[1], par_visual$V0[2],
                               par_visual$V0[2], par_visual$V0[3]), 2)
     utils::str(par_visual)
     cat("---------------------------\n")
   }
   
-  return(uniModel)
+  return(unimodel)
 }
 
 uniss_em_alg <- function(...) {
