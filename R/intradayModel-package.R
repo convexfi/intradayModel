@@ -6,18 +6,19 @@
 #' It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 #' 
 #' @section Functions:
-#' \code{\link{uniModelSpec}},
-#' \code{\link{uniModelFit}}, 
-#' \code{\link{uniModelPred}}, 
-#' \code{\link{uniModelFilter}}
+#' \code{\link{fit_unimodel}}, 
+#' \code{\link{forecast_unimodel}}, 
+#' \code{\link{smooth_unimodel}},
+#' \code{\link{plot_components}},
+#' \code{\link{plot_performance}}
 #'
 #' @section Data:
-#' \code{\link{AAPL_volume}},
-#' \code{\link{GE_volume}}
+#' \code{\link{aapl_volume}},
+#' \code{\link{fdx_volume}}
 #'
 #' @section Help:
 #' For a quick help see the README file:
-#' \href{https://github.com/convexfi/intradayModeling/blob/master/README.md}{GitHub-README}.
+#' \href{https://github.com/convexfi/intradayModel/blob/master/README.md}{GitHub-README}.
 #'
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar

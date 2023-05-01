@@ -7,3 +7,6 @@ NAMESPACE
 /doc/
 /Meta/
 *.pdf
+/man/*.Rd
+intradayModel.Rcheck
+*.tar.gz

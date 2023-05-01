@@ -1,3 +1,6 @@
+# install basic package for vignette
+install.packages(c("cleanrmd", "R.rsp"))
+
 ##
 ## User installation
 ##
@@ -10,7 +13,7 @@ install.packages("intradayModel")
 # Getting help
 library(intradayModel)
 help(package = "intradayModel")
-?uniModelFit
+?fit_unimodel
 citation("intradayModel")
 vignette(package = "intradayModel")
 
@@ -35,10 +38,24 @@ devtools::test()
 devtools::check()  # run_dont_test = TRUE
 rcmdcheck::rcmdcheck()  # build_args = "--run-donttest"
 devtools::build()
+
+# Alternatives to the above three that ignore vignettes
+devtools::check(args = c('--ignore-vignettes'), build_args = c('--no-build-vignettes'))
+rcmdcheck::rcmdcheck(args = c('--ignore-vignettes'), build_args = c('--no-build-vignettes'))
+devtools::build(args = c('--no-build-vignettes'))
+
+
 #devtools::revdep(pkg = "intradayModel")  # to check reverse dependencies
 #devtools::check_win_release()  #to check under windows
+
 #R CMD build . --resave-data  # this is to generate tarball
-#R CMD check intradayModeling_0.0.1.tar.gz --as-cran --run-donttest  # this is before submission to CRAN
-#R CMD install intradayModeling_0.0.1.tar.gz
+#R CMD check intradayModel_0.0.1.tar.gz --as-cran --run-donttest  # this is before submission to CRAN
+# (on mac) R CMD install intradayModel_0.0.1.tar.gz
+# (on win) Rcmd INSTALL intradayModel_0.0.1.tar.gz
+
 # check Mac builder at: https://mac.r-project.org/macbuilder/submit.html
+# or with devtools::check_mac_release()
+# check Windows and Linux builder: https://builder.r-hub.io/
+# or with rhub::check_for_cran()
+
 #submit the tarball directly via the webform: https://cran.r-project.org/submit.html
