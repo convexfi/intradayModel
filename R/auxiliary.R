@@ -4,6 +4,7 @@
 # Define a Univariate State-Space Model
 spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   uniModel <- list()
+  class(uniModel) <- "unimodel"
   
   # error control
   if (!is.null(init.pars) && !is.list(init.pars)) stop("init.pars must be a list.")
