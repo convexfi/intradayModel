@@ -2,14 +2,14 @@ citHeader("To cite 'intradayModel' in publications, please use:")
 
 bibentry(bibtype = "Manual",
          title        = "intradayModel: Modeling and Forecasting Financial Intraday Signals",
-         author       = c(person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
-                          person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk"),
-                          person(c("Daniel", "P."), "Palomar", role = c("cre", "aut"), email = "daniel.p.palomar@gmail.com")),
+         author       = c(person("Shengjie", "Xiu", role = "aut", email = "sxiu@connect.ust.hk"),
+                          person("Yifan", "Yu", role = "aut", email = "yyuco@connect.ust.hk"),
+                          person(c("Daniel", "P."), "Palomar", role = c("cre", "aut", "cph"), email = "daniel.p.palomar@gmail.com")),
          note         = "R package version 0.0.1",
          year         = "2023",
          url          = "https://CRAN.R-project.org/package=intradayModel",
          textVersion  =
-           paste("S. Xiu, Y. Yu and D. P. Palomar (2023).",
+           paste("S. Xiu, Y. Yu, and D. P. Palomar (2023).",
                  "intradayModel: Modeling and Forecasting Financial Intraday Signals.",
                  "R package version 0.0.1.",
                  "https://CRAN.R-project.org/package=intradayModel")
@@ -24,7 +24,7 @@ bibentry(bibtype = "Article",
          year         = "2016",
          url          = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695",
          textVersion  =
-           paste("R. Chen, Y. Feng and D. P. Palomar (2016).",
+           paste("R. Chen, Y. Feng, and D. P. Palomar (2016).",
                  "Forecasting Intraday Trading Volume: A Kalman Filter Approach.",
                  "Available at SSRN.",
                  "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695")
