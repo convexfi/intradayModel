@@ -21,7 +21,7 @@
 #' The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \textrm{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param fixed.pars List of parameters' fixed values. The allowed parameters are listed below,
+#' @param fixed.pars A list of parameters' fixed values. The allowed parameters are listed below,
 #'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
 #'                           \item{\code{"a_mu"}: \eqn{a^{\mu}}{a.\mu}} of size 1 ;
 #'                           \item{\code{"var_eta"}: \eqn{\sigma^{\eta}}{(\sigma.\eta)^2}} of size 1 ;
@@ -30,23 +30,23 @@
 #'                           \item{\code{"phi"}: \eqn{\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top}{\phi = [\phi(1); ... ; \phi(I)]} of size \eqn{I} ;}
 #'                           \item{\code{"x0"}: \eqn{\mathbf{x}_0}{x(0)} of size 2 ;}
 #'                           \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)} of size 2 * 2 .}}
-#' @param init.pars List of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
+#' @param init.pars A list of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
 #'                  If the user does not assign initial values for the unfitted parameters, default ones will be used.
 #' @param verbose An integer specifying the print level of information during the algorithm (default \code{1}). Possible numbers:
 #'                \itemize{\item{\code{"0"}: no output;}
 #'                    \item{\code{"1"}: show the iteration number and \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||};}
 #'                    \item{\code{"2"}: 1 + show the obtained parameters.}}
-#' @param control List of control values of EM algorithm:
+#' @param control A list of control values of EM algorithm:
 #'                 \itemize{\item{\code{acceleration}: TRUE/FALSE indicating whether to use the accelerated EM algorithm (default TRUE);}
 #'                    \item{\code{maxit}: Maximum number of iterations (default \code{3000});}
 #'                    \item{\code{abstol}: Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default \code{1e-4})}
 #'                    \item{\code{log.switch}: TRUE/FALSE indicating whether to record the history of convergence progress (defalut TRUE).}}    
 #'
-#' @return A list containing the following elements (if the algorithm converges):
-#'         \item{\code{par}}{List of parameters' fitted values.}
-#'         \item{\code{init}}{List of valid initial values from users.}
-#'         \item{\code{par_log}}{List of intermediate parameters' values if \code{log.switch = TRUE}.} 
-#'         \item{\code{fit_request}}{List of logical values indicating whether each parameter requires further fitting.}
+#' @return A list of class "\code{unimodel}" with the following elements (if the algorithm converges):
+#'         \item{\code{par}}{A list of parameters' fitted values.}
+#'         \item{\code{init}}{A list of valid initial values from users.}
+#'         \item{\code{par_log}}{A list of intermediate parameters' values if \code{log.switch = TRUE}.} 
+#'         \item{\code{fit_request}}{A list of logical values indicating whether each parameter requires further fitting.}
 #'                                
 #' 
 #' @references

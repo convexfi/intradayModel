@@ -13,7 +13,7 @@
 #'              where \eqn{M} is the total number of out-of-sample bins.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param uniModel A univariate model list object from function \code{fit_unimodel}.
+#' @param uniModel A "\code{unimodel}" object from function \code{fit_unimodel}.
 #' @param out.sample  Number of days from the end of the dataset for out-of-sample forecast.
 #'
 #' @return A list containing the following elements:

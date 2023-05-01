@@ -7,7 +7,7 @@
 #'              \eqn{\boldsymbol{\phi}}{\phi}.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param uniModel A univariate model list object from function \code{fit_unimodel}.
+#' @param uniModel A "\code{unimodel}" object from function \code{fit_unimodel}.
 #'
 #' @return A list containing the following elements:
 #'        \item{\code{original.signal}}{A vector of original intraday signal;}

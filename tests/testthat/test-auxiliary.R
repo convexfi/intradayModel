@@ -25,7 +25,7 @@ test_that("specify_uniss works with partial fixed params", {
   model_predefined$fit_request <- list("a_eta" = TRUE, "a_mu" = FALSE, "var_eta" = FALSE, "var_mu" = TRUE, 
                                        "r" = TRUE, "phi" = FALSE, "x0" = FALSE, "V0" = TRUE)
   
-  
+  class(model_predefined) <- "unimodel"
   expect_equal(model_test, model_predefined)
 })
 
