@@ -3,10 +3,8 @@
 .RData
 .Ruserdata
 .DS_Store
-NAMESPACE
 /doc/
 /Meta/
 *.pdf
-/man/*.Rd
 intradayModel.Rcheck
 *.tar.gz
