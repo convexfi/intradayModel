@@ -8,6 +8,9 @@ install.packages(c("cleanrmd", "R.rsp"))
 install.packages(file.choose(), repos = NULL, type = "source")
 # Installation from GitHub
 devtools::install_github("convexfi/intradayModel")
+# devtools::install_github("convexfi/intradayModel",
+#                          ref="master"
+#                          ,auth_token = "")
 # Installation from CRAN
 install.packages("intradayModel")
 # Getting help
