@@ -1,4 +1,4 @@
-#' @title Fit a Univaraite State-Space Model via Expectation-Maximization Algorithm
+#' @title Fit a Univariate State-Space Model via Expectation-Maximization Algorithm
 #' 
 #' @description The main function for defining and fitting a univaraite state-space model. The model proposed in (Chen et al., 2016) is formulated as
 #'  \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}{x(\tau+1) = A(\tau) x(\tau) + w(\tau),}
