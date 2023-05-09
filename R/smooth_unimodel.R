@@ -25,8 +25,8 @@
 #' \dontrun{
 #' 
 #' data(aapl_volume)
-#' unimodel_obj <- fit_unimodel(aapl_volume)
-#' smooth_result <- smooth_unimodel(aapl_volume, unimodel_obj)
+#' unimodel_fit <- fit_unimodel(aapl_volume)
+#' smooth_result <- smooth_unimodel(aapl_volume, unimodel_fit)
 #' }
 #' 
 #' @export

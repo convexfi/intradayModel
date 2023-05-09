@@ -61,15 +61,15 @@
 #' data(aapl_volume)
 #' 
 #' # Fit model with no prior knowledge
-#' unimodel_obj <- fit_unimodel(aapl_volume)
+#' unimodel_fit <- fit_unimodel(aapl_volume)
 #' 
 #' # Fit model with fixed.pars and init.pars
 #' fixed.pars <- list(a_mu = 0.5, var_mu = 0.03)
 #' init.pars <- list(a_eta = 0.5)
-#' unimodel_obj <- fit_unimodel(aapl_volume, fixed.pars = fixed.pars, init.pars = init.pars)
+#' unimodel_fit <- fit_unimodel(aapl_volume, fixed.pars = fixed.pars, init.pars = init.pars)
 #' 
 #' # Fit model with other control options
-#' unimodel_obj <- fit_unimodel(aapl_volume, verbose = 2, 
+#' unimodel_fit <- fit_unimodel(aapl_volume, verbose = 2, 
 #'   control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log.switch = FALSE))
 #' }                  
 #' 

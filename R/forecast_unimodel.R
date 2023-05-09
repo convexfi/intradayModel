@@ -34,11 +34,11 @@
 #' data(aapl_volume)
 #' 
 #' # Fit on the first 104 days
-#' aapl_volume_fit <- aapl_volume[, 1:104]
-#' unimodel_obj <- fit_unimodel(aapl_volume_fit)
+#' aapl_volume_training <- aapl_volume[, 1:104]
+#' unimodel_fit <- fit_unimodel(aapl_volume_training)
 #' 
 #' # forecast on last 20 days
-#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
 #' }
 #' 
 #' @importFrom utils tail

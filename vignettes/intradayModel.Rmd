@@ -67,14 +67,14 @@ aapl_volume[1:5, 1:5] # print the head of data
 Next, we fit a univariate state-space model using `fit_unimodel` function. To be specific, we use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
 
 ```{r}
-aapl_volume_fit <- aapl_volume[, 1:104]
-unimodel_obj <- fit_unimodel(aapl_volume_fit)
+aapl_volume_training <- aapl_volume[, 1:104]
+unimodel_fit <- fit_unimodel(aapl_volume_training)
 ```
 
 Once the model is fitted, we can estimate the hidden components of any intraday signal based on all its observations, which is called **smoothing**. By calling `smooth_unimodel` function, we obtain daily, seasonal, and intraday dynamic components. This procedure helps us better identify the underlying information of the intraday signal.
 
 ```{r}
-smooth_result <- smooth_unimodel(aapl_volume_fit, unimodel_obj)
+smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
 plot_components(smooth_result) # plot smoothed hidden components
 plot_performance(smooth_result) # plot smoothed result
 ```
@@ -82,7 +82,7 @@ plot_performance(smooth_result) # plot smoothed result
 To see how well our model performs on new data, we use `forecast_unimodel` function to do one-bin-ahead forecast on the out-of-sample dataset of 20 days.
 
 ```{r}
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
+forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 plot_performance(forecast_result) # plot forecast result
 ```
@@ -180,7 +180,7 @@ init.pars <- list()
 init.pars$"a_eta" <- 1
 
 fdx_volume_fit <- fdx_volume['2019-07-01/2019-11-30']
-unimodel_obj <- fit_unimodel(fdx_volume_fit, verbose = 2, control = list(acceleration = TRUE))
+unimodel_fit <- fit_unimodel(fdx_volume_fit, verbose = 2, control = list(acceleration = TRUE))
 ```
 
 One observation is that the trading days with missing bins because of early close,  2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving Day), have been automatically removed.
@@ -194,7 +194,7 @@ One observation is that the trading days with missing bins because of early clos
 To use this function, input the intraday signal you want to smooth and the fitted model as arguments.
 
 ```{r}
-smooth_result <- smooth_unimodel(fdx_volume_fit, unimodel_obj)
+smooth_result <- smooth_unimodel(fdx_volume_fit, unimodel_fit)
 str(smooth_result)
 ```
 
@@ -222,7 +222,7 @@ Since fitting a model to some data does not guarantee good prediction on unseen 
 Here $M$ is the total number of out-of-sample bins. The sample code is given as follows.
 
 ```{r}
-forecast_result <- forecast_unimodel(fdx_volume, unimodel_obj, out.sample = 20)
+forecast_result <- forecast_unimodel(fdx_volume, unimodel_fit, out.sample = 20)
 str(forecast_result)
 ```
 
