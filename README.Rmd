@@ -69,7 +69,7 @@ plot_performance(smooth_result) # plot smoothed result
 To see how well our model performs on new data, we use `forecast_unimodel` function to do one-bin-ahead forecast on the out-of-sample dataset of 20 days.
 
 ```{r forecast_plot}
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
+forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 plot_performance(forecast_result) # plot forecast result
 ```

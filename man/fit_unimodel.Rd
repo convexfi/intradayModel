@@ -2,12 +2,12 @@
 % Please edit documentation in R/fit_unimodel.R
 \name{fit_unimodel}
 \alias{fit_unimodel}
-\title{Fit a Univaraite State-Space Model via Expectation-Maximization Algorithm}
+\title{Fit a Univariate State-Space Model via Expectation-Maximization Algorithm}
 \usage{
 fit_unimodel(
   data,
-  fixed.pars = NULL,
-  init.pars = NULL,
+  fixed_pars = NULL,
+  init_pars = NULL,
   verbose = 0,
   control = NULL
 )
@@ -15,7 +15,7 @@ fit_unimodel(
 \arguments{
 \item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
 
-\item{fixed.pars}{A list of parameters' fixed values. The allowed parameters are listed below,
+\item{fixed_pars}{A list of parameters' fixed values. The allowed parameters are listed below,
 \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
          \item{\code{"a_mu"}: \eqn{a^{\mu}}{a.\mu}} of size 1 ;
          \item{\code{"var_eta"}: \eqn{\sigma^{\eta}}{(\sigma.\eta)^2}} of size 1 ;
@@ -25,7 +25,7 @@ fit_unimodel(
          \item{\code{"x0"}: \eqn{\mathbf{x}_0}{x(0)} of size 2 ;}
          \item{\code{"V0"}: \eqn{\mathbf{V}_0}{V(0)} of size 2 * 2 .}}}
 
-\item{init.pars}{A list of unfitted parameters' initial values. The parameters are the same as \code{fixed.pars}. 
+\item{init_pars}{A list of unfitted parameters' initial values. The parameters are the same as \code{fixed_pars}. 
 If the user does not assign initial values for the unfitted parameters, default ones will be used.}
 
 \item{verbose}{An integer specifying the print level of information during the algorithm (default \code{1}). Possible numbers:
@@ -37,13 +37,13 @@ If the user does not assign initial values for the unfitted parameters, default 
 \itemize{\item{\code{acceleration}: TRUE/FALSE indicating whether to use the accelerated EM algorithm (default TRUE);}
    \item{\code{maxit}: Maximum number of iterations (default \code{3000});}
    \item{\code{abstol}: Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default \code{1e-4})}
-   \item{\code{log.switch}: TRUE/FALSE indicating whether to record the history of convergence progress (defalut TRUE).}}}
+   \item{\code{log_switch}: TRUE/FALSE indicating whether to record the history of convergence progress (defalut TRUE).}}}
 }
 \value{
 A list of class "\code{unimodel}" with the following elements (if the algorithm converges):
         \item{\code{par}}{A list of parameters' fitted values.}
         \item{\code{init}}{A list of valid initial values from users.}
-        \item{\code{par_log}}{A list of intermediate parameters' values if \code{log.switch = TRUE}.} 
+        \item{\code{par_log}}{A list of intermediate parameters' values if \code{log_switch = TRUE}.} 
         \item{\code{fit_request}}{A list of logical values indicating whether each parameter requires further fitting.}
 }
 \description{
@@ -73,16 +73,16 @@ The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\D
 data(aapl_volume)
 
 # Fit model with no prior knowledge
-unimodel_obj <- fit_unimodel(aapl_volume)
+unimodel_fit <- fit_unimodel(aapl_volume)
 
-# Fit model with fixed.pars and init.pars
-fixed.pars <- list(a_mu = 0.5, var_mu = 0.03)
-init.pars <- list(a_eta = 0.5)
-unimodel_obj <- fit_unimodel(aapl_volume, fixed.pars = fixed.pars, init.pars = init.pars)
+# Fit model with fixed_pars and init_pars
+fixed_pars <- list(a_mu = 0.5, var_mu = 0.03)
+init_pars <- list(a_eta = 0.5)
+unimodel_fit <- fit_unimodel(aapl_volume, fixed_pars = fixed_pars, init_pars = init_pars)
 
 # Fit model with other control options
-unimodel_obj <- fit_unimodel(aapl_volume, verbose = 2, 
-  control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log.switch = FALSE))
+unimodel_fit <- fit_unimodel(aapl_volume, verbose = 2, 
+  control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log_switch = FALSE))
 }                  
 
 }

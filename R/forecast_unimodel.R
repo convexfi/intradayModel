@@ -14,15 +14,15 @@
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
 #' @param unimodel A "\code{unimodel}" object from function \code{fit_unimodel}.
-#' @param out.sample  Number of days from the end of the dataset for out-of-sample forecast.
+#' @param out_sample  Number of days from the end of the dataset for out-of-sample forecast.
 #'
 #' @return A list containing the following elements:
-#'         \item{\code{original.signal}}{A vector of original intraday signal;}
-#'         \item{\code{forecast.signal}}{A vector of forecast intraday signal;}
+#'         \item{\code{original_signal}}{A vector of original intraday signal;}
+#'         \item{\code{forecast_signal}}{A vector of forecast intraday signal;}
 #'         \item{\code{components}}{A list of the three forecast components:
-#'              \itemize{ \item{\code{forecast.daily}}
-#'                        \item{\code{forecast.seasonal}}
-#'                        \item{\code{forecast.dynamic}}}}   
+#'              \itemize{ \item{\code{forecast_daily}}
+#'                        \item{\code{forecast_seasonal}}
+#'                        \item{\code{forecast_dynamic}}}}   
 #'         \item{\code{error}}{A list of three error measures:
 #'              \itemize{ \item{\code{mae}}
 #'                        \item{\code{mape}}
@@ -38,19 +38,19 @@
 #' unimodel_fit <- fit_unimodel(aapl_volume_training)
 #' 
 #' # forecast on last 20 days
-#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 #' }
 #' 
 #' @importFrom utils tail
 #' 
 #' @export
-forecast_unimodel <- function(data, unimodel, out.sample) {
+forecast_unimodel <- function(data, unimodel, out_sample) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
   data <- clean_data(data)
-  if (out.sample > ncol(data)) stop("out.sample must be smaller than the number of columns in data matrix.")
+  if (out_sample > ncol(data)) stop("out_sample must be smaller than the number of columns in data matrix.")
   
   is_unimodel(unimodel, nrow(data))
 
@@ -71,27 +71,27 @@ forecast_unimodel <- function(data, unimodel, out.sample) {
   
   # tidy up components (scale change)
   components <- list(
-    forecast.daily = exp(Kf$xtt1[1,]),
-    forecast.dynamic = exp(Kf$xtt1[2,]),
-    forecast.seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+    forecast_daily = exp(Kf$xtt1[1,]),
+    forecast_dynamic = exp(Kf$xtt1[2,]),
+    forecast_seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  components.out <- lapply(components, function (c) tail(c, nrow(data) * out.sample))
-  forecast.signal <- components.out$forecast.daily * 
-    components.out$forecast.dynamic * components.out$forecast.seasonal
+  components_out <- lapply(components, function (c) tail(c, nrow(data) * out_sample))
+  forecast_signal <- components_out$forecast_daily * 
+    components_out$forecast_dynamic * components_out$forecast_seasonal
 
   # error measures
-  signal_real <- tail(as.vector(as.matrix(data)), nrow(data) * out.sample)
+  signal_real <- tail(as.vector(as.matrix(data)), nrow(data) * out_sample)
   error <- list(
-    mae = calculate_mae(signal_real, forecast.signal),
-    mape = calculate_mape(signal_real, forecast.signal),
-    rmse = calculate_rmse(signal_real, forecast.signal)
+    mae = calculate_mae(signal_real, forecast_signal),
+    mape = calculate_mape(signal_real, forecast_signal),
+    rmse = calculate_rmse(signal_real, forecast_signal)
   )
 
   # result
   res <- list(
-    original.signal = signal_real,
-    forecast.signal = forecast.signal,
-    components = components.out,
+    original_signal = signal_real,
+    forecast_signal = forecast_signal,
+    components = components_out,
     error = error
   )
   

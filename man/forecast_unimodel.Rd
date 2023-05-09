@@ -4,23 +4,23 @@
 \alias{forecast_unimodel}
 \title{Forecast One-bin-ahead Financial Intraday Signal via a Univariate State-Space Model}
 \usage{
-forecast_unimodel(data, unimodel, out.sample)
+forecast_unimodel(data, unimodel, out_sample)
 }
 \arguments{
 \item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
 
 \item{unimodel}{A "\code{unimodel}" object from function \code{fit_unimodel}.}
 
-\item{out.sample}{Number of days from the end of the dataset for out-of-sample forecast.}
+\item{out_sample}{Number of days from the end of the dataset for out-of-sample forecast.}
 }
 \value{
 A list containing the following elements:
-        \item{\code{original.signal}}{A vector of original intraday signal;}
-        \item{\code{forecast.signal}}{A vector of forecast intraday signal;}
+        \item{\code{original_signal}}{A vector of original intraday signal;}
+        \item{\code{forecast_signal}}{A vector of forecast intraday signal;}
         \item{\code{components}}{A list of the three forecast components:
-             \itemize{ \item{\code{forecast.daily}}
-                       \item{\code{forecast.seasonal}}
-                       \item{\code{forecast.dynamic}}}}   
+             \itemize{ \item{\code{forecast_daily}}
+                       \item{\code{forecast_seasonal}}
+                       \item{\code{forecast_dynamic}}}}   
         \item{\code{error}}{A list of three error measures:
              \itemize{ \item{\code{mae}}
                        \item{\code{mape}}
@@ -45,11 +45,11 @@ The one-bin-ahead forecast is mathematically denoted by \eqn{\hat{y}_{\tau+1} = 
 data(aapl_volume)
 
 # Fit on the first 104 days
-aapl_volume_fit <- aapl_volume[, 1:104]
-unimodel_obj <- fit_unimodel(aapl_volume_fit)
+aapl_volume_training <- aapl_volume[, 1:104]
+unimodel_fit <- fit_unimodel(aapl_volume_training)
 
 # forecast on last 20 days
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
+forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 }
 
 }

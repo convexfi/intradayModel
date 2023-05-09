@@ -10,12 +10,12 @@
 #' @param unimodel A "\code{unimodel}" object from function \code{fit_unimodel}.
 #'
 #' @return A list containing the following elements:
-#'        \item{\code{original.signal}}{A vector of original intraday signal;}
-#'        \item{\code{smooth.signal}}{A vector of smoothed intraday signal;}
+#'        \item{\code{original_signal}}{A vector of original intraday signal;}
+#'        \item{\code{smooth_signal}}{A vector of smoothed intraday signal;}
 #'        \item{\code{components}}{A list of the three smoothed components:
-#'              \itemize{ \item{\code{smooth.daily}}
-#'                        \item{\code{smooth.seasonal}}
-#'                        \item{\code{smooth.dynamic}}}}        
+#'              \itemize{ \item{\code{smooth_daily}}
+#'                        \item{\code{smooth_seasonal}}
+#'                        \item{\code{smooth_dynamic}}}}        
 #' 
 #' @references
 #' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
@@ -56,16 +56,16 @@ smooth_unimodel <- function(data, unimodel) {
   
   # tidy up components (scale change)
   components <- list(
-    smooth.daily = exp(Kf$xtT[1,]),
-    smooth.dynamic = exp(Kf$xtT[2,]),
-    smooth.seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+    smooth_daily = exp(Kf$xtT[1,]),
+    smooth_dynamic = exp(Kf$xtT[2,]),
+    smooth_seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  smooth.signal <- components$smooth.daily * 
-    components$smooth.dynamic * components$smooth.seasonal
+  smooth_signal <- components$smooth_daily * 
+    components$smooth_dynamic * components$smooth_seasonal
   
   res <- list(
-    original.signal = as.vector(data),
-    smooth.signal = smooth.signal,
+    original_signal = as.vector(data),
+    smooth_signal = smooth_signal,
     components = components
   )
   

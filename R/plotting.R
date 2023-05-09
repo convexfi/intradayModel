@@ -8,6 +8,7 @@
 #'
 #' @import patchwork
 #' @import ggplot2
+#' @import scales
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
@@ -18,7 +19,7 @@
 #' # Obtain smoothing and forecasting result
 #' unimodel_fit <- fit_unimodel(aapl_volume_training)
 #' smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
-#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 #'
 #' # Plot smoothed and forecast components
 #' plot_components(smooth_result)
@@ -31,7 +32,7 @@ plot_components <- function(smooth_forecast_result) {
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$original.signal,
+      original = smooth_forecast_result$original_signal,
       daily = components[[grep("daily", names(components))]],
       seasonal = components[[grep("seasonal", names(components))]],
       dynamic = components[[grep("dynamic", names(components))]]
@@ -147,7 +148,7 @@ plot_components <- function(smooth_forecast_result) {
 #' # Obtain smoothing and forecasting result
 #' unimodel_fit <- fit_unimodel(aapl_volume_training)
 #' smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
-#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 #'
 #' # Plot smoothing and forecasting performance
 #' plot_performance(smooth_result)
@@ -168,7 +169,7 @@ plot_performance <- function(smooth_forecast_result) {
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$original.signal,
+      original = smooth_forecast_result$original_signal,
       output = smooth_forecast_result[[grep(type, names(smooth_forecast_result))]]
     )
   plt_data_log <- log(plt_data)

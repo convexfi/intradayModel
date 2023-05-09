@@ -82,7 +82,7 @@ plot_performance(smooth_result) # plot smoothed result
 To see how well our model performs on new data, we use `forecast_unimodel` function to do one-bin-ahead forecast on the out-of-sample dataset of 20 days.
 
 ```{r}
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
+forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 plot_performance(forecast_result) # plot forecast result
 ```
@@ -162,9 +162,9 @@ tail(fdx_volume)
 
 ## Fitting
 
-> **fit_unimodel**(data, fixed.pars  = NULL, init.pars = NULL, verbose = 0, control = NULL)
+> **fit_unimodel**(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, control = NULL)
 
-To fit a univariate state-space model, you should use `fit_unimodel` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed.pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init.pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
+To fit a univariate state-space model, you should use `fit_unimodel` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed_pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init_pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
 
 The fitting process stops when either the maximum number of iterations is reached or the termination criteria is met $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
 
@@ -172,15 +172,15 @@ The following code shows how to fit the model to the FDX stock.
 
 ```{r}
 # set fixed value
-fixed.pars <- list()
-fixed.pars$"x0" <- c(13.33, -0.37)
+fixed_pars <- list()
+fixed_pars$"x0" <- c(13.33, -0.37)
 
 # set initial value 
-init.pars <- list()
-init.pars$"a_eta" <- 1
+init_pars <- list()
+init_pars$"a_eta" <- 1
 
-fdx_volume_fit <- fdx_volume['2019-07-01/2019-11-30']
-unimodel_fit <- fit_unimodel(fdx_volume_fit, verbose = 2, control = list(acceleration = TRUE))
+fdx_volume_training <- fdx_volume['2019-07-01/2019-11-30']
+unimodel_fit <- fit_unimodel(fdx_volume_training, verbose = 2, control = list(acceleration = TRUE))
 ```
 
 One observation is that the trading days with missing bins because of early close,  2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving Day), have been automatically removed.
@@ -194,7 +194,7 @@ One observation is that the trading days with missing bins because of early clos
 To use this function, input the intraday signal you want to smooth and the fitted model as arguments.
 
 ```{r}
-smooth_result <- smooth_unimodel(fdx_volume_fit, unimodel_fit)
+smooth_result <- smooth_unimodel(fdx_volume_training, unimodel_fit)
 str(smooth_result)
 ```
 
@@ -207,7 +207,7 @@ plot_performance(smooth_result)
 
 ## Forecasting
 
-> **forecast_unimodel**(data, unimodel, out.sample) 
+> **forecast_unimodel**(data, unimodel, out_sample) 
 
 `forecast_unimodel` function allows you to forecast the intraday signal one-bin-ahead, given a dataset and a fitted model. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
 
@@ -222,7 +222,7 @@ Since fitting a model to some data does not guarantee good prediction on unseen 
 Here $M$ is the total number of out-of-sample bins. The sample code is given as follows.
 
 ```{r}
-forecast_result <- forecast_unimodel(fdx_volume, unimodel_fit, out.sample = 20)
+forecast_result <- forecast_unimodel(fdx_volume, unimodel_fit, out_sample = 20)
 str(forecast_result)
 ```
 

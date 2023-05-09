@@ -13,12 +13,12 @@ smooth_unimodel(data, unimodel)
 }
 \value{
 A list containing the following elements:
-       \item{\code{original.signal}}{A vector of original intraday signal;}
-       \item{\code{smooth.signal}}{A vector of smoothed intraday signal;}
+       \item{\code{original_signal}}{A vector of original intraday signal;}
+       \item{\code{smooth_signal}}{A vector of smoothed intraday signal;}
        \item{\code{components}}{A list of the three smoothed components:
-             \itemize{ \item{\code{smooth.daily}}
-                       \item{\code{smooth.seasonal}}
-                       \item{\code{smooth.dynamic}}}}
+             \itemize{ \item{\code{smooth_daily}}
+                       \item{\code{smooth_seasonal}}
+                       \item{\code{smooth_dynamic}}}}
 }
 \description{
 A model with all parameters fixed can be used to decompose the financial intraday signal into daily, seasonal, 
@@ -31,8 +31,8 @@ A model with all parameters fixed can be used to decompose the financial intrada
 \dontrun{
 
 data(aapl_volume)
-unimodel_obj <- fit_unimodel(aapl_volume)
-smooth_result <- smooth_unimodel(aapl_volume, unimodel_obj)
+unimodel_fit <- fit_unimodel(aapl_volume)
+smooth_result <- smooth_unimodel(aapl_volume, unimodel_fit)
 }
 
 }

@@ -2,13 +2,13 @@
 # They should be invisible to package users
 
 # Define a Univariate State-Space Model
-spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
+spec_unimodel <- function(fixed_pars = NULL, init_pars = NULL) {
   unimodel <- list()
   class(unimodel) <- "unimodel"
   
   # error control
-  if (!is.null(init.pars) && !is.list(init.pars)) stop("init.pars must be a list.")
-  if (!is.null(fixed.pars) && !is.list(fixed.pars)) stop("fixed.pars must be a list.")
+  if (!is.null(init_pars) && !is.list(init_pars)) stop("init_pars must be a list.")
+  if (!is.null(fixed_pars) && !is.list(fixed_pars)) stop("fixed_pars must be a list.")
   
   # unimodel class properties
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
@@ -23,27 +23,27 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   unimodel$init <- list()
   
   # read in input parameters
-  fixed_clean_result <- clean_pars_list(fixed.pars)
-  fixed.pars <- fixed_clean_result$input_list
+  fixed_clean_result <- clean_pars_list(fixed_pars)
+  fixed_pars <- fixed_clean_result$input_list
   
-  unecessary_init <- intersect(names(init.pars), names(fixed.pars))
-  init.pars <- init.pars[setdiff(names(init.pars), names(fixed.pars))]
-  init_clean_result <- clean_pars_list(init.pars)
-  init.pars <- init_clean_result$input_list
+  unecessary_init <- intersect(names(init_pars), names(fixed_pars))
+  init_pars <- init_pars[setdiff(names(init_pars), names(fixed_pars))]
+  init_clean_result <- clean_pars_list(init_pars)
+  init_pars <- init_clean_result$input_list
   
   # generate warning message
   msg <- c()
   if (length(fixed_clean_result$msg) > 0) {
-    msg <- append(msg,"Warnings in fixed.pars:\n")
-    # cat("Warnings in fixed.pars:\n")
+    msg <- append(msg,"Warnings in fixed_pars:\n")
+    # cat("Warnings in fixed_pars:\n")
     for (m in fixed_clean_result$msg) {
       msg <- append(msg, paste("  ", m, "\n", sep = ""))
       # cat("  ", m, "\n", sep = "")
     }
   }
   if (length(init_clean_result$msg) > 0 | length(unecessary_init) > 0) {
-    msg <- append(msg,"Warnings in init.pars:\n")
-    # cat("Warnings in init.pars:\n")
+    msg <- append(msg,"Warnings in init_pars:\n")
+    # cat("Warnings in init_pars:\n")
     if (!is.null(init_clean_result$msg)) {
       for (m in init_clean_result$msg) {
         msg <- append(msg, paste("  ", m, "\n", sep = ""))
@@ -61,13 +61,13 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
     warning(msg)
   }
   # if (length(fixed_clean_result$msg) > 0) {
-  #   cat("Warnings in fixed.pars:\n")
+  #   cat("Warnings in fixed_pars:\n")
   #   for (m in fixed_clean_result$msg) {
   #     cat("  ", m, "\n", sep = "")
   #   }
   # }
   # if (length(init_clean_result$msg) > 0 | length(unecessary_init) > 0) {
-  #   cat("Warnings in init.pars:\n")
+  #   cat("Warnings in init_pars:\n")
   #   if (!is.null(init_clean_result$msg)) {
   #     for (m in init_clean_result$msg) {
   #       cat("  ", m, "\n", sep = "")
@@ -81,10 +81,10 @@ spec_unimodel <- function(fixed.pars = NULL, init.pars = NULL) {
   
   # store inputs in univariate model object
   for (name in all_pars_name) {
-    if (name %in% names(fixed.pars)) {
-      unimodel$par[[name]] <- fixed.pars[[name]]
-    } else if (name %in% names(init.pars)) {
-      unimodel$init[[name]] <- init.pars[[name]]
+    if (name %in% names(fixed_pars)) {
+      unimodel$par[[name]] <- fixed_pars[[name]]
+    } else if (name %in% names(init_pars)) {
+      unimodel$init[[name]] <- init_pars[[name]]
     }
   }
   
@@ -155,7 +155,7 @@ intraday_xts_to_matrix <- function(data.xts) {
 }
 
 
-# clean the uniunimodel()'s input args (init.pars/fixed.pars)
+# clean the uniunimodel()'s input args (init_pars/fixed_pars)
 # remove any variable containing NA/inf/non-numeric
 # remove any variable that won't appear in model
 # flatten the variable if user input a high dimension one
@@ -226,7 +226,7 @@ clean_pars_list <- function(input_list) {
   return(clean_result)
 }
 
-# part of error check for init.pars/fixed.pars
+# part of error check for init_pars/fixed_pars
 check_pars_list <- function(unimodel, n_bin = NULL) {
   fit_request_list <- unimodel$fit_request
   par_list <- unimodel$par
