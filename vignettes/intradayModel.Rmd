@@ -10,8 +10,7 @@ output:
     mathjax: default
     toc: true
     toc_depth: 2
-csl: apalike.csl # springer-socpsych-author-date.csl
-csl-entry-spacing: 1.2em
+csl: apalike.csl
 bibliography: reference.bib
 link-citations: yes
 vignette: >
@@ -47,6 +46,11 @@ body {
 /* math is smaller */
 .math {
   font-size: small;
+}
+
+/* set reference spacing in cleanrmd */
+.references>div:first-child{ 
+	margin-bottom: 1.6em;
 }
 ```
 
@@ -243,5 +247,6 @@ The current version only supports univariate state-space models for intraday tra
 
 &nbsp; 
 
-# References {-}
+# References
 
+<div id="refs"></div>
