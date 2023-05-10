@@ -22,10 +22,10 @@ bibentry(bibtype = "Article",
                           person(c("Daniel", "P."), "Palomar")),
          journal      = "Available at SSRN",
          year         = "2016",
-         url          = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695",
+         url          = "https://dx.doi.org/10.2139/ssrn.3101695",
          textVersion  =
            paste("R. Chen, Y. Feng, and D. P. Palomar (2016).",
                  "Forecasting Intraday Trading Volume: A Kalman Filter Approach.",
                  "Available at SSRN.",
-                 "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695")
+                 "https://dx.doi.org/10.2139/ssrn.3101695")
 )

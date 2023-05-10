@@ -3,12 +3,12 @@ data(aapl_volume)
 test_that("is_unimodel works", {
   data <- aapl_volume
   n_bin <- 26
-  fixed.pars <- list()
-  fixed.pars$"a_mu" <- 1
-  fixed.pars$"var_eta" <- 4
-  fixed.pars$"x0" <- matrix(0,2)
-  fixed.pars$"phi" <- matrix(2, n_bin)
-  modelSpec <- spec_unimodel(fixed.pars = fixed.pars)
+  fixed_pars <- list()
+  fixed_pars$"a_mu" <- 1
+  fixed_pars$"var_eta" <- 4
+  fixed_pars$"x0" <- matrix(0,2)
+  fixed_pars$"phi" <- matrix(2, n_bin)
+  modelSpec <- spec_unimodel(fixed_pars = fixed_pars)
   
   modelSpec_check1 <- modelSpec[c("par", "init")]
   expect_error(is_unimodel(modelSpec_check1), "Elements fit_request are missing from the model.\n")
@@ -36,38 +36,38 @@ test_that("is_unimodel works", {
 test_that("forecast_unimodel/Smooth works", {
   data <- aapl_volume
   n_bin <- 26
-  fixed.pars <- list()
-  fixed.pars$"a_mu" <- 1
-  fixed.pars$"var_eta" <- 4
-  fixed.pars$"x0" <- matrix(0,2)
-  fixed.pars$"phi" <- matrix(2, n_bin)
-  modelSpec <- spec_unimodel(fixed.pars = fixed.pars)
+  fixed_pars <- list()
+  fixed_pars$"a_mu" <- 1
+  fixed_pars$"var_eta" <- 4
+  fixed_pars$"x0" <- matrix(0,2)
+  fixed_pars$"phi" <- matrix(2, n_bin)
+  modelSpec <- spec_unimodel(fixed_pars = fixed_pars)
   expect_error(smooth_unimodel(data, modelSpec), 
                regexp = "All parameters must be optimally fitted. Parameters a_eta, var_mu, r, V0 are not optimally fitted.")
   
 
-  fixed.pars$"r" <- 1
-  fixed.pars$"a_eta" <- 1
-  fixed.pars$"var_mu" <- 4
-  fixed.pars$"V0" <- c(1,0,0,1)
-  modelSpec <- spec_unimodel(fixed.pars = fixed.pars)
+  fixed_pars$"r" <- 1
+  fixed_pars$"a_eta" <- 1
+  fixed_pars$"var_mu" <- 4
+  fixed_pars$"V0" <- c(1,0,0,1)
+  modelSpec <- spec_unimodel(fixed_pars = fixed_pars)
   expect_error(forecast_unimodel(data, modelSpec, 300), 
-               regexp = "out.sample must be smaller than the number of columns in data matrix.")
+               regexp = "out_sample must be smaller than the number of columns in data matrix.")
   
 })
 
 test_that("spec_unimodel message", {
-  init.pars <- list()
-  init.pars$"a_eta" <- 1
-  init.pars$"x0" <- matrix(0, 2, 2)
-  init.pars$"V0" <- matrix(1, 4)
-  init.pars$"xxx" <- 3
+  init_pars <- list()
+  init_pars$"a_eta" <- 1
+  init_pars$"x0" <- matrix(0, 2, 2)
+  init_pars$"V0" <- matrix(1, 4)
+  init_pars$"xxx" <- 3
   
-  fixed.pars <- list()
-  fixed.pars$"a_mu" <- NA
-  fixed.pars$"var_eta" <- 4
-  fixed.pars$"x0" <- matrix(Inf, 2)
-  fixed.pars$"V0" <- matrix(c(1,0,0,1), nrow= 2)
+  fixed_pars <- list()
+  fixed_pars$"a_mu" <- NA
+  fixed_pars$"var_eta" <- 4
+  fixed_pars$"x0" <- matrix(Inf, 2)
+  fixed_pars$"V0" <- matrix(c(1,0,0,1), nrow= 2)
   
   # predefinde_model <- list()
   # predefinde_model$par <- list("a_eta" =  NA, "a_mu" = NA,
@@ -81,11 +81,11 @@ test_that("spec_unimodel message", {
   #                                      "r" = TRUE, "phi" = TRUE,
   #                                      "x0" = TRUE, "V0" = FALSE)
   
-  warning_message <- paste("Warnings in fixed.pars:\n","  Elements a_mu, x0 are invalid [(]check number/dimension/PSD[)].\n",
-                           "Warnings in init.pars:\n","  Elements xxx are not allowed in parameter list.\n",
+  warning_message <- paste("Warnings in fixed_pars:\n","  Elements a_mu, x0 are invalid [(]check number/dimension/PSD[)].\n",
+                           "Warnings in init_pars:\n","  Elements xxx are not allowed in parameter list.\n",
                            "  Elements x0 are invalid [(]check number/dimension/PSD[)].\n","  Elements V0 have already been fixed." ,sep = "")
-  # expect_output(spec_unimodel(init.pars = init.pars, fixed.pars = fixed.pars), warning_message)
-  expect_warning(spec_unimodel(init.pars = init.pars, fixed.pars = fixed.pars), warning_message)
+  # expect_output(spec_unimodel(init_pars = init_pars, fixed_pars = fixed_pars), warning_message)
+  expect_warning(spec_unimodel(init_pars = init_pars, fixed_pars = fixed_pars), warning_message)
   
 })
 
@@ -94,7 +94,7 @@ test_that("fit_unimodel message", {
   data_train <- aapl_volume[, 1:104]
   data_error_test <- data_train
   data_error_test[1,1] <- NA
-  fixed.pars <- list(
+  fixed_pars <- list(
     "x0" = c(0, 0),
     "a_eta" = 1, "a_mu" = 0,
     "r" = 1e-4,
@@ -108,9 +108,9 @@ test_that("fit_unimodel message", {
   expect_output(fit_unimodel(data_train,verbose = 1, control = list(maxit = 1000, acceleration = TRUE)), 
                 regexp = "Success! abstol test passed at")
   expect_error(fit_unimodel(c(1,1)), regexp = "data must be matrix or xts.")
-  expect_output(fit_unimodel(data, fixed.pars = fixed.pars, verbose = 1), "All parameters have already been fixed.")
+  expect_output(fit_unimodel(data, fixed_pars = fixed_pars, verbose = 1), "All parameters have already been fixed.")
   
-  # modelSpec.fit_acc <- fit_unimodel(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log.switch = TRUE, acceleration = TRUE, verbose = 0)
+  # modelSpec.fit_acc <- fit_unimodel(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE, verbose = 0)
   # 
   # expect_output(fit_unimodel(data_train, modelSpec.fit_acc), "All parameters have already been fixed.")
   # 

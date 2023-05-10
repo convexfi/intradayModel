@@ -8,17 +8,18 @@
 #'
 #' @import patchwork
 #' @import ggplot2
+#' @import scales
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
 #'
 #' data(aapl_volume)
-#' aapl_volume_fit <- aapl_volume[, 1:104]
+#' aapl_volume_training <- aapl_volume[, 1:104]
 #'
 #' # Obtain smoothing and forecasting result
-#' unimodel_obj <- fit_unimodel(aapl_volume_fit)
-#' smooth_result <- smooth_unimodel(aapl_volume_fit, unimodel_obj)
-#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
+#' unimodel_fit <- fit_unimodel(aapl_volume_training)
+#' smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 #'
 #' # Plot smoothed and forecast components
 #' plot_components(smooth_result)
@@ -31,7 +32,7 @@ plot_components <- function(smooth_forecast_result) {
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$original.signal,
+      original = smooth_forecast_result$original_signal,
       daily = components[[grep("daily", names(components))]],
       seasonal = components[[grep("seasonal", names(components))]],
       dynamic = components[[grep("dynamic", names(components))]]
@@ -43,6 +44,7 @@ plot_components <- function(smooth_forecast_result) {
   p1 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y = original), alpha = 0.8, color = "steelblue", size = 0.4) +
+    scale_y_continuous(labels = number_format(prefix = "e^")) +
     xlab(expression(tau)) +
     ylab("Original") +
     theme_bw() +
@@ -62,6 +64,7 @@ plot_components <- function(smooth_forecast_result) {
   p2 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y = daily), alpha = 0.8, color = "steelblue", size = 0.6) +
+    scale_y_continuous(labels = number_format(prefix = "e^")) +
     xlab(expression(tau)) +
     ylab("Daily") +
     theme_bw() +
@@ -81,6 +84,7 @@ plot_components <- function(smooth_forecast_result) {
   p3 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y = seasonal), alpha = 0.8, color = "steelblue", size = 0.4) +
+    scale_y_continuous(labels = number_format(prefix = "e^")) +
     xlab(expression(tau)) +
     ylab("Seasonal") +
     theme_bw() +
@@ -100,12 +104,12 @@ plot_components <- function(smooth_forecast_result) {
   p4 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y = dynamic), alpha = 0.8, color = "steelblue", size = 0.4) +
-    xlab(expression(tau)) +
+    scale_y_continuous(labels = number_format(prefix = "e^")) +
     ylab("Intraday\nDynamic") +
     theme_bw() +
-    xlab(expression(tau)) +
+    xlab("time") +
     theme(
-      axis.title.x = element_text(size = 14, face = "bold"),
+      axis.title.x = element_text(size = 12, face = "bold"),
       axis.title.y = element_text(size = text_size, face = "bold"),
       legend.position = "right",
       legend.justification = c(0, 1),
@@ -118,7 +122,7 @@ plot_components <- function(smooth_forecast_result) {
 
   p <- p1 / p2 / p3 / p4 +
     plot_annotation(
-      title = "Decomposition of intraday signal (log scale)",
+      title = "Decomposition of intraday signal",
       theme = theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
     )
 
@@ -139,12 +143,12 @@ plot_components <- function(smooth_forecast_result) {
 #' \dontrun{
 #'
 #' data(aapl_volume)
-#' aapl_volume_fit <- aapl_volume[, 1:104]
+#' aapl_volume_training <- aapl_volume[, 1:104]
 #'
 #' # Obtain smoothing and forecasting result
-#' unimodel_obj <- fit_unimodel(aapl_volume_fit)
-#' smooth_result <- smooth_unimodel(aapl_volume_fit, unimodel_obj)
-#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
+#' unimodel_fit <- fit_unimodel(aapl_volume_training)
+#' smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
+#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 #'
 #' # Plot smoothing and forecasting performance
 #' plot_performance(smooth_result)
@@ -157,15 +161,15 @@ plot_performance <- function(smooth_forecast_result) {
   # determine type
   if (sum(grepl("smooth", names(smooth_forecast_result)))) {
     type <- "smooth"
-    title <- "Smoothing result (log scale)"
+    title <- "Smoothing result"
   } else {
     type <- "forecast"
-    title <- "One-bin-ahead forecast (log scale)"
+    title <- "One-bin-ahead forecast"
   }
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$original.signal,
+      original = smooth_forecast_result$original_signal,
       output = smooth_forecast_result[[grep(type, names(smooth_forecast_result))]]
     )
   plt_data_log <- log(plt_data)
@@ -183,7 +187,8 @@ plot_performance <- function(smooth_forecast_result) {
     ggplot() +
     geom_line(aes(x = i, y = value, color = variable), alpha = 0.8, size = 0.4) +
     scale_colour_manual(values = c(original = "steelblue", output = "#FD6467"), labels = c("original", type)) +
-    xlab(expression(tau)) +
+    scale_y_continuous(labels = number_format(prefix = "e^")) +
+    xlab("time") +
     ylab("Intraday Signal") +
     theme_bw() +
     theme(
@@ -191,8 +196,7 @@ plot_performance <- function(smooth_forecast_result) {
       legend.position = "bottom",
       legend.text = element_text(size = text_size, face = "bold"),
       legend.title = element_blank(),
-      plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-      axis.text.x = element_blank()
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
     ) +
     plot_annotation(
       title = title,

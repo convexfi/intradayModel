@@ -11,7 +11,7 @@ Authors@R: c(
 Maintainer: Daniel P. Palomar <daniel.p.palomar@gmail.com>
 URL: https://github.com/convexfi/intradayModel,
      https://www.danielppalomar.com,
-     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3101695
+     https://dx.doi.org/10.2139/ssrn.3101695
 BugReports: https://github.com/convexfi/intradayModel/issues
 License: Apache License (== 2.0)
 Encoding: UTF-8
@@ -24,6 +24,7 @@ Imports:
     reshape2,
     rlist,
     utils,
+    scales,
     xts,
     zoo
 Suggests:

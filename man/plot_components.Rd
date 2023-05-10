@@ -19,12 +19,12 @@ Plot the components of smoothing/forecasting result in one figure.
 \dontrun{
 
 data(aapl_volume)
-aapl_volume_fit <- aapl_volume[, 1:104]
+aapl_volume_training <- aapl_volume[, 1:104]
 
 # Obtain smoothing and forecasting result
-unimodel_obj <- fit_unimodel(aapl_volume_fit)
-smooth_result <- smooth_unimodel(aapl_volume_fit, unimodel_obj)
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_obj, out.sample = 20)
+unimodel_fit <- fit_unimodel(aapl_volume_training)
+smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
+forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 
 # Plot smoothed and forecast components
 plot_components(smooth_result)

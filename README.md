@@ -1,3 +1,12 @@
+---
+output:
+  html_document:
+    variant: markdown_github
+    keep_md: true
+  md_document:
+    variant: markdown_github
+---
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 
@@ -65,7 +74,7 @@ To see how well our model performs on new data, we use `forecast_unimodel` funct
 
 
 ```r
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out.sample = 20)
+forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 ```
 

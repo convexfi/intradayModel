@@ -8,12 +8,12 @@ test_that("specify_uniss works with partial fixed params", {
     as.list() %>%
     unlist()
 
-  fixed.pars <- list()
-  fixed.pars$"a_mu" <- 1
-  fixed.pars$"var_eta" <- 4
-  fixed.pars$"x0" <- matrix(0,2)
-  fixed.pars$"phi" <- matrix(2, n_bin)
-  model_test <- spec_unimodel(fixed.pars = fixed.pars)
+  fixed_pars <- list()
+  fixed_pars$"a_mu" <- 1
+  fixed_pars$"var_eta" <- 4
+  fixed_pars$"x0" <- matrix(0,2)
+  fixed_pars$"phi" <- matrix(2, n_bin)
+  model_test <- spec_unimodel(fixed_pars = fixed_pars)
 
   # predefined model
   model_predefined <- list()
@@ -30,17 +30,17 @@ test_that("specify_uniss works with partial fixed params", {
 })
 
 test_that("cleanParsList works", {
-  fixed.pars <- list()
-  fixed.pars$"a_mu" <- NA
-  fixed.pars$"var_eta" <- 4
-  fixed.pars$"x0" <- matrix(0, 2)
-  fixed.pars$"V0" <- matrix(c(1,2,3,4), 2)
+  fixed_pars <- list()
+  fixed_pars$"a_mu" <- NA
+  fixed_pars$"var_eta" <- 4
+  fixed_pars$"x0" <- matrix(0, 2)
+  fixed_pars$"V0" <- matrix(c(1,2,3,4), 2)
   
-  fixed.pars <- clean_pars_list(fixed.pars)$input_list
+  fixed_pars <- clean_pars_list(fixed_pars)$input_list
   
   predefined.pars <- list()
   predefined.pars$"var_eta" <- 4
   predefined.pars$"x0" <- c(0, 0)
   
-  expect_equal(fixed.pars, predefined.pars)
+  expect_equal(fixed_pars, predefined.pars)
 })
