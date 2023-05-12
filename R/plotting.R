@@ -45,7 +45,7 @@ plot_components <- function(smooth_forecast_result) {
       daily = components[[grep("daily", names(components))]],
       seasonal = components[[grep("seasonal", names(components))]],
       dynamic = components[[grep("dynamic", names(components))]],
-      error = components$error
+      residual = components$residual
     )
   plt_data_log <- log10(plt_data)
   plt_data_log$i <- plt_data$i <- c(1:nrow(plt_data))
@@ -125,8 +125,8 @@ plot_components <- function(smooth_forecast_result) {
 
   p5 <- plt_data_log %>%
     ggplot() +
-    geom_line(aes(x = i, y = error), alpha = 0.8, color = "steelblue", size = 0.4) +
-    ylab("Error") +
+    geom_line(aes(x = i, y = residual), alpha = 0.8, color = "steelblue", size = 0.4) +
+    ylab("Residual") +
     theme_bw() +
     xlab("time") +
     theme(
