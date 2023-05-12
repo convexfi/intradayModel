@@ -25,7 +25,8 @@
 #'        \item{\code{components}}{A list of the three smoothed components:
 #'              \itemize{ \item{\code{smooth_daily}}
 #'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}}}
+#'                        \item{\code{smooth_dynamic}}}
+#'                        \item{\code{error}}}
 #'        \item{\code{error}}{A list of three error measures:
 #'              \itemize{ \item{\code{mae}}
 #'                        \item{\code{mape}}
@@ -34,9 +35,10 @@
 #'         \item{\code{original_signal}}{A vector of original intraday signal;}
 #'         \item{\code{forecast_signal}}{A vector of forecast intraday signal;}
 #'         \item{\code{components}}{A list of the three forecast components:
-#'              \itemize{ \item{\code{forecast_daily}}
-#'                        \item{\code{forecast_seasonal}}
-#'                        \item{\code{forecast_dynamic}}}}   
+#'              \itemize{ \item{\code{smooth_daily}}
+#'                        \item{\code{smooth_seasonal}}
+#'                        \item{\code{smooth_dynamic}}}
+#'                        \item{\code{error}}} 
 #'         \item{\code{error}}{A list of three error measures:
 #'              \itemize{ \item{\code{mae}}
 #'                        \item{\code{mape}}
