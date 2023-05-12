@@ -54,15 +54,15 @@
 #' 
 #' data(aapl_volume)
 #' model_fit <- fit_volume(aapl_volume)
-#' smooth_result <- smooth_unimodel(aapl_volume, model_fit)
+#' smooth_result <- smooth_volume_model(aapl_volume, model_fit)
 #' }
 #' 
 #' @export
 use_model <- function(purpose, model, data, burn_in_days = 0) {
   if (tolower(purpose) == "analysis") {
-    res <- smooth_unimodel(data = data, unimodel = model)
+    res <- smooth_volume_model(data = data, volume_model = model)
   } else if (tolower(purpose) == "forecast") {
-    res <- forecast_unimodel(data = data, unimodel = model, burn_in_days = burn_in_days)
+    res <- forecast_volume_model(data = data, volume_model = model, burn_in_days = burn_in_days)
   } else {
     warning("Wrong purpose for use_model function.\n")
   }
@@ -70,26 +70,26 @@ use_model <- function(purpose, model, data, burn_in_days = 0) {
   return(res)
 }
 
-smooth_unimodel <- function(data, unimodel) {
+smooth_volume_model <- function(data, volume_model) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
   } 
   data <- clean_data(data)
   
-  is_unimodel(unimodel, nrow(data))
+  is_volume_model(volume_model, nrow(data))
 
   # if model isn't optimally fitted (no convergence), it cannot filter
-  if (Reduce("+", unimodel$fit_request) != 0) {
+  if (Reduce("+", volume_model$fit_request) != 0) {
     msg <- c("All parameters must be optimally fitted. ",
-             "Parameters ", paste(names(unimodel$fit_request[unimodel$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
+             "Parameters ", paste(names(volume_model$fit_request[volume_model$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
     stop(msg)
   }
 
   # filter using UNISS (our own Kalman)
   args <- list(
     data = log(data),
-    unimodel = unimodel
+    volume_model = volume_model
   )
   uniss_obj <- do.call(specify_uniss, args)
   Kf <- uniss_kalman(uniss_obj, "smoother")
@@ -120,7 +120,7 @@ smooth_unimodel <- function(data, unimodel) {
   return(res)
 }
 
-forecast_unimodel <- function(data, unimodel, burn_in_days = 0) {
+forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
@@ -128,19 +128,19 @@ forecast_unimodel <- function(data, unimodel, burn_in_days = 0) {
   data <- clean_data(data)
   if (burn_in_days > ncol(data)) stop("out_sample must be smaller than the number of columns in data matrix.")
   
-  is_unimodel(unimodel, nrow(data))
+  is_volume_model(volume_model, nrow(data))
   
   # check if fit is necessary
-  if (Reduce("+", unimodel$fit_request) != 0) {
+  if (Reduce("+", volume_model$fit_request) != 0) {
     msg <- c("All parameters must be fitted.\n ",
-             "Parameter ", paste(names(unimodel$fit_request[unimodel$fit_request == TRUE]), collapse = ", "), " is not fitted.")
+             "Parameter ", paste(names(volume_model$fit_request[volume_model$fit_request == TRUE]), collapse = ", "), " is not fitted.")
     stop(msg)
   }
   
   # one-step ahead prediction using UNISS (our own Kalman)
   args <- list(
     data = log(data),
-    unimodel = unimodel
+    volume_model = volume_model
   )
   uniss_obj <- do.call(specify_uniss, args)
   Kf <- uniss_kalman(uniss_obj, "filter")

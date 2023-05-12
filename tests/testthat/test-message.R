@@ -1,6 +1,6 @@
 data(aapl_volume)
 
-test_that("is_unimodel works", {
+test_that("is_volume_model works", {
   data <- aapl_volume
   n_bin <- 26
   fixed_pars <- list()
@@ -8,32 +8,32 @@ test_that("is_unimodel works", {
   fixed_pars$"var_eta" <- 4
   fixed_pars$"x0" <- matrix(0,2)
   fixed_pars$"phi" <- matrix(2, n_bin)
-  modelSpec <- spec_unimodel(fixed_pars = fixed_pars)
+  modelSpec <- spec_volume_model(fixed_pars = fixed_pars)
   
   modelSpec_check1 <- modelSpec[c("par", "init")]
-  expect_error(is_unimodel(modelSpec_check1), "Elements fit_request are missing from the model.\n")
+  expect_error(is_volume_model(modelSpec_check1), "Elements fit_request are missing from the model.\n")
   
   modelSpec_check2 <- modelSpec
   modelSpec_check2$par[["x0"]] <- NULL
-  expect_error(is_unimodel(modelSpec_check2),"Elements x0 are missing from unimodel[$]par.\n")
+  expect_error(is_volume_model(modelSpec_check2),"Elements x0 are missing from volume_model[$]par.\n")
   
   modelSpec_check3 <- modelSpec
   modelSpec_check3$fit_request[["var_eta"]] <- TRUE
-  expect_error(is_unimodel(modelSpec_check3), "unimodel[$]par[$]var_eta and unimodel[$]fit_request[$]var_eta are conflicted.\n")
+  expect_error(is_volume_model(modelSpec_check3), "volume_model[$]par[$]var_eta and volume_model[$]fit_request[$]var_eta are conflicted.\n")
   modelSpec_check3$fit_request[["a_eta"]] <- Inf
-  expect_error(is_unimodel(modelSpec_check3), "Elements in unimodel[$]fit_request must be TRUE/FALSE.\n")
+  expect_error(is_volume_model(modelSpec_check3), "Elements in volume_model[$]fit_request must be TRUE/FALSE.\n")
   modelSpec_check3$fit_request[["a_eta"]] <- NA
-  expect_error(is_unimodel(modelSpec_check3), "Elements in unimodel[$]fit_request must be TRUE/FALSE.\n")
+  expect_error(is_volume_model(modelSpec_check3), "Elements in volume_model[$]fit_request must be TRUE/FALSE.\n")
   
   
   modelSpec_check4 <- modelSpec
   modelSpec_check4$par[["x0"]] <- 1
   modelSpec_check4$par[["var_eta"]] <- array(c(1,2))
-  error_message <- paste("Length of unimodel[$]par[$]var_eta is wrong.\n")
-  expect_error(is_unimodel(modelSpec_check4, 25), error_message)
+  error_message <- paste("Length of volume_model[$]par[$]var_eta is wrong.\n")
+  expect_error(is_volume_model(modelSpec_check4, 25), error_message)
 })
 
-test_that("forecast_unimodel/Smooth works", {
+test_that("forecast_volume_model/Smooth works", {
   data <- aapl_volume
   n_bin <- 26
   fixed_pars <- list()
@@ -41,8 +41,8 @@ test_that("forecast_unimodel/Smooth works", {
   fixed_pars$"var_eta" <- 4
   fixed_pars$"x0" <- matrix(0,2)
   fixed_pars$"phi" <- matrix(2, n_bin)
-  modelSpec <- spec_unimodel(fixed_pars = fixed_pars)
-  expect_error(smooth_unimodel(data, modelSpec), 
+  modelSpec <- spec_volume_model(fixed_pars = fixed_pars)
+  expect_error(smooth_volume_model(data, modelSpec), 
                regexp = "All parameters must be optimally fitted. Parameters a_eta, var_mu, r, V0 are not optimally fitted.")
   
 
@@ -50,13 +50,13 @@ test_that("forecast_unimodel/Smooth works", {
   fixed_pars$"a_eta" <- 1
   fixed_pars$"var_mu" <- 4
   fixed_pars$"V0" <- c(1,0,0,1)
-  modelSpec <- spec_unimodel(fixed_pars = fixed_pars)
-  expect_error(forecast_unimodel(data, modelSpec, 300), 
+  modelSpec <- spec_volume_model(fixed_pars = fixed_pars)
+  expect_error(forecast_volume_model(data, modelSpec, 300), 
                regexp = "out_sample must be smaller than the number of columns in data matrix.")
   
 })
 
-test_that("spec_unimodel message", {
+test_that("spec_volume_model message", {
   init_pars <- list()
   init_pars$"a_eta" <- 1
   init_pars$"x0" <- matrix(0, 2, 2)
@@ -84,8 +84,8 @@ test_that("spec_unimodel message", {
   warning_message <- paste("Warnings in fixed_pars:\n","  Elements a_mu, x0 are invalid [(]check number/dimension/PSD[)].\n",
                            "Warnings in init_pars:\n","  Elements xxx are not allowed in parameter list.\n",
                            "  Elements x0 are invalid [(]check number/dimension/PSD[)].\n","  Elements V0 have already been fixed." ,sep = "")
-  # expect_output(spec_unimodel(init_pars = init_pars, fixed_pars = fixed_pars), warning_message)
-  expect_warning(spec_unimodel(init_pars = init_pars, fixed_pars = fixed_pars), warning_message)
+  # expect_output(spec_volume_model(init_pars = init_pars, fixed_pars = fixed_pars), warning_message)
+  expect_warning(spec_volume_model(init_pars = init_pars, fixed_pars = fixed_pars), warning_message)
   
 })
 

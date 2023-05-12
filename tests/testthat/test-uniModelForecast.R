@@ -1,4 +1,4 @@
-test_that("forecast_unimodel, stock = ADBE", {
+test_that("forecast_volume_model, stock = ADBE", {
   skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "ADBE_volume"))
   data <- data.pred[,1:104]
@@ -6,8 +6,8 @@ test_that("forecast_unimodel, stock = ADBE", {
   modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(forecast_unimodel(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
-  log_volume_pred_acc <- log(forecast_unimodel(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
+  log_volume_pred <- log(forecast_volume_model(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
+  log_volume_pred_acc <- log(forecast_volume_model(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -21,7 +21,7 @@ test_that("forecast_unimodel, stock = ADBE", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 1e-4)
 })
 
-test_that("forecast_unimodel, ACN", {
+test_that("forecast_volume_model, ACN", {
   skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "ACN_volume"))
   data <- data.pred[,1:104]
@@ -29,8 +29,8 @@ test_that("forecast_unimodel, ACN", {
   modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(forecast_unimodel(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
-  log_volume_pred_acc <- log(forecast_unimodel(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
+  log_volume_pred <- log(forecast_volume_model(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
+  log_volume_pred_acc <- log(forecast_volume_model(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
   log_volume_real <- log(tail(as.vector(as.matrix(data.pred)), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -44,7 +44,7 @@ test_that("forecast_unimodel, ACN", {
   expect_equal(c(mae, mape, rmse), c(expected_res$mae, expected_res$mape, expected_res$rmse), tolerance = 5e-4)
 })
 
-test_that("forecast_unimodel, stock = CVS", {
+test_that("forecast_volume_model, stock = CVS", {
   skip_on_cran()
   data.pred <- readRDS(test_path("fixtures", "CVS_volume"))
   data <- data.pred[,1:104]
@@ -53,8 +53,8 @@ test_that("forecast_unimodel, stock = CVS", {
   
   modelSpec.fit_acc <- fit_volume(data, init_pars = list(a_mu = 0), control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(forecast_unimodel(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
-  log_volume_pred_acc <- log(forecast_unimodel(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
+  log_volume_pred <- log(forecast_volume_model(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
+  log_volume_pred_acc <- log(forecast_volume_model(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)

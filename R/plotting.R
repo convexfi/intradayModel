@@ -2,7 +2,7 @@
 #'
 #' @description Plot the components of smoothing/forecasting result in one figure.
 #'
-#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_unimodel} or \code{forecast_unimodel}.
+#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_volume_model} or \code{forecast_volume_model}.
 #'
 #' @return A \code{patchwork} object composed of 4 patches.
 #'
@@ -18,8 +18,8 @@
 #'
 #' # Obtain smoothing and forecasting result
 #' model_fit <- fit_volume(aapl_volume_training)
-#' smooth_result <- smooth_unimodel(aapl_volume_training, model_fit)
-#' forecast_result <- forecast_unimodel(aapl_volume, model_fit, out_sample = 20)
+#' smooth_result <- smooth_volume_model(aapl_volume_training, model_fit)
+#' forecast_result <- forecast_volume_model(aapl_volume, model_fit, out_sample = 20)
 #'
 #' # Plot smoothed and forecast components
 #' plot_components(smooth_result)
@@ -154,7 +154,7 @@ plot_components <- function(smooth_forecast_result) {
 #'
 #' @description Compares the original signal with the smoothed/forecast signal in one plot.
 #'
-#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_unimodel} or \code{forecast_unimodel}.
+#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_volume_model} or \code{forecast_volume_model}.
 #'
 #' @return A \code{patchwork} object composed of 1 patch.
 #'
@@ -168,8 +168,8 @@ plot_components <- function(smooth_forecast_result) {
 #'
 #' # Obtain smoothing and forecasting result
 #' model_fit <- fit_volume(aapl_volume_training)
-#' smooth_result <- smooth_unimodel(aapl_volume_training, model_fit)
-#' forecast_result <- forecast_unimodel(aapl_volume, model_fit, out_sample = 20)
+#' smooth_result <- smooth_volume_model(aapl_volume_training, model_fit)
+#' forecast_result <- forecast_volume_model(aapl_volume, model_fit, out_sample = 20)
 #'
 #' # Plot smoothing and forecasting performance
 #' plot_performance(smooth_result)

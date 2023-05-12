@@ -7,7 +7,7 @@
 plot_performance(smooth_forecast_result)
 }
 \arguments{
-\item{smooth_forecast_result}{Smoothing/forecasting result from \code{smooth_unimodel} or \code{forecast_unimodel}.}
+\item{smooth_forecast_result}{Smoothing/forecasting result from \code{smooth_volume_model} or \code{forecast_volume_model}.}
 }
 \value{
 A \code{patchwork} object composed of 1 patch.
@@ -23,8 +23,8 @@ aapl_volume_training <- aapl_volume[, 1:104]
 
 # Obtain smoothing and forecasting result
 model_fit <- fit_volume(aapl_volume_training)
-smooth_result <- smooth_unimodel(aapl_volume_training, model_fit)
-forecast_result <- forecast_unimodel(aapl_volume, model_fit, out_sample = 20)
+smooth_result <- smooth_volume_model(aapl_volume_training, model_fit)
+forecast_result <- forecast_volume_model(aapl_volume, model_fit, out_sample = 20)
 
 # Plot smoothing and forecasting performance
 plot_performance(smooth_result)

@@ -1,6 +1,6 @@
-#' @title Fit a Univariate State-Space Model via Expectation-Maximization Algorithm
+#' @title Fit a Univariate State-Space Model on Intraday Trading Volume
 #' 
-#' @description The main function for defining and fitting a univaraite state-space model. The model proposed in (Chen et al., 2016) is formulated as
+#' @description The main function for defining and fitting a univaraite state-space model for intraday volume. The model proposed in (Chen et al., 2016) is formulated as
 #'  \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}{x(\tau+1) = A(\tau) x(\tau) + w(\tau),}
 #'              \deqn{y_{\tau} = \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,}{y(\tau) = C x(\tau) + \phi(\tau) + v(\tau),}
 #'              where
@@ -42,7 +42,7 @@
 #'                    \item{\code{abstol}: Absolute tolerance for parameters' change \eqn{\|\Delta \boldsymbol{\Theta}_i\|}{||\Delta \Theta(i)||} as the stopping criteria (default \code{1e-4})}
 #'                    \item{\code{log_switch}: TRUE/FALSE indicating whether to record the history of convergence progress (defalut TRUE).}}    
 #'
-#' @return A list of class "\code{unimodel}" with the following elements (if the algorithm converges):
+#' @return A list of class "\code{volume_model}" with the following elements (if the algorithm converges):
 #'         \item{\code{par}}{A list of parameters' fitted values.}
 #'         \item{\code{init}}{A list of valid initial values from users.}
 #'         \item{\code{par_log}}{A list of intermediate parameters' values if \code{log_switch = TRUE}.} 
@@ -85,15 +85,15 @@ fit_volume <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, 
   data <- clean_data(data)
   
   # Define a Univariate State-Space Model
-  unimodel <- spec_unimodel(fixed_pars, init_pars)
-  is_unimodel(unimodel, nrow(data))
+  volume_model <- spec_volume_model(fixed_pars, init_pars)
+  is_volume_model(volume_model, nrow(data))
 
   # check if fit is required
-  if (Reduce("+", unimodel$fit_request) == 0) {
+  if (Reduce("+", volume_model$fit_request) == 0) {
     if (verbose > 0) {
       cat("All parameters have already been fixed.\n")
     }
-    return(unimodel)
+    return(volume_model)
   }
 
   # control list check
@@ -108,10 +108,10 @@ fit_volume <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, 
     }
   }
   
-  # specify uniss-format model (unimodel is outer interface, uniss is inner obj)
+  # specify uniss-format model (volume_model is outer interface, uniss is inner obj)
   args <- list(
     data = log(data),
-    unimodel = unimodel
+    volume_model = volume_model
   )
   uniss_obj <- do.call(specify_uniss, args)
   
@@ -126,30 +126,30 @@ fit_volume <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, 
   } else {
     em_result <- do.call(uniss_em_alg_acc, args)
   }
-  unimodel$par_log <- em_result$par_log
+  volume_model$par_log <- em_result$par_log
   
   if (length(em_result$warning_msg) > 0) {
     warning(em_result$warning_msg)
   }
   
-  # update unimodel list object
-  unimodel$par <- em_result$uniss_obj$par
+  # update volume_model list object
+  volume_model$par <- em_result$uniss_obj$par
   if (em_result$convergence) {
-    unimodel$fit_request[] <- FALSE
-    unimodel$init <- list()
+    volume_model$fit_request[] <- FALSE
+    volume_model$init <- list()
   }
   
   # verbose
   if (verbose >= 2) {
     cat("--- obtained parameters ---\n")
-    par_visual <- lapply(unimodel$par, as.numeric)
+    par_visual <- lapply(volume_model$par, as.numeric)
     par_visual$V0 <- matrix(c(par_visual$V0[1], par_visual$V0[2],
                               par_visual$V0[2], par_visual$V0[3]), 2)
     utils::str(par_visual)
     cat("---------------------------\n")
   }
   
-  return(unimodel)
+  return(volume_model)
 }
 
 uniss_em_alg <- function(...) {

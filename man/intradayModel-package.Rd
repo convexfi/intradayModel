@@ -13,8 +13,8 @@ It is a valuable tool for anyone interested in exploring intraday, algorithmic, 
 \section{Functions}{
 
 \code{\link{fit_volume}}, 
-\code{\link{forecast_unimodel}}, 
-\code{\link{smooth_unimodel}},
+\code{\link{forecast_volume_model}}, 
+\code{\link{smooth_volume_model}},
 \code{\link{plot_components}},
 \code{\link{plot_performance}}
 }

@@ -59,7 +59,7 @@ If use the fitted model for \code{analysis} (smoothing in state-space model), th
 
 data(aapl_volume)
 model_fit <- fit_volume(aapl_volume)
-smooth_result <- smooth_unimodel(aapl_volume, model_fit)
+smooth_result <- smooth_volume_model(aapl_volume, model_fit)
 }
 
 }

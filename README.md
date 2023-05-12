@@ -54,12 +54,12 @@ model_fit <- fit_volume(aapl_volume_training)
 
 Once the model is fitted, we can estimate the hidden components of any
 intraday signal based on all its observations, which is called
-**smoothing**. By calling `smooth_unimodel` function, we obtain daily,
+**smoothing**. By calling `smooth_volume_model` function, we obtain daily,
 seasonal, and intraday dynamic components. This procedure helps us
 better identify the underlying information of the intraday signal.
 
 ``` r
-smooth_result <- smooth_unimodel(aapl_volume_training, model_fit)
+smooth_result <- smooth_volume_model(aapl_volume_training, model_fit)
 plot_components(smooth_result) # plot smoothed hidden components
 ```
 
@@ -72,11 +72,11 @@ plot_performance(smooth_result) # plot smoothed result
 <img src="man/figures/README-smooth_plot-2.png" width="75%" style="display: block; margin: auto;" />
 
 To see how well our model performs on new data, we use
-`forecast_unimodel` function to do one-bin-ahead forecast on the
+`forecast_volume_model` function to do one-bin-ahead forecast on the
 out-of-sample dataset of 20 days.
 
 ``` r
-forecast_result <- forecast_unimodel(aapl_volume, model_fit, out_sample = 20)
+forecast_result <- forecast_volume_model(aapl_volume, model_fit, out_sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 ```
 
