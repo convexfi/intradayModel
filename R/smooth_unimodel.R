@@ -7,7 +7,7 @@
 #'              \eqn{\boldsymbol{\phi}}{\phi}.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param unimodel A "\code{unimodel}" object from function \code{fit_unimodel}.
+#' @param unimodel A "\code{unimodel}" object from function \code{fit_volume}.
 #'
 #' @return A list containing the following elements:
 #'        \item{\code{original_signal}}{A vector of original intraday signal;}
@@ -25,8 +25,8 @@
 #' \dontrun{
 #' 
 #' data(aapl_volume)
-#' unimodel_fit <- fit_unimodel(aapl_volume)
-#' smooth_result <- smooth_unimodel(aapl_volume, unimodel_fit)
+#' model_fit <- fit_volume(aapl_volume)
+#' smooth_result <- smooth_unimodel(aapl_volume, model_fit)
 #' }
 #' 
 #' @export

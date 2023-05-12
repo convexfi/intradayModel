@@ -9,7 +9,7 @@ smooth_unimodel(data, unimodel)
 \arguments{
 \item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
 
-\item{unimodel}{A "\code{unimodel}" object from function \code{fit_unimodel}.}
+\item{unimodel}{A "\code{unimodel}" object from function \code{fit_volume}.}
 }
 \value{
 A list containing the following elements:
@@ -31,8 +31,8 @@ A model with all parameters fixed can be used to decompose the financial intrada
 \dontrun{
 
 data(aapl_volume)
-unimodel_fit <- fit_unimodel(aapl_volume)
-smooth_result <- smooth_unimodel(aapl_volume, unimodel_fit)
+model_fit <- fit_volume(aapl_volume)
+smooth_result <- smooth_unimodel(aapl_volume, model_fit)
 }
 
 }

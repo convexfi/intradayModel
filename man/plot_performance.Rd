@@ -22,9 +22,9 @@ data(aapl_volume)
 aapl_volume_training <- aapl_volume[, 1:104]
 
 # Obtain smoothing and forecasting result
-unimodel_fit <- fit_unimodel(aapl_volume_training)
-smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
+model_fit <- fit_volume(aapl_volume_training)
+smooth_result <- smooth_unimodel(aapl_volume_training, model_fit)
+forecast_result <- forecast_unimodel(aapl_volume, model_fit, out_sample = 20)
 
 # Plot smoothing and forecasting performance
 plot_performance(smooth_result)

@@ -89,7 +89,7 @@ test_that("spec_unimodel message", {
   
 })
 
-test_that("fit_unimodel message", {
+test_that("fit_volume message", {
   data <- aapl_volume
   data_train <- aapl_volume[, 1:104]
   data_error_test <- data_train
@@ -103,16 +103,16 @@ test_that("fit_unimodel message", {
     "phi" = rep(2,26)
   )
   
-  expect_warning(fit_unimodel(data_train, control = list(maxit = 1)), 
+  expect_warning(fit_volume(data_train, control = list(maxit = 1)), 
                  regexp = "Warning! Reached maxit before parameters converged. Maxit was 1.\n")
-  expect_output(fit_unimodel(data_train,verbose = 1, control = list(maxit = 1000, acceleration = TRUE)), 
+  expect_output(fit_volume(data_train,verbose = 1, control = list(maxit = 1000, acceleration = TRUE)), 
                 regexp = "Success! abstol test passed at")
-  expect_error(fit_unimodel(c(1,1)), regexp = "data must be matrix or xts.")
-  expect_output(fit_unimodel(data, fixed_pars = fixed_pars, verbose = 1), "All parameters have already been fixed.")
+  expect_error(fit_volume(c(1,1)), regexp = "data must be matrix or xts.")
+  expect_output(fit_volume(data, fixed_pars = fixed_pars, verbose = 1), "All parameters have already been fixed.")
   
-  # modelSpec.fit_acc <- fit_unimodel(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE, verbose = 0)
+  # modelSpec.fit_acc <- fit_volume(data_train, modelSpec, maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE, verbose = 0)
   # 
-  # expect_output(fit_unimodel(data_train, modelSpec.fit_acc), "All parameters have already been fixed.")
+  # expect_output(fit_volume(data_train, modelSpec.fit_acc), "All parameters have already been fixed.")
   # 
   
 })

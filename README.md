@@ -43,13 +43,13 @@ aapl_volume[1:5, 1:5] # print the head of data
 #> 10:30 AM    4587159   18041115    8686059    7130980    5479852
 ```
 
-Next, we fit a univariate state-space model using `fit_unimodel`
+Next, we fit a univariate state-space model using `fit_volume`
 function. To be specific, we use the first 104 trading days for fitting,
 and the last 20 days for evaluation of forecasting performance.
 
 ``` r
 aapl_volume_training <- aapl_volume[, 1:104]
-unimodel_fit <- fit_unimodel(aapl_volume_training)
+model_fit <- fit_volume(aapl_volume_training)
 ```
 
 Once the model is fitted, we can estimate the hidden components of any
@@ -59,7 +59,7 @@ seasonal, and intraday dynamic components. This procedure helps us
 better identify the underlying information of the intraday signal.
 
 ``` r
-smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
+smooth_result <- smooth_unimodel(aapl_volume_training, model_fit)
 plot_components(smooth_result) # plot smoothed hidden components
 ```
 
@@ -76,7 +76,7 @@ To see how well our model performs on new data, we use
 out-of-sample dataset of 20 days.
 
 ``` r
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
+forecast_result <- forecast_unimodel(aapl_volume, model_fit, out_sample = 20)
 plot_components(forecast_result) # plot forecast hidden components
 ```
 

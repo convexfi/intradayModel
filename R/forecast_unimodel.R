@@ -13,7 +13,7 @@
 #'              where \eqn{M} is the total number of out-of-sample bins.
 #'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param unimodel A "\code{unimodel}" object from function \code{fit_unimodel}.
+#' @param unimodel A "\code{unimodel}" object from function \code{fit_volume}.
 #' @param out_sample  Number of days from the end of the dataset for out-of-sample forecast.
 #'
 #' @return A list containing the following elements:
@@ -35,10 +35,10 @@
 #' 
 #' # Fit on the first 104 days
 #' aapl_volume_training <- aapl_volume[, 1:104]
-#' unimodel_fit <- fit_unimodel(aapl_volume_training)
+#' model_fit <- fit_volume(aapl_volume_training)
 #' 
 #' # forecast on last 20 days
-#' forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
+#' forecast_result <- forecast_unimodel(aapl_volume, model_fit, out_sample = 20)
 #' }
 #' 
 #' @importFrom utils tail

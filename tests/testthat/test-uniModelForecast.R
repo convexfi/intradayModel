@@ -3,8 +3,8 @@ test_that("forecast_unimodel, stock = ADBE", {
   data.pred <- readRDS(test_path("fixtures", "ADBE_volume"))
   data <- data.pred[,1:104]
 
-  modelSpec.fit <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
-  modelSpec.fit_acc <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   log_volume_pred <- log(forecast_unimodel(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
   log_volume_pred_acc <- log(forecast_unimodel(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
@@ -26,8 +26,8 @@ test_that("forecast_unimodel, ACN", {
   data.pred <- readRDS(test_path("fixtures", "ACN_volume"))
   data <- data.pred[,1:104]
 
-  modelSpec.fit <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
-  modelSpec.fit_acc <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   log_volume_pred <- log(forecast_unimodel(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
   log_volume_pred_acc <- log(forecast_unimodel(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)
@@ -49,9 +49,9 @@ test_that("forecast_unimodel, stock = CVS", {
   data.pred <- readRDS(test_path("fixtures", "CVS_volume"))
   data <- data.pred[,1:104]
 
-  modelSpec.fit <- fit_unimodel(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
   
-  modelSpec.fit_acc <- fit_unimodel(data, init_pars = list(a_mu = 0), control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
+  modelSpec.fit_acc <- fit_volume(data, init_pars = list(a_mu = 0), control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   log_volume_pred <- log(forecast_unimodel(data.pred, modelSpec.fit, out_sample = 20)$forecast_signal)
   log_volume_pred_acc <- log(forecast_unimodel(data.pred, modelSpec.fit_acc, out_sample = 20)$forecast_signal)

@@ -61,15 +61,15 @@
 #' data(aapl_volume)
 #' 
 #' # Fit model with no prior knowledge
-#' unimodel_fit <- fit_unimodel(aapl_volume)
+#' model_fit <- fit_volume(aapl_volume)
 #' 
 #' # Fit model with fixed_pars and init_pars
 #' fixed_pars <- list(a_mu = 0.5, var_mu = 0.03)
 #' init_pars <- list(a_eta = 0.5)
-#' unimodel_fit <- fit_unimodel(aapl_volume, fixed_pars = fixed_pars, init_pars = init_pars)
+#' model_fit <- fit_volume(aapl_volume, fixed_pars = fixed_pars, init_pars = init_pars)
 #' 
 #' # Fit model with other control options
-#' unimodel_fit <- fit_unimodel(aapl_volume, verbose = 2, 
+#' model_fit <- fit_volume(aapl_volume, verbose = 2, 
 #'   control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log_switch = FALSE))
 #' }                  
 #' 
@@ -77,7 +77,7 @@
 #' @import xts
 #' 
 #' @export
-fit_unimodel <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, control = NULL) {
+fit_volume <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, control = NULL) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
     stop("data must be matrix or xts.")
