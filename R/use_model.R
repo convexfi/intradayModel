@@ -1,7 +1,7 @@
-#' @title Use Fitted Model for Analysis and Forecast
+#' @title Use a Fitted Model for Analysis and Forecast
 #'
-#' @description If use the fitted model for \code{analysis} (smoothing in state-space model), the optimal components of the intraday signal conditioned on all the data are provided.
-#'              If use the fitted model for \code{forecast} (forecasting in state-space model), the default one-bin-ahead forecast signal is mathematically denoted by \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#' @description If \code{purpose = analysis} (aka Kalman smoothing), the optimal components of the intraday signal conditioned on all the data are estimated.
+#'              If \code{purpose = forecast} (aka forecast in state-space model), the default one-bin-ahead forecast signal is provided, mathematically denoted by \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
 #'              Three measures are used to evaluate the performance:
 #'              \itemize{\item{Mean absolute error (MAE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M|\hat{y}_{\tau} - y_{\tau}|}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
@@ -10,39 +10,41 @@
 #'                       \item{Root mean square error (RMSE):
 #'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} ,}
 #'              }
-#'              where \eqn{M} is the total number of out-of-sample bins.
+#'              where \eqn{M} is the number of bins.
 #'
 #'
-#' @param purpose String "analysis" or "forecast" indicating the purpose of using model.
-#' @param model A model object from fitting function, including `fit_volume`.
+#' @param purpose String \code{analysis/forecast}. Indicates the purpose of using the provided model.
+#' @param model A model object from fitting functions including \code{fit_volume}.
 #' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param burn_in_days  Number of initial days in the burn-in period in forecast. Samples from the first burn_in_days are used to warm up the model and then are discarded.
+#' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.
 #'
 #'
 #' @return If \code{purpose = analysis}: A list containing the following elements:
-#'        \item{\code{original_signal}}{A vector of original intraday signal;}
-#'        \item{\code{smooth_signal}}{A vector of smoothed intraday signal;}
-#'        \item{\code{components}}{A list of the three smoothed components:
+#'        \itemize{
+#'        \item{\code{original_signal}: }{A vector of original intraday signal;}
+#'        \item{\code{smooth_signal}: }{A vector of smoothed intraday signal;}
+#'        \item{\code{components}: }{A list of the three smoothed components:
 #'              \itemize{ \item{\code{smooth_daily}}
 #'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}}
-#'                        \item{\code{error}}}
-#'        \item{\code{error}}{A list of three error measures:
+#'                        \item{\code{smooth_dynamic}}
+#'                        \item{\code{residual}}}}
+#'        \item{\code{error}: }{A list of three error measures:
 #'              \itemize{ \item{\code{mae}}
 #'                        \item{\code{mape}}
-#'                        \item{\code{rmse}}}}   
+#'                        \item{\code{rmse}}}}}   
 #'        If \code{purpose = forecast}: A list containing the following elements:
-#'         \item{\code{original_signal}}{A vector of original intraday signal;}
-#'         \item{\code{forecast_signal}}{A vector of forecast intraday signal;}
-#'         \item{\code{components}}{A list of the three forecast components:
+#'        \itemize{
+#'         \item{\code{original_signal}: }{A vector of original intraday signal;}
+#'         \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
+#'         \item{\code{components}: }{A list of the three forecast components:
 #'              \itemize{ \item{\code{smooth_daily}}
 #'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}}
-#'                        \item{\code{error}}} 
-#'         \item{\code{error}}{A list of three error measures:
+#'                        \item{\code{smooth_dynamic}}
+#'                        \item{\code{error}}}} 
+#'         \item{\code{error}: }{A list of three error measures:
 #'              \itemize{ \item{\code{mae}}
 #'                        \item{\code{mape}}
-#'                        \item{\code{rmse}}}}   
+#'                        \item{\code{rmse}}}}}
 #'         
 #' 
 #' @references
@@ -103,7 +105,7 @@ smooth_volume_model <- function(data, volume_model) {
   smooth_signal <- components$smooth_daily * 
     components$smooth_dynamic * components$smooth_seasonal
   original_signal <- as.vector(data)
-  components$error <- original_signal / smooth_signal
+  components$residual <- original_signal / smooth_signal
   error <- list(
     mae = calculate_mae(original_signal, smooth_signal),
     mape = calculate_mape(original_signal, smooth_signal),
@@ -157,7 +159,7 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   
   # error measures
   original_signal <- tail(as.vector(as.matrix(data)), nrow(data) * (ncol(data) - burn_in_days))
-  components_out$error <- original_signal / forecast_signal
+  components_out$residual <- original_signal / forecast_signal
   error <- list(
     mae = calculate_mae(original_signal, forecast_signal),
     mape = calculate_mape(original_signal, forecast_signal),

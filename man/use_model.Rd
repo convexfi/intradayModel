@@ -2,48 +2,50 @@
 % Please edit documentation in R/use_model.R
 \name{use_model}
 \alias{use_model}
-\title{Use Fitted Model for Analysis and Forecast}
+\title{Use a Fitted Model for Analysis and Forecast}
 \usage{
 use_model(purpose, model, data, burn_in_days = 0)
 }
 \arguments{
-\item{purpose}{String "analysis" or "forecast" indicating the purpose of using model.}
+\item{purpose}{String \code{analysis/forecast}. Indicates the purpose of using the provided model.}
 
-\item{model}{A model object from fitting function, including `fit_volume`.}
+\item{model}{A model object from fitting functions including \code{fit_volume}.}
 
 \item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
 
-\item{burn_in_days}{Number of initial days in the burn-in period in forecast. Samples from the first burn_in_days are used to warm up the model and then are discarded.}
+\item{burn_in_days}{Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.}
 }
 \value{
 If \code{purpose = analysis}: A list containing the following elements:
-       \item{\code{original_signal}}{A vector of original intraday signal;}
-       \item{\code{smooth_signal}}{A vector of smoothed intraday signal;}
-       \item{\code{components}}{A list of the three smoothed components:
+       \itemize{
+       \item{\code{original_signal}: }{A vector of original intraday signal;}
+       \item{\code{smooth_signal}: }{A vector of smoothed intraday signal;}
+       \item{\code{components}: }{A list of the three smoothed components:
              \itemize{ \item{\code{smooth_daily}}
                        \item{\code{smooth_seasonal}}
-                       \item{\code{smooth_dynamic}}}
-                       \item{\code{error}}}
-       \item{\code{error}}{A list of three error measures:
+                       \item{\code{smooth_dynamic}}
+                       \item{\code{error}}}}
+       \item{\code{error}: }{A list of three error measures:
              \itemize{ \item{\code{mae}}
                        \item{\code{mape}}
-                       \item{\code{rmse}}}}   
+                       \item{\code{rmse}}}}}   
        If \code{purpose = forecast}: A list containing the following elements:
-        \item{\code{original_signal}}{A vector of original intraday signal;}
-        \item{\code{forecast_signal}}{A vector of forecast intraday signal;}
-        \item{\code{components}}{A list of the three forecast components:
+       \itemize{
+        \item{\code{original_signal}: }{A vector of original intraday signal;}
+        \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
+        \item{\code{components}: }{A list of the three forecast components:
              \itemize{ \item{\code{smooth_daily}}
                        \item{\code{smooth_seasonal}}
-                       \item{\code{smooth_dynamic}}}
-                       \item{\code{error}}} 
-        \item{\code{error}}{A list of three error measures:
+                       \item{\code{smooth_dynamic}}
+                       \item{\code{error}}}} 
+        \item{\code{error}: }{A list of three error measures:
              \itemize{ \item{\code{mae}}
                        \item{\code{mape}}
-                       \item{\code{rmse}}}}
+                       \item{\code{rmse}}}}}
 }
 \description{
-If use the fitted model for \code{analysis} (smoothing in state-space model), the optimal components of the intraday signal conditioned on all the data are provided.
-             If use the fitted model for \code{forecast} (forecasting in state-space model), the default one-bin-ahead forecast signal is mathematically denoted by \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+If \code{purpose = analysis} (aka Kalman smoothing), the optimal components of the intraday signal conditioned on all the data are estimated.
+             If \code{purpose = forecast} (aka forecast in state-space model), the default one-bin-ahead forecast signal is provided, mathematically denoted by \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
              Three measures are used to evaluate the performance:
              \itemize{\item{Mean absolute error (MAE):
                             \eqn{\frac{1}{M}\sum_{\tau=1}^M|\hat{y}_{\tau} - y_{\tau}|}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
@@ -52,7 +54,7 @@ If use the fitted model for \code{analysis} (smoothing in state-space model), th
                       \item{Root mean square error (RMSE):
                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} ,}
              }
-             where \eqn{M} is the total number of out-of-sample bins.
+             where \eqn{M} is the number of bins.
 }
 \examples{
 \dontrun{
