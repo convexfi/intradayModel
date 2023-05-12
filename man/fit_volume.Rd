@@ -13,7 +13,7 @@ fit_volume(
 )
 }
 \arguments{
-\item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
+\item{data}{A n_bin * n_day matrix or an xts object storing intraday trading volume.}
 
 \item{fixed_pars}{A list of parameters' fixed values. The allowed parameters are listed below,
 \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
@@ -47,7 +47,7 @@ A list of class "\code{volume_model}" with the following elements (if the algori
         \item{\code{fit_request}}{A list of logical values indicating whether each parameter requires further fitting.}
 }
 \description{
-The main function for defining and fitting a univaraite state-space model for intraday volume. The model proposed in (Chen et al., 2016) is formulated as
+The main function for defining and fitting a univaraite state-space model on intraday trading volume. The model is proposed in (Chen et al., 2016) as
  \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}{x(\tau+1) = A(\tau) x(\tau) + w(\tau),}
              \deqn{y_{\tau} = \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,}{y(\tau) = C x(\tau) + \phi(\tau) + v(\tau),}
              where

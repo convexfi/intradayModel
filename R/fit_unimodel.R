@@ -1,6 +1,6 @@
 #' @title Fit a Univariate State-Space Model on Intraday Trading Volume
 #' 
-#' @description The main function for defining and fitting a univaraite state-space model for intraday volume. The model proposed in (Chen et al., 2016) is formulated as
+#' @description The main function for defining and fitting a univaraite state-space model on intraday trading volume. The model is proposed in (Chen et al., 2016) as
 #'  \deqn{\mathbf{x}_{\tau+1} = \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},}{x(\tau+1) = A(\tau) x(\tau) + w(\tau),}
 #'              \deqn{y_{\tau} = \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,}{y(\tau) = C x(\tau) + \phi(\tau) + v(\tau),}
 #'              where
@@ -20,7 +20,7 @@
 #' The model is fitted by expectation-maximization (EM) algorithms. The implementation follows (Chen et al., 2016), and the accelerated scheme is provided in (Varadhan and Roland, 2008).
 #' The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \textrm{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 #'
-#' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
+#' @param data A n_bin * n_day matrix or an xts object storing intraday trading volume.
 #' @param fixed_pars A list of parameters' fixed values. The allowed parameters are listed below,
 #'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
 #'                           \item{\code{"a_mu"}: \eqn{a^{\mu}}{a.\mu}} of size 1 ;
