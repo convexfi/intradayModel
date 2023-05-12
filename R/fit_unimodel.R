@@ -50,7 +50,7 @@
 #'                                
 #' 
 #' @references
-#' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
+#' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A Kalman filter approach. Available at SSRN 3101695.
 #' 
 #' Varadhan, R., and Roland, C. (2008). Simple and globally convergent methods for accelerating the convergence of any EM algorithm. 
 #' Scandinavian Journal of Statistics, 35(2), 335–353.
