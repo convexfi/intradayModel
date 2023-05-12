@@ -56,7 +56,7 @@
 #' }
 #' 
 #' @export
-use_model <- function(purpose, model, data, burn_in_days) {
+use_model <- function(purpose, model, data, burn_in_days = 0) {
   if (tolower(purpose) == "analysis") {
     res <- smooth_unimodel(data = data, unimodel = model)
   } else if (tolower(purpose) == "forecast") {
@@ -100,11 +100,19 @@ smooth_unimodel <- function(data, unimodel) {
   )
   smooth_signal <- components$smooth_daily * 
     components$smooth_dynamic * components$smooth_seasonal
+  original_signal <- as.vector(data)
+  components$error <- original_signal / smooth_signal
+  error <- list(
+    mae = calculate_mae(original_signal, smooth_signal),
+    mape = calculate_mape(original_signal, smooth_signal),
+    rmse = calculate_rmse(original_signal, smooth_signal)
+  )
   
   res <- list(
-    original_signal = as.vector(data),
+    original_signal = original_signal,
     smooth_signal = smooth_signal,
-    components = components
+    components = components,
+    error = error
   )
   
   return(res)
@@ -146,16 +154,17 @@ forecast_unimodel <- function(data, unimodel, burn_in_days = 0) {
     components_out$forecast_dynamic * components_out$forecast_seasonal
   
   # error measures
-  signal_real <- tail(as.vector(as.matrix(data)), nrow(data) * (ncol(data) - burn_in_days))
+  original_signal <- tail(as.vector(as.matrix(data)), nrow(data) * (ncol(data) - burn_in_days))
+  components_out$error <- original_signal / forecast_signal
   error <- list(
-    mae = calculate_mae(signal_real, forecast_signal),
-    mape = calculate_mape(signal_real, forecast_signal),
-    rmse = calculate_rmse(signal_real, forecast_signal)
+    mae = calculate_mae(original_signal, forecast_signal),
+    mape = calculate_mape(original_signal, forecast_signal),
+    rmse = calculate_rmse(original_signal, forecast_signal)
   )
   
   # result
   res <- list(
-    original_signal = signal_real,
+    original_signal = original_signal,
     forecast_signal = forecast_signal,
     components = components_out,
     error = error
