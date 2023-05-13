@@ -24,7 +24,7 @@ If \code{purpose = analysis}: A list containing the following elements:
              \itemize{ \item{\code{smooth_daily}}
                        \item{\code{smooth_seasonal}}
                        \item{\code{smooth_dynamic}}
-                       \item{\code{error}}}}
+                       \item{\code{residual}}}}
        \item{\code{error}: }{A list of three error measures:
              \itemize{ \item{\code{mae}}
                        \item{\code{mape}}
@@ -37,7 +37,7 @@ If \code{purpose = analysis}: A list containing the following elements:
              \itemize{ \item{\code{smooth_daily}}
                        \item{\code{smooth_seasonal}}
                        \item{\code{smooth_dynamic}}
-                       \item{\code{error}}}} 
+                       \item{\code{residual}}}} 
         \item{\code{error}: }{A list of three error measures:
              \itemize{ \item{\code{mae}}
                        \item{\code{mape}}
@@ -60,11 +60,23 @@ If \code{purpose = analysis} (aka Kalman smoothing), the optimal components of t
 \dontrun{
 
 data(aapl_volume)
-model_fit <- fit_volume(aapl_volume)
-smooth_result <- smooth_volume_model(aapl_volume, model_fit)
+aapl_volume_training <- aapl_volume[, 1:104]
+aapl_volume_testing <- aapl_volume[, 105:124]
+model_fit <- fit_volume(aapl_volume_training)
+
+# analyze training volume
+analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+
+# forecast testing volume
+forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+
+# forecast testing volume with burn-in 
+forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume,
+                             burn_in_days = 104)
+
 }
 
 }
 \references{
-Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A kalman filter approach. Available at SSRN 3101695.
+Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A Kalman filter approach. Available at SSRN 3101695.
 }
