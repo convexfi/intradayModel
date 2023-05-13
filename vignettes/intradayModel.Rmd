@@ -97,7 +97,157 @@ plots <- autoplot(forecast_result)
 plots$original_and_resultant # plot forecast result
 ```
 
+Now that you have a quick start on using the package, let's explore the details and dive deeper into its functionalities and features.
 
+&nbsp; 
+
+# Usage of the package
+
+## Preliminary theory
+
+Intraday observations of trading volume are divided into days, indexed by $t\in\{1,\dots,T\}$. Each day is further divided into bins, indexed by $i\in\{1,\dots,I\}$. To refer to a specific observation, we use the index $\tau = I \times (t-1) + i$.
+
+Our package uses a state-space model to extract several components of intraday signals. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
+
+
+The observed intraday signal can be written in a multiplicative combination of the components [@brownlees2011intra]:
+
+$$
+\large
+\text{intraday signal} = \text{daily} \times \text{seasonal} \times \text{intraday dynamic} \times \text{noise}. \tag{1}
+\small
+$$
+
+Alternatively, by taking the logarithm transform, the intraday signal can be also regarded as an addictive combination of these components:
+
+$$
+\large
+y_{\tau} = \eta_{\tau} + \phi_i + \mu_{t,i} + v_{t,i}. \tag{2}
+\small
+$$
+
+The univariate model proposed by [@chen2016forecasting] is defined on Equation (2) as
+$$
+\large
+\begin{aligned}
+\mathbf{x}_{\tau+1} &= \mathbf{A}_{\tau}\mathbf{x}_{\tau} + \mathbf{w}_{\tau},\\
+y_{\tau} &= \mathbf{C}\mathbf{x}_{\tau} + \phi_{\tau} + v_\tau,
+\end{aligned}
+\tag{3}
+\small
+$$
+where
+
+- $\mathbf{x}_{\tau} = [\eta_{\tau}, \mu_{\tau}]^\top$ is the hidden state vector containing the log daily component and the log intraday dynamic component;
+
+- $\mathbf{A}_{\tau} = \left[\begin{array}{l}a_{\tau}^{\eta}&0\\0&a^{\mu}\end{array} \right]$ is the state transition matrix with $a_{\tau}^{\eta} = \begin{cases}a^{\eta}&\tau = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}$
+
+- $\mathbf{C} = [1, 1]$ is the observation matrix;
+
+- $\phi_{\tau}$ is the corresponding element from $\boldsymbol{\phi} = [\phi_1,\dots, \phi_I]^\top$, which is the log seasonal component;
+
+- $\mathbf{w}_{\tau} = \left[\epsilon_{\tau}^{\eta},\epsilon_{\tau}^{\mu}\right]^\top \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}_{\tau})$ represents the i.i.d. Gaussian noise in the state transition, with a time-varying covariance matrix $\mathbf{Q}_{\tau} = \left[\begin{array}{l}(\sigma_\tau^{\eta})^2&0\\0&(\sigma^{\mu})^2\end{array} \right]$ and $\sigma_\tau^{\eta} = \begin{cases}\sigma^{\eta}&\tau = kI, k = 1,2,\dots\\0&\text{otherwise};\end{cases}$
+
+- $v_\tau \sim \mathcal{N}(0, r)$ is the i.i.d. Gaussian noise in the observation;
+
+- $\mathbf{x}_1$ is the initial state at $\tau = 1$, and it follows $\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0)$.
+
+In this model, $\boldsymbol{\Theta} = \{a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\sigma^{\mu})^2, r, \boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0 \}$ are treated as parameters.
+
+## Datasets
+
+Two data classes of intraday volume are supported:
+
+- a 2D numeric matrix of size `(n_bin, n_day)`;
+
+- an xts object.
+
+To help you get started, we provide two sample datasets: a matrix-class `aapl_volume` and an xts-class `fdx_volume`. Here, we elaborate on the later one.
+
+```{r, warning=FALSE}
+data(fdx_volume)
+head(fdx_volume)
+tail(fdx_volume)
+```
+
+## Fitting
+
+> **fit_volume**(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, control = NULL)
+
+To fit a univariate state-space model on intraday volume, you should use `fit_volume` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed_pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init_pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
+
+The fitting process stops when either the maximum number of iterations is reached or the termination criteria is met $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
+
+The following code shows how to fit the model to the FDX stock.
+
+```{r}
+# set fixed value
+fixed_pars <- list()
+fixed_pars$"x0" <- c(13.33, -0.37)
+
+# set initial value 
+init_pars <- list()
+init_pars$"a_eta" <- 1
+
+fdx_volume_training <- fdx_volume['2019-07-01/2019-11-30']
+model_fit <- fit_volume(fdx_volume_training, verbose = 2, control = list(acceleration = TRUE))
+```
+
+Trading days with missing bins are automatically removed. They are 2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving Day) which have early close.
+
+## Analysis
+
+> **use_model**(purpose = "analysis", model, data)
+
+`use_model` function with `purpose = analysis` and a fitted model allows you to analyze every dataset based on all its observations. It applies the technique called Kalman smoothing.
+
+This step decomposes the intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
+
+This function also helps to evaluate the smoothing performance with the following measures:
+  
+  - Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$.
+
+- Mean absolute percent error (MAPE): $\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_\tau - y_\tau\rvert}{y_\tau}$.
+
+- Root mean square error (RMSE): $\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_\tau - y_\tau\right)^2}{M}}$.
+
+Here $M$ is the total number of bins.
+
+```{r}
+analysis_result <- use_model(purpose = "analysis", model_fit, fdx_volume_training)
+str(analysis_result)
+```
+
+Function `autoplot` visualizes the smoothed components and the smoothing performance.
+
+```{r}
+plots <- autoplot(analysis_result)
+plots$log_components
+plots$original_and_resultant
+```
+
+## Forecasting
+
+> **use_model**(purpose = "forecast", model, data, burn_in_days = 0)
+
+`use_model` function with `purpose = forecast` and a fitted model allows you to forecast the intraday signal one-bin-ahead on a new dataset. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. 
+
+In general, when encountering a new dataset with different statistical characteristics or from different stocks, the state space model may not initially start in an optimal state. To address this, the first `burn_in_days` days in the data can be utilized to warm up the Kalman filter, allowing it to reach the desired state. These initial days will be discarded after initialization.
+
+
+```{r}
+# use training data for burn-in
+forecast_result <- use_model(purpose = "forecast", model_fit, fdx_volume, burn_in_days = 105) 
+str(forecast_result)
+```
+
+Function `autoplot` visualize the one-bin-ahead forecast components and the forecasting performance.
+
+```{r}
+plots <- autoplot(forecast_result)
+plots$log_components
+plots$original_and_resultant
+```
 
 
 &nbsp; 
