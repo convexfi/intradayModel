@@ -1,10 +1,13 @@
-#' @title Plot Smoothed/Forecast Components
+#' @title Plot Analysis and Forecast Result
 #'
-#' @description Plot the components of smoothing/forecasting result in one figure.
+#' @description Autoplot the results of analysis and forecast.
 #'
-#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_volume_model} or \code{forecast_volume_model}.
+#' @param analysis_forecast_result Analysis/forecast result from \code{use_model}.
 #'
-#' @return A \code{patchwork} object composed of 4 patches.
+#' @return A list of \code{patchwork} objects:
+#'        \itemize{
+#'        \item{\code{log_components}: }{Plot of components of intraday signal in their log10 scale;}
+#'        \item{\code{original_and_resultant}: }{Plot of the original and the resulant signals.}}
 #'
 #' @import patchwork
 #' @import ggplot2
@@ -15,33 +18,34 @@
 #'
 #' data(aapl_volume)
 #' aapl_volume_training <- aapl_volume[, 1:104]
+#' aapl_volume_testing <- aapl_volume[, 105:124]
 #'
 #' # Obtain smoothing and forecasting result
 #' model_fit <- fit_volume(aapl_volume_training)
-#' smooth_result <- smooth_volume_model(aapl_volume_training, model_fit)
-#' forecast_result <- forecast_volume_model(aapl_volume, model_fit, out_sample = 20)
-#'
-#' # Plot smoothed and forecast components
-#' plot_components(smooth_result)
-#' plot_components(forecast_result)
+#' analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+#' forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+#' 
+#' # Plot components
+#' autoplot(analysis_result)
+#' autoplot(forecast_result)
 #' }
 #' @export
-autoplot <- function(smooth_forecast_result) {
+autoplot <- function(analysis_forecast_result) {
   plot_list <- list()
   
-  plot_list$log_components <- plot_components(smooth_forecast_result)
-  plot_list$original_and_resultant <- plot_performance(smooth_forecast_result)
+  plot_list$log_components <- plot_components(analysis_forecast_result)
+  plot_list$original_and_resultant <- plot_performance(analysis_forecast_result)
   
   return(plot_list)
 }
 
-plot_components <- function(smooth_forecast_result) {
+plot_components <- function(analysis_forecast_result) {
   i <- original <- daily <- seasonal <- dynamic <- NULL
-  components <- smooth_forecast_result[["components"]]
+  components <- analysis_forecast_result[["components"]]
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$original_signal,
+      original = analysis_forecast_result$original_signal,
       daily = components[[grep("daily", names(components))]],
       seasonal = components[[grep("seasonal", names(components))]],
       dynamic = components[[grep("dynamic", names(components))]],
@@ -150,36 +154,11 @@ plot_components <- function(smooth_forecast_result) {
   return(p)
 }
 
-#' @title Plot Smoothing/Forecasting Performance
-#'
-#' @description Compares the original signal with the smoothed/forecast signal in one plot.
-#'
-#' @param smooth_forecast_result Smoothing/forecasting result from \code{smooth_volume_model} or \code{forecast_volume_model}.
-#'
-#' @return A \code{patchwork} object composed of 1 patch.
-#'
-#' @import ggplot2
-#' @importFrom magrittr %>%
-#' @examples
-#' \dontrun{
-#'
-#' data(aapl_volume)
-#' aapl_volume_training <- aapl_volume[, 1:104]
-#'
-#' # Obtain smoothing and forecasting result
-#' model_fit <- fit_volume(aapl_volume_training)
-#' smooth_result <- smooth_volume_model(aapl_volume_training, model_fit)
-#' forecast_result <- forecast_volume_model(aapl_volume, model_fit, out_sample = 20)
-#'
-#' # Plot smoothing and forecasting performance
-#' plot_performance(smooth_result)
-#' plot_performance(forecast_result)
-#' }
-plot_performance <- function(smooth_forecast_result) {
+plot_performance <- function(analysis_forecast_result) {
   i <- value <- variable <- NULL
 
   # determine type
-  if (sum(grepl("smooth", names(smooth_forecast_result)))) {
+  if (sum(grepl("smooth", names(analysis_forecast_result)))) {
     type <- "smooth"
     title <- "Smoothing result"
   } else {
@@ -189,8 +168,8 @@ plot_performance <- function(smooth_forecast_result) {
 
   plt_data <-
     data.frame(
-      original = smooth_forecast_result$original_signal,
-      output = smooth_forecast_result[[grep(type, names(smooth_forecast_result))]]
+      original = analysis_forecast_result$original_signal,
+      output = analysis_forecast_result[[grep(type, names(analysis_forecast_result))]]
     )
 #  plt_data_log <- log(plt_data)
 #  plt_data_log$i <- plt_data$i <- c(1:nrow(plt_data))

@@ -2,32 +2,36 @@
 % Please edit documentation in R/plotting.R
 \name{autoplot}
 \alias{autoplot}
-\title{Plot Smoothed/Forecast Components}
+\title{Plot Analysis and Forecast Result}
 \usage{
-autoplot(smooth_forecast_result)
+autoplot(analysis_forecast_result)
 }
 \arguments{
-\item{smooth_forecast_result}{Smoothing/forecasting result from \code{smooth_volume_model} or \code{forecast_volume_model}.}
+\item{analysis_forecast_result}{Analysis/forecast result from \code{use_model}.}
 }
 \value{
-A \code{patchwork} object composed of 4 patches.
+A list of \code{patchwork} objects:
+       \itemize{
+       \item{\code{log_components}: }{Plot of components of intraday signal in their log10 scale;}
+       \item{\code{original_and_resultant}: }{Plot of the original and the resulant signals.}}
 }
 \description{
-Plot the components of smoothing/forecasting result in one figure.
+Autoplot the results of analysis and forecast.
 }
 \examples{
 \dontrun{
 
 data(aapl_volume)
 aapl_volume_training <- aapl_volume[, 1:104]
+aapl_volume_testing <- aapl_volume[, 105:124]
 
 # Obtain smoothing and forecasting result
 model_fit <- fit_volume(aapl_volume_training)
-smooth_result <- smooth_volume_model(aapl_volume_training, model_fit)
-forecast_result <- forecast_volume_model(aapl_volume, model_fit, out_sample = 20)
+analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
 
-# Plot smoothed and forecast components
-plot_components(smooth_result)
-plot_components(forecast_result)
+# Plot components
+autoplot(analysis_result)
+autoplot(forecast_result)
 }
 }
