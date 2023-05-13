@@ -134,6 +134,7 @@ smooth_volume_model <- function(data, volume_model) {
   return(res)
 }
 
+#' @importFrom utils tail
 forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {

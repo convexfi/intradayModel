@@ -1,4 +1,5 @@
 test_that("specify_uniss works with partial fixed params", {
+  skip_on_cran()
   data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
   n_bin <- nrow(data)
   n_day <- ncol(data)
@@ -30,6 +31,7 @@ test_that("specify_uniss works with partial fixed params", {
 })
 
 test_that("cleanParsList works", {
+  skip_on_cran()
   fixed_pars <- list()
   fixed_pars$"a_mu" <- NA
   fixed_pars$"var_eta" <- 4

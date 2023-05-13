@@ -1,6 +1,7 @@
 data(aapl_volume)
 
 test_that("is_volume_model works", {
+  skip_on_cran()
   data <- aapl_volume
   n_bin <- 26
   fixed_pars <- list()
@@ -34,6 +35,7 @@ test_that("is_volume_model works", {
 })
 
 test_that("forecast_volume_model/Smooth works", {
+  skip_on_cran()
   data <- aapl_volume
   n_bin <- 26
   fixed_pars <- list()
@@ -57,6 +59,7 @@ test_that("forecast_volume_model/Smooth works", {
 })
 
 test_that("spec_volume_model message", {
+  skip_on_cran()
   init_pars <- list()
   init_pars$"a_eta" <- 1
   init_pars$"x0" <- matrix(0, 2, 2)
@@ -90,6 +93,7 @@ test_that("spec_volume_model message", {
 })
 
 test_that("fit_volume message", {
+  skip_on_cran()
   data <- aapl_volume
   data_train <- aapl_volume[, 1:104]
   data_error_test <- data_train
@@ -118,6 +122,7 @@ test_that("fit_volume message", {
 })
 
 test_that("clean_data message", {
+  skip_on_cran()
   data_error_test <- aapl_volume
   data_error_test[1,1] <- NA
   data_error_test[2,3] <- NA

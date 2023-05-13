@@ -40,7 +40,7 @@ autoplot <- function(analysis_forecast_result) {
 }
 
 plot_components <- function(analysis_forecast_result) {
-  i <- original <- daily <- seasonal <- dynamic <- NULL
+  i <- original <- daily <- seasonal <- dynamic <- residual <- NULL
   components <- analysis_forecast_result[["components"]]
 
   plt_data <-
@@ -55,6 +55,7 @@ plot_components <- function(analysis_forecast_result) {
   plt_data_log$i <- plt_data$i <- c(1:nrow(plt_data))
 
   text_size <- 10
+  .x <- NULL
   p1 <- plt_data_log %>%
     ggplot() +
     geom_line(aes(x = i, y = original), alpha = 0.8, color = "steelblue", size = 0.4) +
@@ -155,7 +156,7 @@ plot_components <- function(analysis_forecast_result) {
 }
 
 plot_performance <- function(analysis_forecast_result) {
-  i <- value <- variable <- NULL
+  i <- value <- variable <- .x <- NULL
 
   # determine type
   if (sum(grepl("smooth", names(analysis_forecast_result)))) {
