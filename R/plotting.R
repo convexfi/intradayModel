@@ -132,7 +132,7 @@ plot_components <- function(analysis_forecast_result) {
     geom_line(aes(x = i, y = residual), alpha = 0.8, color = "steelblue", size = 0.4) +
     ylab("Residual") +
     theme_bw() +
-    xlab("time") +
+    xlab("time (bins)") +
     theme(
       axis.title.x = element_text(size = 12, face = "bold"),
       axis.title.y = element_text(size = text_size, face = "bold"),
@@ -160,10 +160,12 @@ plot_performance <- function(analysis_forecast_result) {
   # determine type
   if (sum(grepl("smooth", names(analysis_forecast_result)))) {
     type <- "smooth"
-    title <- "Smoothing result"
+    title <- "Analysis result"
+    legend_name <- "model smooth fit"
   } else {
     type <- "forecast"
     title <- "One-bin-ahead forecast"
+    legend_name <- "forecast"
   }
 
   plt_data <-
@@ -186,12 +188,12 @@ plot_performance <- function(analysis_forecast_result) {
   p <- plt_reshape %>%
     ggplot() +
     geom_line(aes(x = i, y = value, color = variable), alpha = 0.8, size = 0.4) +
-    scale_colour_manual(values = c(original = "steelblue", output = "#FD6467"), labels = c("original", type)) +
+    scale_colour_manual(values = c(original = "steelblue", output = "#FD6467"), labels = c("original", legend_name)) +
     scale_y_log10(
       breaks = trans_breaks("log10", function(x) 10^x),
       labels = trans_format("log10", math_format(10^.x))
     ) +
-    xlab("time") +
+    xlab("time (bins)") +
     ylab("Intraday Signal") +
     theme_bw() +
     theme(
