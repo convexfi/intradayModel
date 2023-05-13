@@ -7,10 +7,8 @@
 #' 
 #' @section Functions:
 #' \code{\link{fit_volume}}, 
-#' \code{\link{forecast_volume_model}}, 
-#' \code{\link{smooth_volume_model}},
-#' \code{\link{plot_components}},
-#' \code{\link{plot_performance}}
+#' \code{\link{use_model}}, 
+#' \code{\link{autoplot}}
 #'
 #' @section Data:
 #' \code{\link{aapl_volume}},
