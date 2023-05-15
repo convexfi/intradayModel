@@ -6,11 +6,9 @@
 #' It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 #' 
 #' @section Functions:
-#' \code{\link{fit_unimodel}}, 
-#' \code{\link{forecast_unimodel}}, 
-#' \code{\link{smooth_unimodel}},
-#' \code{\link{plot_components}},
-#' \code{\link{plot_performance}}
+#' \code{\link{fit_volume}}, 
+#' \code{\link{use_model}}, 
+#' \code{\link{autoplot}}
 #'
 #' @section Data:
 #' \code{\link{aapl_volume}},

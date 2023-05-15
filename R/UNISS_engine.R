@@ -4,7 +4,7 @@
 #
 # Its object is names "uniss_obj", it stores all the required information
 # in the state-space world. 
-# The user's "unimodel" is for user interface, and its detailed information 
+# The user's "volume_model" is for user interface, and its detailed information 
 # is stored in "uniss_obj".
 # --------------------------------------------------
 
@@ -14,7 +14,7 @@ specify_uniss <- function(...) {
   # read input information
   args <- list(...)
   data <- args$data # log intraday signal
-  unimodel <- args$unimodel
+  volume_model <- args$volume_model
 
   data.reform <- unlist(as.list(data))
   n_bin <- nrow(data)
@@ -37,14 +37,14 @@ specify_uniss <- function(...) {
   )
   for (name in all.pars.name) {
     ### specify EM initial values
-    if (unimodel$fit_request[[name]]) {
-      if (name %in% names(unimodel$init)) {
-        uniss_obj$par[[name]] <- unimodel$init[[name]]
+    if (volume_model$fit_request[[name]]) {
+      if (name %in% names(volume_model$init)) {
+        uniss_obj$par[[name]] <- volume_model$init[[name]]
       } else {
         uniss_obj$par[[name]] <- init.default[[name]]
       }
     } else { ### set to fixed values
-      uniss_obj$par[[name]] <- unimodel$par[[name]]
+      uniss_obj$par[[name]] <- volume_model$par[[name]]
     }
   }
 
@@ -53,7 +53,7 @@ specify_uniss <- function(...) {
   uniss_obj$n_bin <- n_bin
   uniss_obj$n_day <- n_day
   uniss_obj$n_bin_total <- n_bin_total
-  uniss_obj$fit_request <- unimodel$fit_request
+  uniss_obj$fit_request <- volume_model$fit_request
 
   return(uniss_obj)
 }

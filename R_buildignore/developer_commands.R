@@ -16,7 +16,7 @@ install.packages("intradayModel")
 # Getting help
 library(intradayModel)
 help(package = "intradayModel")
-?fit_unimodel
+?fit_volume
 citation("intradayModel")
 vignette(package = "intradayModel")
 

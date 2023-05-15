@@ -2,25 +2,25 @@
 # They should be invisible to package users
 
 # Define a Univariate State-Space Model
-spec_unimodel <- function(fixed_pars = NULL, init_pars = NULL) {
-  unimodel <- list()
-  class(unimodel) <- "unimodel"
+spec_volume_model <- function(fixed_pars = NULL, init_pars = NULL) {
+  volume_model <- list()
+  class(volume_model) <- "volume_model"
   
   # error control
   if (!is.null(init_pars) && !is.list(init_pars)) stop("init_pars must be a list.")
   if (!is.null(fixed_pars) && !is.list(fixed_pars)) stop("fixed_pars must be a list.")
   
-  # unimodel class properties
+  # volume_model class properties
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
-  unimodel$par$"a_eta" <- NA
-  unimodel$par$"a_mu" <- NA
-  unimodel$par$"var_eta" <- NA
-  unimodel$par$"var_mu" <- NA
-  unimodel$par$"r" <- NA
-  unimodel$par$"phi" <- NA
-  unimodel$par$"x0" <- rep(NA, 2)
-  unimodel$par$"V0" <- rep(NA, 3)
-  unimodel$init <- list()
+  volume_model$par$"a_eta" <- NA
+  volume_model$par$"a_mu" <- NA
+  volume_model$par$"var_eta" <- NA
+  volume_model$par$"var_mu" <- NA
+  volume_model$par$"r" <- NA
+  volume_model$par$"phi" <- NA
+  volume_model$par$"x0" <- rep(NA, 2)
+  volume_model$par$"V0" <- rep(NA, 3)
+  volume_model$init <- list()
   
   # read in input parameters
   fixed_clean_result <- clean_pars_list(fixed_pars)
@@ -82,22 +82,22 @@ spec_unimodel <- function(fixed_pars = NULL, init_pars = NULL) {
   # store inputs in univariate model object
   for (name in all_pars_name) {
     if (name %in% names(fixed_pars)) {
-      unimodel$par[[name]] <- fixed_pars[[name]]
+      volume_model$par[[name]] <- fixed_pars[[name]]
     } else if (name %in% names(init_pars)) {
-      unimodel$init[[name]] <- init_pars[[name]]
+      volume_model$init[[name]] <- init_pars[[name]]
     }
   }
   
-  unimodel$fit_request <- list()
+  volume_model$fit_request <- list()
   for (name in all_pars_name) {
-    if (anyNA(unimodel$par[[name]])) {
-      unimodel$fit_request[[name]] <- TRUE
+    if (anyNA(volume_model$par[[name]])) {
+      volume_model$fit_request[[name]] <- TRUE
     } else {
-      unimodel$fit_request[[name]] <- FALSE
+      volume_model$fit_request[[name]] <- FALSE
     }
   }
   
-  return(unimodel)
+  return(volume_model)
 }
 
 # Remove anyday containing NA/missing bins
@@ -155,7 +155,7 @@ intraday_xts_to_matrix <- function(data.xts) {
 }
 
 
-# clean the uniunimodel()'s input args (init_pars/fixed_pars)
+# clean the univolume_model()'s input args (init_pars/fixed_pars)
 # remove any variable containing NA/inf/non-numeric
 # remove any variable that won't appear in model
 # flatten the variable if user input a high dimension one
@@ -227,10 +227,10 @@ clean_pars_list <- function(input_list) {
 }
 
 # part of error check for init_pars/fixed_pars
-check_pars_list <- function(unimodel, n_bin = NULL) {
-  fit_request_list <- unimodel$fit_request
-  par_list <- unimodel$par
-  init_list <- unimodel$init
+check_pars_list <- function(volume_model, n_bin = NULL) {
+  fit_request_list <- volume_model$fit_request
+  par_list <- volume_model$par
+  init_list <- volume_model$init
   
   all_par_list <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "x0", "V0")
   scalar_par_list <- c("a_eta", "a_mu", "var_eta", "var_mu", "r")
@@ -249,12 +249,12 @@ check_pars_list <- function(unimodel, n_bin = NULL) {
         msg <- c(msg, paste(name, "must be numeric, have no NAs, and no Infs.\n"))
       }
       if (name %in% scalar_par_list && !identical(len_expect[[name]], length(par_list[[name]]))) {
-        msg <- c(msg, paste("Length of unimodel$par$", name, " is wrong.\n", sep = ""))
+        msg <- c(msg, paste("Length of volume_model$par$", name, " is wrong.\n", sep = ""))
       }
     }
     for (name in unfixed){
       if (!all(is.na(par_list[[name]]))) {
-        msg <- c(msg, paste("unimodel$par$", name, " and unimodel$fit_request$", name, " are conflicted.\n", sep = ""))
+        msg <- c(msg, paste("volume_model$par$", name, " and volume_model$fit_request$", name, " are conflicted.\n", sep = ""))
       }
     }
   
@@ -270,30 +270,30 @@ check_pars_list <- function(unimodel, n_bin = NULL) {
         msg <- c(msg, paste(name, "must be numeric, have no NAs, and no Infs.\n"))
       }
       if (name %in% scalar_par_list && !identical(len_expect[[name]], length(init_list[[name]]))) {
-        msg <- c(msg, paste("Lenght of unimodel$init$", name, " is wrong.\n", sep = ""))
+        msg <- c(msg, paste("Lenght of volume_model$init$", name, " is wrong.\n", sep = ""))
       }
     }
   return (msg)
   
 }
 
-# check whether the unimodel is correct
-is_unimodel <- function(unimodel, n_bin = NULL) {
+# check whether the volume_model is correct
+is_volume_model <- function(volume_model, n_bin = NULL) {
   ## Check for required components 
   el <- c("fit_request", "par", "init")
-  # if some components are missing from the unimodel, rest of the tests won't work so stop now
-  if (!all(el %in% names(unimodel))) {
-    stop("Elements ", paste(el[!(el %in% names(unimodel))], collapse = ", "), " are missing from the model.\n")
+  # if some components are missing from the volume_model, rest of the tests won't work so stop now
+  if (!all(el %in% names(volume_model))) {
+    stop("Elements ", paste(el[!(el %in% names(volume_model))], collapse = ", "), " are missing from the model.\n")
   }
   
-  # if some args are missing from the unimodel's components, the code will stop when all missing parts are found.
+  # if some args are missing from the volume_model's components, the code will stop when all missing parts are found.
   msg <- NULL
   all_pars_name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
-  if (!all(all_pars_name %in% names(unimodel$par))) {
-    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(unimodel$par))], collapse = ", "), " are missing from unimodel$par.\n")
+  if (!all(all_pars_name %in% names(volume_model$par))) {
+    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(volume_model$par))], collapse = ", "), " are missing from volume_model$par.\n")
   }
-  if (!all(all_pars_name %in% names(unimodel$fit_request))) {
-    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(unimodel$fit_request))], collapse = ", "), " are missing from unimodel$fit_request.\n")
+  if (!all(all_pars_name %in% names(volume_model$fit_request))) {
+    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(volume_model$fit_request))], collapse = ", "), " are missing from volume_model$fit_request.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
@@ -301,20 +301,20 @@ is_unimodel <- function(unimodel, n_bin = NULL) {
 
   # Check no additional names in fit_request, par, init
   # for (mat in el) {
-  #   if (!all(names(unimodel[[mat]]) %in% all_pars_name)) {
+  #   if (!all(names(volume_model[[mat]]) %in% all_pars_name)) {
   #     msg <- c(msg, "Element\n")
   #   }
   # }
   
   # check fit_request
-  logical_check <- lapply(unimodel$fit_request, function (f) isTRUE(f) | identical(f, FALSE))
+  logical_check <- lapply(volume_model$fit_request, function (f) isTRUE(f) | identical(f, FALSE))
   if (any(logical_check == FALSE)) {
-    msg <- c("Elements in unimodel$fit_request must be TRUE/FALSE.\n")
+    msg <- c("Elements in volume_model$fit_request must be TRUE/FALSE.\n")
     stop(msg)
   }
   
   # Check no NA inf and dimension
-  msg <- check_pars_list(unimodel, n_bin)
+  msg <- check_pars_list(volume_model, n_bin)
   if (!is.null(msg)) {
     stop(msg)
   }

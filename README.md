@@ -29,7 +29,8 @@ citation("intradayModel")
 
 To get started, we load our package and some sample data: the 15-minute
 intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
-124 trading days.
+124 trading days. We use the first 104 trading days for fitting, and the
+last 20 days for evaluation of forecasting performance.
 
 ``` r
 library(intradayModel)
@@ -41,52 +42,46 @@ aapl_volume[1:5, 1:5] # print the head of data
 #> 10:00 AM    6240374   14743180   11478596    7453044    6145623
 #> 10:15 AM    5273488   14841012   16024512    7270399    6031988
 #> 10:30 AM    4587159   18041115    8686059    7130980    5479852
+
+aapl_volume_training <- aapl_volume[, 1:104]
+aapl_volume_testing <- aapl_volume[, 105:124]
 ```
 
-Next, we fit a univariate state-space model using `fit_unimodel`
-function. To be specific, we use the first 104 trading days for fitting,
-and the last 20 days for evaluation of forecasting performance.
+Next, we fit a univariate state-space model using `fit_volume` function.
 
 ``` r
-aapl_volume_training <- aapl_volume[, 1:104]
-unimodel_fit <- fit_unimodel(aapl_volume_training)
+model_fit <- fit_volume(aapl_volume_training)
 ```
 
-Once the model is fitted, we can estimate the hidden components of any
-intraday signal based on all its observations, which is called
-**smoothing**. By calling `smooth_unimodel` function, we obtain daily,
+Once the model is fitted, we can analyze the hidden components of any
+intraday signal based on all its observations. By calling `use_model`
+function with `purpose = analysis`, we obtain the smoothed daily,
 seasonal, and intraday dynamic components. This procedure helps us
 better identify the underlying information of the intraday signal.
 
 ``` r
-smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
-plot_components(smooth_result) # plot smoothed hidden components
+analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+
+# visualization
+plots <- autoplot(analysis_result)
+plots$log_components # plot smoothed hidden components (in log scale)
 ```
 
-<img src="man/figures/README-smooth_plot-1.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
+
+To see how well our model performs on new data, we call `use_model`
+function with `purpose = forecast` to do one-bin-ahead forecast on the
+testing set.
 
 ``` r
-plot_performance(smooth_result) # plot smoothed result
+forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+
+# visualization
+plots <- autoplot(forecast_result)
+plots$original_and_resultant # plot forecast result
 ```
 
-<img src="man/figures/README-smooth_plot-2.png" width="75%" style="display: block; margin: auto;" />
-
-To see how well our model performs on new data, we use
-`forecast_unimodel` function to do one-bin-ahead forecast on the
-out-of-sample dataset of 20 days.
-
-``` r
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
-plot_components(forecast_result) # plot forecast hidden components
-```
-
-<img src="man/figures/README-forecast_plot-1.png" width="75%" style="display: block; margin: auto;" />
-
-``` r
-plot_performance(forecast_result) # plot forecast result
-```
-
-<img src="man/figures/README-forecast_plot-2.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" />
 
 ## Contributing
 
@@ -98,15 +93,12 @@ to report a bug or discuss a feature request.
 If you make use of this software please consider citing:
 
 -   Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday
-    trading volume: A kalman filter approach.
+    trading volume: A Kalman filter approach.
     <https://dx.doi.org/10.2139/ssrn.3101695>
 
 ## Links
 
 Package: [GitHub](https://github.com/convexfi/intradayModel)
-
-README file:
-[GitHub-readme](https://github.com/convexfi/intradayModel/blob/master/README.md).
 
 Vignette:
 [GitHub-vignette](https://htmlpreview.github.io/?https://github.com/convexfi/intradayModel/blob/master/vignettes/intradayModel.html).

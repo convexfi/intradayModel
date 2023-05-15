@@ -58,40 +58,46 @@ body {
 
 > Welcome to the `intradayModel` package! This vignette provides an overview of the package's features and how to use them. `intradayModel` uses state-space models to model and forecast financial intraday signal, with a focus on intraday trading volume. Our team is currently working on expanding the package to include more support for intraday volatility.
 
-# Quick Start
+# Quick start
 
-To get started, we load our package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days.
+To get started, we load our package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days. We use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
 
 ```{r, message = FALSE}
 library(intradayModel)
 data(aapl_volume)
 aapl_volume[1:5, 1:5] # print the head of data
-```
 
-Next, we fit a univariate state-space model using `fit_unimodel` function. To be specific, we use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
-
-```{r}
 aapl_volume_training <- aapl_volume[, 1:104]
-unimodel_fit <- fit_unimodel(aapl_volume_training)
+aapl_volume_testing <- aapl_volume[, 105:124]
 ```
 
-Once the model is fitted, we can estimate the hidden components of any intraday signal based on all its observations, which is called **smoothing**. By calling `smooth_unimodel` function, we obtain daily, seasonal, and intraday dynamic components. This procedure helps us better identify the underlying information of the intraday signal.
+Next, we fit a univariate state-space model using `fit_volume` function. 
 
 ```{r}
-smooth_result <- smooth_unimodel(aapl_volume_training, unimodel_fit)
-plot_components(smooth_result) # plot smoothed hidden components
-plot_performance(smooth_result) # plot smoothed result
+model_fit <- fit_volume(aapl_volume_training)
 ```
 
-To see how well our model performs on new data, we use `forecast_unimodel` function to do one-bin-ahead forecast on the out-of-sample dataset of 20 days.
+Once the model is fitted, we can analyze the hidden components of any intraday signal based on all its observations. By calling `use_model` function with `purpose = analysis`, we obtain the smoothed daily, seasonal, and intraday dynamic components. This procedure helps us better identify the underlying information of the intraday signal.
 
-```{r}
-forecast_result <- forecast_unimodel(aapl_volume, unimodel_fit, out_sample = 20)
-plot_components(forecast_result) # plot forecast hidden components
-plot_performance(forecast_result) # plot forecast result
+```{r, out.width="100%"}
+analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+
+# visualization
+plots <- autoplot(analysis_result)
+plots$log_components # plot smoothed hidden components (in log scale)
 ```
 
-Exciting, right? Let's dive in!
+To see how well our model performs on new data, we call `use_model` function with `purpose = forecast` to do one-bin-ahead forecast on the testing set.
+
+```{r, out.width="100%"}
+forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+
+# visualization
+plots <- autoplot(forecast_result)
+plots$original_and_resultant # plot forecast result
+```
+
+Now that you have a quick start on using the package, let's explore the details and dive deeper into its functionalities and features.
 
 &nbsp; 
 
@@ -99,7 +105,7 @@ Exciting, right? Let's dive in!
 
 ## Preliminary theory
 
-Intraday observations of signals are divided into days, indexed by $t\in\{1,\dots,T\}$. Each day is further divided into bins, indexed by $i\in\{1,\dots,I\}$. To refer to a specific observation, we use the index $\tau = I \times (t-1) + i$.
+Intraday observations of trading volume are divided into days, indexed by $t\in\{1,\dots,T\}$. Each day is further divided into bins, indexed by $i\in\{1,\dots,I\}$. To refer to a specific observation, we use the index $\tau = I \times (t-1) + i$.
 
 Our package uses a state-space model to extract several components of intraday signals. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
 
@@ -150,7 +156,7 @@ In this model, $\boldsymbol{\Theta} = \{a^{\eta}, a^{\mu}, (\sigma^{\eta})^2, (\
 
 ## Datasets
 
-Two data classes of intraday signal are supported:
+Two data classes of intraday volume are supported:
 
 - a 2D numeric matrix of size `(n_bin, n_day)`;
 
@@ -166,9 +172,9 @@ tail(fdx_volume)
 
 ## Fitting
 
-> **fit_unimodel**(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, control = NULL)
+> **fit_volume**(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, control = NULL)
 
-To fit a univariate state-space model, you should use `fit_unimodel` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed_pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init_pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
+To fit a univariate state-space model on intraday volume, you should use `fit_volume` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed_pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init_pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
 
 The fitting process stops when either the maximum number of iterations is reached or the termination criteria is met $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
 
@@ -184,58 +190,65 @@ init_pars <- list()
 init_pars$"a_eta" <- 1
 
 fdx_volume_training <- fdx_volume['2019-07-01/2019-11-30']
-unimodel_fit <- fit_unimodel(fdx_volume_training, verbose = 2, control = list(acceleration = TRUE))
+model_fit <- fit_volume(fdx_volume_training, verbose = 2, control = list(acceleration = TRUE))
 ```
 
-One observation is that the trading days with missing bins because of early close,  2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving Day), have been automatically removed.
+Trading days with missing bins are automatically removed. They are 2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving Day) which have early close.
 
-## Smoothing
+## Analysis
 
-> **smooth_unimodel**(data, unimodel)
+> **use_model**(purpose = "analysis", model, data)
 
-`smooth_unimodel` function allows you to smooth on a dataset based on all its observations. It decomposes the intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
+`use_model` function with `purpose = analysis` and a fitted model allows you to analyze every dataset based on all its observations. It applies the technique called Kalman smoothing.
 
-To use this function, input the intraday signal you want to smooth and the fitted model as arguments.
+This step decomposes the intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
 
-```{r}
-smooth_result <- smooth_unimodel(fdx_volume_training, unimodel_fit)
-str(smooth_result)
-```
-
-Functions `plot_components` and `plot_performance` visualize the smoothed components and the smoothing performance.
-
-```{r}
-plot_components(smooth_result)
-plot_performance(smooth_result)
-```
-
-## Forecasting
-
-> **forecast_unimodel**(data, unimodel, out_sample) 
-
-`forecast_unimodel` function allows you to forecast the intraday signal one-bin-ahead, given a dataset and a fitted model. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. You need to indicate how many days from the end of the dataset to keep for out-of-sample prediction.
-
-Since fitting a model to some data does not guarantee good prediction on unseen data, `forecast_unimodel` helps to evaluate the model's performance with the following measures:
-
-- Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$.
+This function also helps to evaluate the smoothing performance with the following measures:
+  
+  - Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$.
 
 - Mean absolute percent error (MAPE): $\frac{1}{M}\sum_{\tau=1}^M\frac{\lvert\hat{y}_\tau - y_\tau\rvert}{y_\tau}$.
 
 - Root mean square error (RMSE): $\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_\tau - y_\tau\right)^2}{M}}$.
 
-Here $M$ is the total number of out-of-sample bins. The sample code is given as follows.
+Here $M$ is the total number of bins.
 
 ```{r}
-forecast_result <- forecast_unimodel(fdx_volume, unimodel_fit, out_sample = 20)
+analysis_result <- use_model(purpose = "analysis", model_fit, fdx_volume_training)
+str(analysis_result)
+```
+
+Function `autoplot` visualizes the smoothed components and the smoothing performance.
+
+```{r}
+plots <- autoplot(analysis_result)
+plots$log_components
+plots$original_and_resultant
+```
+
+## Forecasting
+
+> **use_model**(purpose = "forecast", model, data, burn_in_days = 0)
+
+`use_model` function with `purpose = forecast` and a fitted model allows you to forecast the intraday signal one-bin-ahead on a new dataset. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. 
+
+In general, when encountering a new dataset with different statistical characteristics or from different stocks, the state space model may not initially start in an optimal state. To address this, the first `burn_in_days` days in the data can be utilized to warm up the Kalman filter, allowing it to reach the desired state. These initial days will be discarded after initialization.
+
+
+```{r}
+# use training data for burn-in
+forecast_result <- use_model(purpose = "forecast", model_fit, fdx_volume, burn_in_days = 105) 
 str(forecast_result)
 ```
 
-Functions `plot_components` and `plot_performance` visualize the one-bin-ahead forecast components and the forecasting performance.
+Function `autoplot` visualize the one-bin-ahead forecast components and the forecasting performance.
 
 ```{r}
-plot_components(forecast_result)
-plot_performance(forecast_result)
+plots <- autoplot(forecast_result)
+plots$log_components
+plots$original_and_resultant
 ```
+
 
 &nbsp; 
 

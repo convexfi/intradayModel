@@ -1,4 +1,5 @@
 test_that("specify_uniss works with partial fixed params", {
+  skip_on_cran()
   data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
   n_bin <- nrow(data)
   n_day <- ncol(data)
@@ -13,7 +14,7 @@ test_that("specify_uniss works with partial fixed params", {
   fixed_pars$"var_eta" <- 4
   fixed_pars$"x0" <- matrix(0,2)
   fixed_pars$"phi" <- matrix(2, n_bin)
-  model_test <- spec_unimodel(fixed_pars = fixed_pars)
+  model_test <- spec_volume_model(fixed_pars = fixed_pars)
 
   # predefined model
   model_predefined <- list()
@@ -25,11 +26,12 @@ test_that("specify_uniss works with partial fixed params", {
   model_predefined$fit_request <- list("a_eta" = TRUE, "a_mu" = FALSE, "var_eta" = FALSE, "var_mu" = TRUE, 
                                        "r" = TRUE, "phi" = FALSE, "x0" = FALSE, "V0" = TRUE)
   
-  class(model_predefined) <- "unimodel"
+  class(model_predefined) <- "volume_model"
   expect_equal(model_test, model_predefined)
 })
 
 test_that("cleanParsList works", {
+  skip_on_cran()
   fixed_pars <- list()
   fixed_pars$"a_mu" <- NA
   fixed_pars$"var_eta" <- 4
