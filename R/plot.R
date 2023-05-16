@@ -6,8 +6,9 @@
 #'
 #' @return A list of \code{patchwork} objects:
 #'        \itemize{
+#'        \item{\code{components}: }{Plot of components of intraday signal;}
 #'        \item{\code{log_components}: }{Plot of components of intraday signal in their log10 scale;}
-#'        \item{\code{original_and_resultant}: }{Plot of the original and the resulant signals.}}
+#'        \item{\code{original_and_smooth} / \code{original_and_forecast}: }{Plot of the original and the smooth/forecast signals.}}
 #'
 #' @import patchwork
 #' @import ggplot2
@@ -33,13 +34,31 @@
 generate_plot <- function(analysis_forecast_result) {
   plot_list <- list()
   
-  plot_list$log_components <- plot_components(analysis_forecast_result)
-  plot_list$original_and_resultant <- plot_performance(analysis_forecast_result)
-  
+  plot_list$components <- plot_components(analysis_forecast_result, log = FALSE)
+  plot_list$log_components <- plot_components(analysis_forecast_result, log = TRUE)
+  if ("analysis" %in% attr(analysis_forecast_result, "type")) {
+    plot_list$original_and_smooth <- plot_performance(analysis_forecast_result)
+  } else {
+    plot_list$original_and_forecast <- plot_performance(analysis_forecast_result)
+  }
   return(plot_list)
 }
 
-plot_components <- function(analysis_forecast_result) {
+plot_components <- function(analysis_forecast_result, log = TRUE) {
+  if ("analysis" %in% attr(analysis_forecast_result, "type")) {
+    if (log == TRUE) {
+      title <- "Components of Log Intraday Volume (analysis)"
+    } else {
+      title <- "Components of Intraday Volume (analysis)"
+    }
+  } else {
+    if (log == TRUE) {
+      title <- "Components of Log Intraday Volume (forecast)"
+    } else {
+      title <- "Components of Intraday Volume (forecast)"
+    }
+  }
+  
   i <- original <- daily <- seasonal <- dynamic <- residual <- NULL
   components <- analysis_forecast_result[[grep("components", names(analysis_forecast_result))]]
 
@@ -51,12 +70,16 @@ plot_components <- function(analysis_forecast_result) {
       dynamic = components$dynamic,
       residual = components$residual
     )
-  plt_data_log <- log10(plt_data)
-  plt_data_log$i <- plt_data$i <- c(1:nrow(plt_data))
+  if (log == TRUE) {
+    plt_data <- log10(plt_data)
+  }
+  plt_data$i <- plt_data$i <- c(1:nrow(plt_data))
 
   text_size <- 10
   .x <- NULL
-  p1 <- plt_data_log %>%
+  
+  if (log == TRUE) {
+  p1 <- plt_data %>%
     ggplot() +
     geom_line(aes(x = i, y = original), alpha = 0.8, color = "steelblue", size = 0.4) +
     ylab("Original") +
@@ -74,7 +97,7 @@ plot_components <- function(analysis_forecast_result) {
       axis.text.x = element_blank()
     )
 
-  p2 <- plt_data_log %>%
+  p2 <- plt_data %>%
     ggplot() +
     geom_line(aes(x = i, y = daily), alpha = 0.8, color = "steelblue", size = 0.6) +
     ylab("Daily") +
@@ -91,8 +114,54 @@ plot_components <- function(analysis_forecast_result) {
       axis.title.x = element_blank(),
       axis.text.x = element_blank()
     )
+  } else {
+    p1 <- plt_data %>%
+      ggplot() +
+      geom_line(aes(x = i, y = original), alpha = 0.8, color = "steelblue", size = 0.4) +
+      ylab("Original") +
+      scale_y_log10(
+        breaks = trans_breaks("log10", function(x) 10^x),
+        labels = trans_format("log10", math_format(10^.x))
+      ) +
+      theme_bw() +
+      theme(
+        axis.title = element_text(size = text_size, face = "bold"),
+        legend.position = "right",
+        legend.justification = c(0, 1),
+        legend.box.just = "left",
+        legend.margin = margin(8, 8, 8, 8),
+        legend.text = element_text(size = text_size, face = "bold"),
+        legend.key.size = unit(1, "cm"),
+        plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank()
+      )
+    
+    p2 <- plt_data %>%
+      ggplot() +
+      geom_line(aes(x = i, y = daily), alpha = 0.8, color = "steelblue", size = 0.6) +
+      ylab("Daily") +
+      scale_y_log10(
+        breaks = trans_breaks("log10", function(x) 10^x),
+        labels = trans_format("log10", math_format(10^.x))
+      ) +
+      theme_bw() +
+      theme(
+        axis.title = element_text(size = text_size, face = "bold"),
+        legend.position = "right",
+        legend.justification = c(0, 1),
+        legend.box.just = "left",
+        legend.margin = margin(8, 8, 8, 8),
+        legend.text = element_text(size = text_size, face = "bold"),
+        legend.key.size = unit(1, "cm"),
+        plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank()
+      )
+    }
+    
 
-  p3 <- plt_data_log %>%
+  p3 <- plt_data %>%
     ggplot() +
     geom_line(aes(x = i, y = seasonal), alpha = 0.8, color = "steelblue", size = 0.4) +
     ylab("Seasonal") +
@@ -110,7 +179,7 @@ plot_components <- function(analysis_forecast_result) {
       axis.text.x = element_blank()
     )
 
-  p4 <- plt_data_log %>%
+  p4 <- plt_data %>%
     ggplot() +
     geom_line(aes(x = i, y = dynamic), alpha = 0.8, color = "steelblue", size = 0.4) +
     ylab("Intraday\nDynamic") +
@@ -128,7 +197,7 @@ plot_components <- function(analysis_forecast_result) {
       axis.text.x = element_blank()
     )
 
-  p5 <- plt_data_log %>%
+  p5 <- plt_data %>%
     ggplot() +
     geom_line(aes(x = i, y = residual), alpha = 0.8, color = "steelblue", size = 0.4) +
     ylab("Residual") +
@@ -148,7 +217,7 @@ plot_components <- function(analysis_forecast_result) {
   
   p <- p1 / p2 / p3 / p4 / p5 +
     plot_annotation(
-      title = "Decomposition of intraday signal",
+      title = title,
       theme = theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
     )
 
@@ -161,11 +230,11 @@ plot_performance <- function(analysis_forecast_result) {
   # determine type
   if ("analysis" %in% attr(analysis_forecast_result, "type")) {
     approximated_signal <- analysis_forecast_result$smooth_signal
-    title <- "Analysis result"
-    legend_name <- "model smooth fit"
+    title <- "Original and Smooth Signals (analysis)"
+    legend_name <- "smooth"
   } else {
     approximated_signal <- analysis_forecast_result$forecast_signal
-    title <- "One-bin-ahead forecast"
+    title <- "Original and One-bin-ahead Forecast signal (forecast)"
     legend_name <- "forecast"
   }
 
@@ -174,8 +243,6 @@ plot_performance <- function(analysis_forecast_result) {
       original = analysis_forecast_result$original_signal,
       output = approximated_signal
     )
-#  plt_data_log <- log(plt_data)
-#  plt_data_log$i <- plt_data$i <- c(1:nrow(plt_data))
 
   plt_data$i <- c(1:nrow(plt_data))
   

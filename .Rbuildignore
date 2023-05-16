@@ -12,3 +12,5 @@
 ^papers$
 ^vignettes/ieee\.csl$
 ^vignettes/refs\.bib$
+^doc$
+^Meta$

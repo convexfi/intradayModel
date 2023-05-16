@@ -12,8 +12,9 @@ generate_plot(analysis_forecast_result)
 \value{
 A list of \code{patchwork} objects:
        \itemize{
+       \item{\code{components}: }{Plot of components of intraday signal;}
        \item{\code{log_components}: }{Plot of components of intraday signal in their log10 scale;}
-       \item{\code{original_and_resultant}: }{Plot of the original and the resulant signals.}}
+       \item{\code{original_and_smooth} / \code{original_and_forecast}: }{Plot of the original and the smooth/forecast signals.}}
 }
 \description{
 generate_plot the results of analysis and forecast.

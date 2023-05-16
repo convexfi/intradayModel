@@ -94,7 +94,7 @@ forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume
 
 # visualization
 plots <- generate_plot(forecast_result)
-plots$original_and_resultant # plot forecast result
+plots$original_and_forecast # plot forecast result
 ```
 
 Now that you have a quick start on using the package, let's explore the details and dive deeper into its functionalities and features.
@@ -222,8 +222,9 @@ Function `generate_plot` visualizes the smoothed components and the smoothing pe
 
 ```{r}
 plots <- generate_plot(analysis_result)
+plots$components
 plots$log_components
-plots$original_and_resultant
+plots$original_and_smooth
 ```
 
 ## Forecasting
@@ -245,8 +246,9 @@ Function `generate_plot` visualize the one-bin-ahead forecast components and the
 
 ```{r}
 plots <- generate_plot(forecast_result)
+plots$components
 plots$log_components
-plots$original_and_resultant
+plots$original_and_forecast
 ```
 
 
