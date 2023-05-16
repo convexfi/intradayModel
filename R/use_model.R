@@ -80,8 +80,10 @@
 decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
   if (tolower(purpose) == "analysis") {
     res <- smooth_volume_model(data = data, volume_model = model)
+    attr(res, "type") <- "analysis"
   } else if (tolower(purpose) == "forecast") {
     res <- forecast_volume_model(data = data, volume_model = model, burn_in_days = burn_in_days)
+    attr(res, "type") <- "forecast"
   } else {
     warning("Wrong purpose for decompose_volume function.\n")
   }

@@ -159,7 +159,7 @@ plot_performance <- function(analysis_forecast_result) {
   i <- value <- variable <- .x <- NULL
 
   # determine type
-  if (sum(grepl("smooth", names(analysis_forecast_result)))) {
+  if (attr(analysis_forecast_result, "type") == "analysis") {
     type <- "smooth"
     title <- "Analysis result"
     legend_name <- "model smooth fit"
