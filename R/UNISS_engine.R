@@ -37,7 +37,7 @@ specify_uniss <- function(...) {
   )
   for (name in all.pars.name) {
     ### specify EM initial values
-    if (volume_model$fit_request[[name]]) {
+    if (!volume_model$converged[[name]]) {
       if (name %in% names(volume_model$init)) {
         uniss_obj$par[[name]] <- volume_model$init[[name]]
       } else {
@@ -53,7 +53,7 @@ specify_uniss <- function(...) {
   uniss_obj$n_bin <- n_bin
   uniss_obj$n_day <- n_day
   uniss_obj$n_bin_total <- n_bin_total
-  uniss_obj$fit_request <- volume_model$fit_request
+  uniss_obj$converged <- volume_model$converged
 
   return(uniss_obj)
 }
@@ -158,7 +158,7 @@ uniss_kalman <- function(uniss_obj, type = "em_update") {
   # em update -----------------------------------
 
   all.pars.name <- c("a_eta", "a_mu", "var_eta", "var_mu", "r", "phi", "x0", "V0")
-  unfitted_pars <- names(uniss_obj$fit_request[uniss_obj$fit_request == TRUE])
+  unfitted_pars <- names(uniss_obj$converged[uniss_obj$converged == FALSE])
 
   Pt <- Ptt1 <- array(NA, c(2, 2, uniss_obj$n_bin_total))
   for (n in 1:uniss_obj$n_bin_total) {

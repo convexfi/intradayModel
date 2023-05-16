@@ -88,12 +88,12 @@ spec_volume_model <- function(fixed_pars = NULL, init_pars = NULL) {
     }
   }
   
-  volume_model$fit_request <- list()
+  volume_model$converged <- list()
   for (name in all_pars_name) {
     if (anyNA(volume_model$par[[name]])) {
-      volume_model$fit_request[[name]] <- TRUE
+      volume_model$converged[[name]] <- FALSE
     } else {
-      volume_model$fit_request[[name]] <- FALSE
+      volume_model$converged[[name]] <- TRUE
     }
   }
   
@@ -228,7 +228,7 @@ clean_pars_list <- function(input_list) {
 
 # part of error check for init_pars/fixed_pars
 check_pars_list <- function(volume_model, n_bin = NULL) {
-  fit_request_list <- volume_model$fit_request
+  converged_list <- volume_model$converged
   par_list <- volume_model$par
   init_list <- volume_model$init
   
@@ -239,8 +239,8 @@ check_pars_list <- function(volume_model, n_bin = NULL) {
     all_par_list <- append(all_par_list, "phi")
     len_expect <- rlist::list.append(len_expect, "phi" = as.integer(n_bin))
   }
-  unfixed <- intersect(names(fit_request_list[fit_request_list == TRUE]), all_par_list)
-  fixed <- intersect(names(fit_request_list[fit_request_list == FALSE]), all_par_list)
+  unfixed <- intersect(names(converged_list[converged_list == FALSE]), all_par_list)
+  fixed <- intersect(names(converged_list[converged_list == TRUE]), all_par_list)
   
 
   msg <- NULL
@@ -254,7 +254,7 @@ check_pars_list <- function(volume_model, n_bin = NULL) {
     }
     for (name in unfixed){
       if (!all(is.na(par_list[[name]]))) {
-        msg <- c(msg, paste("volume_model$par$", name, " and volume_model$fit_request$", name, " are conflicted.\n", sep = ""))
+        msg <- c(msg, paste("volume_model$par$", name, " and volume_model$converged$", name, " are conflicted.\n", sep = ""))
       }
     }
   
@@ -280,7 +280,7 @@ check_pars_list <- function(volume_model, n_bin = NULL) {
 # check whether the volume_model is correct
 is_volume_model <- function(volume_model, n_bin = NULL) {
   ## Check for required components 
-  el <- c("fit_request", "par", "init")
+  el <- c("converged", "par", "init")
   # if some components are missing from the volume_model, rest of the tests won't work so stop now
   if (!all(el %in% names(volume_model))) {
     stop("Elements ", paste(el[!(el %in% names(volume_model))], collapse = ", "), " are missing from the model.\n")
@@ -292,24 +292,24 @@ is_volume_model <- function(volume_model, n_bin = NULL) {
   if (!all(all_pars_name %in% names(volume_model$par))) {
     msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(volume_model$par))], collapse = ", "), " are missing from volume_model$par.\n")
   }
-  if (!all(all_pars_name %in% names(volume_model$fit_request))) {
-    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(volume_model$fit_request))], collapse = ", "), " are missing from volume_model$fit_request.\n")
+  if (!all(all_pars_name %in% names(volume_model$converged))) {
+    msg <- c(msg, "Elements ", paste(all_pars_name[!(all_pars_name %in% names(volume_model$converged))], collapse = ", "), " are missing from volume_model$converged.\n")
   }
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
   }
 
-  # Check no additional names in fit_request, par, init
+  # Check no additional names in converged, par, init
   # for (mat in el) {
   #   if (!all(names(volume_model[[mat]]) %in% all_pars_name)) {
   #     msg <- c(msg, "Element\n")
   #   }
   # }
   
-  # check fit_request
-  logical_check <- lapply(volume_model$fit_request, function (f) isTRUE(f) | identical(f, FALSE))
+  # check converged
+  logical_check <- lapply(volume_model$converged, function (f) isTRUE(f) | identical(f, FALSE))
   if (any(logical_check == FALSE)) {
-    msg <- c("Elements in volume_model$fit_request must be TRUE/FALSE.\n")
+    msg <- c("Elements in volume_model$converged must be TRUE/FALSE.\n")
     stop(msg)
   }
   
