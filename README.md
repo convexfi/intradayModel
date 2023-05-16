@@ -1,38 +1,38 @@
+---
+output:
+  html_document:
+    variant: markdown_github
+    keep_md: true
+  md_document:
+    variant: markdown_github
+---
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# intradayModel
 
-Our package uses state-of-the-art state-space models to facilitate the
-modeling and forecasting of financial intraday signals. This package
-currently offers a univariate model for intraday trading volume, with
-new features on intraday volatility and multivariate models in
-development. It is a valuable tool for anyone interested in exploring
-intraday, algorithmic, and high-frequency trading.
+
+# intradayModel
+Our package uses state-of-the-art state-space models to facilitate the modeling and forecasting of financial intraday signals. This package currently offers a univariate model for intraday trading volume, with new features on intraday volatility and multivariate models in development. It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 
 ## Installation
+The package can be installed from [GitHub](https://github.com/convexfi/intradayModel):
 
-The package can be installed from
-[GitHub](https://github.com/convexfi/intradayModel):
-
-``` r
+```r
 # install development version from GitHub
 devtools::install_github("convexfi/intradayModel")
 ```
 
 Please cite **intradayModel** in publications:
 
-``` r
+```r
 citation("intradayModel")
 ```
 
 ## Quick Start
+To get started, we load our package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days. We use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
 
-To get started, we load our package and some sample data: the 15-minute
-intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
-124 trading days. We use the first 104 trading days for fitting, and the
-last 20 days for evaluation of forecasting performance.
 
-``` r
+```r
 library(intradayModel)
 data(aapl_volume)
 aapl_volume[1:5, 1:5] # print the head of data
@@ -47,58 +47,51 @@ aapl_volume_training <- aapl_volume[, 1:104]
 aapl_volume_testing <- aapl_volume[, 105:124]
 ```
 
-Next, we fit a univariate state-space model using `fit_volume` function.
+Next, we fit a univariate state-space model using `fit_volume` function. 
 
-``` r
+
+```r
 model_fit <- fit_volume(aapl_volume_training)
 ```
 
-Once the model is fitted, we can analyze the hidden components of any
-intraday signal based on all its observations. By calling `decompose_volume`
-function with `purpose = analysis`, we obtain the smoothed daily,
-seasonal, and intraday dynamic components. This procedure helps us
-better identify the underlying information of the intraday signal.
+Once the model is fitted, we can analyze the hidden components of any intraday signal based on all its observations. By calling `decompose_volume` function with `purpose = "analysis"`, we obtain the smoothed daily, seasonal, and intraday dynamic components. It involves incorporating both past and future observations to refine the state estimates.
 
-``` r
+
+```r
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
 plots <- generate_plot(analysis_result)
-plots$log_components # plot smoothed hidden components (in log scale)
+plots$log_components
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
 
-To see how well our model performs on new data, we call `decompose_volume`
-function with `purpose = forecast` to do one-bin-ahead forecast on the
-testing set.
+To see how well our model performs on new data, we call `forecast_volume` function to do one-bin-ahead forecast on the testing set.
 
-``` r
-forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
+
+```r
+forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # visualization
 plots <- generate_plot(forecast_result)
-plots$original_and_resultant # plot forecast result
+plots$original_and_forecast
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" />
 
-## Contributing
+Now that you have a quick start on using the package, let's explore the details and dive deeper into its functionalities and features.
 
+## Contributing
 We welcome all sorts of contributions. Please feel free to open an issue
 to report a bug or discuss a feature request.
 
 ## Citation
-
 If you make use of this software please consider citing:
 
--   Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday
-    trading volume: A Kalman filter approach.
-    <https://dx.doi.org/10.2139/ssrn.3101695>
+- Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A Kalman filter approach. <https://dx.doi.org/10.2139/ssrn.3101695>
 
 ## Links
-
 Package: [GitHub](https://github.com/convexfi/intradayModel)
 
-Vignette:
-[GitHub-vignette](https://htmlpreview.github.io/?https://github.com/convexfi/intradayModel/blob/master/vignettes/intradayModel.html).
+Vignette: [GitHub-vignette](https://htmlpreview.github.io/?https://github.com/convexfi/intradayModel/blob/master/vignettes/intradayModel.html).

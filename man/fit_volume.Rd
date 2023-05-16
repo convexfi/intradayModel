@@ -44,7 +44,7 @@ A list of class "\code{volume_model}" with the following elements (if the algori
         \item{\code{par}}{A list of parameters' fitted values.}
         \item{\code{init}}{A list of valid initial values from users.}
         \item{\code{par_log}}{A list of intermediate parameters' values if \code{log_switch = TRUE}.} 
-        \item{\code{fit_request}}{A list of logical values indicating whether each parameter requires further fitting.}
+        \item{\code{converged}}{A list of logical values indicating whether each parameter is fitted.}
 }
 \description{
 The main function for defining and fitting a univaraite state-space model on intraday trading volume. The model is proposed in (Chen et al., 2016) as
