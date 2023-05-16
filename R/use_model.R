@@ -130,9 +130,9 @@ smooth_volume_model <- function(data, volume_model) {
   is_volume_model(volume_model, nrow(data))
 
   # if model isn't optimally fitted (no convergence), it cannot filter
-  if (Reduce("+", volume_model$fit_request) != 0) {
+  if (Reduce("+", volume_model$converged) != 8) {
     msg <- c("All parameters must be optimally fitted. ",
-             "Parameters ", paste(names(volume_model$fit_request[volume_model$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
+             "Parameters ", paste(names(volume_model$converged[volume_model$converged == FALSE]), collapse = ", "), " are not optimally fitted.")
     stop(msg)
   }
 
@@ -182,9 +182,9 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   is_volume_model(volume_model, nrow(data))
   
   # check if fit is necessary
-  if (Reduce("+", volume_model$fit_request) != 0) {
+  if (Reduce("+", volume_model$converged) != 8) {
     msg <- c("All parameters must be fitted.\n ",
-             "Parameter ", paste(names(volume_model$fit_request[volume_model$fit_request == TRUE]), collapse = ", "), " is not fitted.")
+             "Parameter ", paste(names(volume_model$converged[volume_model$converged == FALSE]), collapse = ", "), " is not fitted.")
     stop(msg)
   }
   

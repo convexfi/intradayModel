@@ -46,7 +46,7 @@
 #'         \item{\code{par}}{A list of parameters' fitted values.}
 #'         \item{\code{init}}{A list of valid initial values from users.}
 #'         \item{\code{par_log}}{A list of intermediate parameters' values if \code{log_switch = TRUE}.} 
-#'         \item{\code{fit_request}}{A list of logical values indicating whether each parameter requires further fitting.}
+#'         \item{\code{converged}}{A list of logical values indicating whether each parameter is fitted.}
 #'                                
 #' 
 #' @references
@@ -89,7 +89,7 @@ fit_volume <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, 
   is_volume_model(volume_model, nrow(data))
 
   # check if fit is required
-  if (Reduce("+", volume_model$fit_request) == 0) {
+  if (Reduce("+", volume_model$converged) == 8) {
     if (verbose > 0) {
       cat("All parameters have already been fixed.\n")
     }
@@ -135,7 +135,7 @@ fit_volume <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, 
   # update volume_model list object
   volume_model$par <- em_result$uniss_obj$par
   if (em_result$convergence) {
-    volume_model$fit_request[] <- FALSE
+    volume_model$converged[] <- TRUE
     volume_model$init <- list()
   }
   
@@ -222,7 +222,7 @@ uniss_em_alg_acc <- function(...) {
     
     new_par <- curr_par # copy the structure
     ## vector-wise acceleration for intraday periodic
-    if (uniss_obj$fit_request$phi) {
+    if (!uniss_obj$converged$phi) {
       r <- new_par_1$phi - curr_par$phi
       v <- new_par_2$phi - new_par_1$phi - r
       r_norm <- norm(r, "2")

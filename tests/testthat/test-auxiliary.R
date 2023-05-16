@@ -23,8 +23,8 @@ test_that("specify_uniss works with partial fixed params", {
                         "r" = NA, "phi"= rep(2, n_bin), 
                         "x0" = c(0,0), "V0" = rep(NA, 3))
   model_predefined$init <- list()
-  model_predefined$fit_request <- list("a_eta" = TRUE, "a_mu" = FALSE, "var_eta" = FALSE, "var_mu" = TRUE, 
-                                       "r" = TRUE, "phi" = FALSE, "x0" = FALSE, "V0" = TRUE)
+  model_predefined$converged <- list("a_eta" = FALSE, "a_mu" = TRUE, "var_eta" = TRUE, "var_mu" = FALSE, 
+                                       "r" = FALSE, "phi" = TRUE, "x0" = TRUE, "V0" = FALSE)
   
   class(model_predefined) <- "volume_model"
   expect_equal(model_test, model_predefined)
