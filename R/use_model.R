@@ -1,16 +1,21 @@
-#' @title Use a Fitted Model for Analysis and Forecast
+#' @title Decompose Intraday Volume into Several Components
 #'
-#' @description If \code{purpose = analysis} (aka Kalman smoothing), the optimal components of the intraday signal conditioned on all the data are estimated.
-#'              If \code{purpose = forecast} (aka forecast in state-space model), the default one-bin-ahead forecast signal is provided, mathematically denoted by \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
-#'              Three measures are used to evaluate the performance:
+#' @description This function decomposes the intraday volume into daily, seasonal, and intraday dynamic components according to (Chen et al., 2016).
+#' If \code{purpose = “analysis”} (aka Kalman smoothing), the optimal components are conditioned on both the past and future observations.
+#' Its mathematical expression is \eqn{\hat{x}_{\tau} = E[x_{\tau}|\{y_{j}\}_{j=1}^{M}]}{x*(\tau) = E[x(\tau) | y(j), j = 1, ... , M]}, 
+#'              where \eqn{M} is the total number of bins in the dataset.
+#'              
+#'              If \code{purpose = “forecast”} (aka Kalman forecasting), the optimal components are conditioned on only the past observations. 
+#'              Its mathematical expression is \eqn{\hat{x}_{\tau+1} = E[x_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{x*(\tau+1) = E[x(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#'              
+#'              Three measures are used to evaluate the model performance:
 #'              \itemize{\item{Mean absolute error (MAE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M|\hat{y}_{\tau} - y_{\tau}|}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
 #'                       \item{Mean absolute percent error (MAPE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\frac{|\hat{y}_{\tau} - y_{\tau}|}{y_{\tau}}}{\sum (|y*(\tau) - y(\tau)| / y(\tau)) / M} ;}
 #'                       \item{Root mean square error (RMSE):
-#'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} ,}
+#'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} .}
 #'              }
-#'              where \eqn{M} is the number of bins.
 #'
 #'
 #' @param purpose String \code{analysis/forecast}. Indicates the purpose of using the provided model.
@@ -60,25 +65,25 @@
 #' model_fit <- fit_volume(aapl_volume_training)
 #' 
 #' # analyze training volume
-#' analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+#' analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 #' 
 #' # forecast testing volume
-#' forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 #' 
 #' # forecast testing volume with burn-in 
-#' forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume,
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
 #'                              burn_in_days = 104)
 #' 
 #' }
 #' 
 #' @export
-use_model <- function(purpose, model, data, burn_in_days = 0) {
+decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
   if (tolower(purpose) == "analysis") {
     res <- smooth_volume_model(data = data, volume_model = model)
   } else if (tolower(purpose) == "forecast") {
     res <- forecast_volume_model(data = data, volume_model = model, burn_in_days = burn_in_days)
   } else {
-    warning("Wrong purpose for use_model function.\n")
+    warning("Wrong purpose for decompose_volume function.\n")
   }
   
   return(res)

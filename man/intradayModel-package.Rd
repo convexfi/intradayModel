@@ -13,7 +13,7 @@ It is a valuable tool for anyone interested in exploring intraday, algorithmic, 
 \section{Functions}{
 
 \code{\link{fit_volume}}, 
-\code{\link{use_model}}, 
+\code{\link{decompose_volume}}, 
 \code{\link{autoplot}}
 }
 

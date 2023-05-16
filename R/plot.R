@@ -2,7 +2,7 @@
 #'
 #' @description Autoplot the results of analysis and forecast.
 #'
-#' @param analysis_forecast_result Analysis/forecast result from \code{use_model}.
+#' @param analysis_forecast_result Analysis/forecast result from \code{decompose_volume}.
 #'
 #' @return A list of \code{patchwork} objects:
 #'        \itemize{
@@ -22,8 +22,8 @@
 #'
 #' # Obtain smoothing and forecasting result
 #' model_fit <- fit_volume(aapl_volume_training)
-#' analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
-#' forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+#' analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 #' 
 #' # Plot components
 #' autoplot(analysis_result)

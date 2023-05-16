@@ -54,13 +54,13 @@ model_fit <- fit_volume(aapl_volume_training)
 ```
 
 Once the model is fitted, we can analyze the hidden components of any
-intraday signal based on all its observations. By calling `use_model`
+intraday signal based on all its observations. By calling `decompose_volume`
 function with `purpose = analysis`, we obtain the smoothed daily,
 seasonal, and intraday dynamic components. This procedure helps us
 better identify the underlying information of the intraday signal.
 
 ``` r
-analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
 plots <- autoplot(analysis_result)
@@ -69,12 +69,12 @@ plots$log_components # plot smoothed hidden components (in log scale)
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
 
-To see how well our model performs on new data, we call `use_model`
+To see how well our model performs on new data, we call `decompose_volume`
 function with `purpose = forecast` to do one-bin-ahead forecast on the
 testing set.
 
 ``` r
-forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 
 # visualization
 plots <- autoplot(forecast_result)
