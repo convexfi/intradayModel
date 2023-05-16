@@ -89,6 +89,60 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
   return(res)
 }
 
+
+#' @title Forecast One-bin-ahead Intraday Volume
+#'
+#' @description This function forecasts one-bin-ahead intraday volume. 
+#' Its mathematical expression is \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#'
+#' @param model A model object from fitting functions including \code{fit_volume}.
+#' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
+#' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.
+#'
+#'
+#' @return A list containing the following elements:
+#'        \itemize{
+#'         \item{\code{original_signal}: }{A vector of original intraday signal;}
+#'         \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
+#'         \item{\code{components}: }{A list of the three forecast components:
+#'              \itemize{ \item{\code{smooth_daily}}
+#'                        \item{\code{smooth_seasonal}}
+#'                        \item{\code{smooth_dynamic}}
+#'                        \item{\code{residual}}}} 
+#'         \item{\code{error}: }{A list of three error measures:
+#'              \itemize{ \item{\code{mae}}
+#'                        \item{\code{mape}}
+#'                        \item{\code{rmse}}}}}
+#'         
+#' 
+#' @references
+#' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A Kalman filter approach. Available at SSRN 3101695.
+#' 
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' data(aapl_volume)
+#' aapl_volume_training <- aapl_volume[, 1:104]
+#' aapl_volume_testing <- aapl_volume[, 105:124]
+#' model_fit <- fit_volume(aapl_volume_training)
+#' 
+#' # forecast testing volume
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
+#' 
+#' # forecast testing volume with burn-in 
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
+#'                              burn_in_days = 104)
+#' 
+#' }
+#' 
+#' @export
+forecst_volume <- function(model, data, burn_in_days = 0) {
+  res <- decompose_volume("forecast", model, data, burn_in_days)
+  return(res)
+}
+
+
 smooth_volume_model <- function(data, volume_model) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {

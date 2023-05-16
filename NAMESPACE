@@ -3,6 +3,7 @@
 export(autoplot)
 export(decompose_volume)
 export(fit_volume)
+export(forecst_volume)
 import(ggplot2)
 import(patchwork)
 import(scales)
