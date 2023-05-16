@@ -114,7 +114,7 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #' }
 #' 
 #' @export
-forecst_volume <- function(model, data, burn_in_days = 0) {
+forecast_volume <- function(model, data, burn_in_days = 0) {
   res <- decompose_volume("forecast", model, data, burn_in_days)
   return(res)
 }

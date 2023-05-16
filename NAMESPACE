@@ -2,7 +2,7 @@
 
 export(decompose_volume)
 export(fit_volume)
-export(forecst_volume)
+export(forecast_volume)
 export(generate_plot)
 import(ggplot2)
 import(patchwork)
