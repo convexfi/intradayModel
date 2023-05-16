@@ -63,7 +63,7 @@ better identify the underlying information of the intraday signal.
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
-plots <- autoplot(analysis_result)
+plots <- generate_plot(analysis_result)
 plots$log_components # plot smoothed hidden components (in log scale)
 ```
 
@@ -77,7 +77,7 @@ testing set.
 forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 
 # visualization
-plots <- autoplot(forecast_result)
+plots <- generate_plot(forecast_result)
 plots$original_and_resultant # plot forecast result
 ```
 
