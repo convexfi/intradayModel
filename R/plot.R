@@ -41,14 +41,14 @@ autoplot <- function(analysis_forecast_result) {
 
 plot_components <- function(analysis_forecast_result) {
   i <- original <- daily <- seasonal <- dynamic <- residual <- NULL
-  components <- analysis_forecast_result[["components"]]
+  components <- analysis_forecast_result[[grep("components", names(analysis_forecast_result))]]
 
   plt_data <-
     data.frame(
       original = analysis_forecast_result$original_signal,
-      daily = components[[grep("daily", names(components))]],
-      seasonal = components[[grep("seasonal", names(components))]],
-      dynamic = components[[grep("dynamic", names(components))]],
+      daily = components$daily,
+      seasonal = components$seasonal,
+      dynamic = components$dynamic,
       residual = components$residual
     )
   plt_data_log <- log10(plt_data)
@@ -159,12 +159,12 @@ plot_performance <- function(analysis_forecast_result) {
   i <- value <- variable <- .x <- NULL
 
   # determine type
-  if (attr(analysis_forecast_result, "type") == "analysis") {
-    type <- "smooth"
+  if ("analysis" %in% attr(analysis_forecast_result, "type")) {
+    approximated_signal <- analysis_forecast_result$smooth_signal
     title <- "Analysis result"
     legend_name <- "model smooth fit"
   } else {
-    type <- "forecast"
+    approximated_signal <- analysis_forecast_result$forecast_signal
     title <- "One-bin-ahead forecast"
     legend_name <- "forecast"
   }
@@ -172,7 +172,7 @@ plot_performance <- function(analysis_forecast_result) {
   plt_data <-
     data.frame(
       original = analysis_forecast_result$original_signal,
-      output = analysis_forecast_result[[grep(type, names(analysis_forecast_result))]]
+      output = approximated_signal
     )
 #  plt_data_log <- log(plt_data)
 #  plt_data_log$i <- plt_data$i <- c(1:nrow(plt_data))

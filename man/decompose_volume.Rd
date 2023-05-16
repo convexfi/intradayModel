@@ -16,32 +16,13 @@ decompose_volume(purpose, model, data, burn_in_days = 0)
 \item{burn_in_days}{Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.}
 }
 \value{
-If \code{purpose = analysis}: A list containing the following elements:
+A list containing the following elements:
        \itemize{
        \item{\code{original_signal}: }{A vector of original intraday signal;}
-       \item{\code{smooth_signal}: }{A vector of smoothed intraday signal;}
-       \item{\code{components}: }{A list of the three smoothed components:
-             \itemize{ \item{\code{smooth_daily}}
-                       \item{\code{smooth_seasonal}}
-                       \item{\code{smooth_dynamic}}
-                       \item{\code{residual}}}}
-       \item{\code{error}: }{A list of three error measures:
-             \itemize{ \item{\code{mae}}
-                       \item{\code{mape}}
-                       \item{\code{rmse}}}}}   
-       If \code{purpose = forecast}: A list containing the following elements:
-       \itemize{
-        \item{\code{original_signal}: }{A vector of original intraday signal;}
-        \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
-        \item{\code{components}: }{A list of the three forecast components:
-             \itemize{ \item{\code{smooth_daily}}
-                       \item{\code{smooth_seasonal}}
-                       \item{\code{smooth_dynamic}}
-                       \item{\code{residual}}}} 
-        \item{\code{error}: }{A list of three error measures:
-             \itemize{ \item{\code{mae}}
-                       \item{\code{mape}}
-                       \item{\code{rmse}}}}}
+       \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday signal;}
+       \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual.}
+       \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
+       }
 }
 \description{
 This function decomposes the intraday volume into daily, seasonal, and intraday dynamic components according to (Chen et al., 2016).

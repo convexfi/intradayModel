@@ -24,32 +24,13 @@
 #' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.
 #'
 #'
-#' @return If \code{purpose = analysis}: A list containing the following elements:
+#' @return A list containing the following elements:
 #'        \itemize{
 #'        \item{\code{original_signal}: }{A vector of original intraday signal;}
-#'        \item{\code{smooth_signal}: }{A vector of smoothed intraday signal;}
-#'        \item{\code{components}: }{A list of the three smoothed components:
-#'              \itemize{ \item{\code{smooth_daily}}
-#'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}
-#'                        \item{\code{residual}}}}
-#'        \item{\code{error}: }{A list of three error measures:
-#'              \itemize{ \item{\code{mae}}
-#'                        \item{\code{mape}}
-#'                        \item{\code{rmse}}}}}   
-#'        If \code{purpose = forecast}: A list containing the following elements:
-#'        \itemize{
-#'         \item{\code{original_signal}: }{A vector of original intraday signal;}
-#'         \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
-#'         \item{\code{components}: }{A list of the three forecast components:
-#'              \itemize{ \item{\code{smooth_daily}}
-#'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}
-#'                        \item{\code{residual}}}} 
-#'         \item{\code{error}: }{A list of three error measures:
-#'              \itemize{ \item{\code{mae}}
-#'                        \item{\code{mape}}
-#'                        \item{\code{rmse}}}}}
+#'        \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday signal;}
+#'        \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual.}
+#'        \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
+#'        }
 #'         
 #' 
 #' @references
@@ -80,7 +61,7 @@
 decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
   if (tolower(purpose) == "analysis") {
     res <- smooth_volume_model(data = data, volume_model = model)
-    attr(res, "type") <- "analysis"
+    attr(res, "type") <- c("analysis", "smooth")
   } else if (tolower(purpose) == "forecast") {
     res <- forecast_volume_model(data = data, volume_model = model, burn_in_days = burn_in_days)
     attr(res, "type") <- "forecast"
@@ -106,15 +87,9 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #'        \itemize{
 #'         \item{\code{original_signal}: }{A vector of original intraday signal;}
 #'         \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
-#'         \item{\code{components}: }{A list of the three forecast components:
-#'              \itemize{ \item{\code{smooth_daily}}
-#'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}
-#'                        \item{\code{residual}}}} 
-#'         \item{\code{error}: }{A list of three error measures:
-#'              \itemize{ \item{\code{mae}}
-#'                        \item{\code{mape}}
-#'                        \item{\code{rmse}}}}}
+#'         \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, dynamic, and residual.} 
+#'         \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
+#'         }
 #'         
 #' 
 #' @references
@@ -170,15 +145,15 @@ smooth_volume_model <- function(data, volume_model) {
   Kf <- uniss_kalman(uniss_obj, "smoother")
   
   # tidy up components (scale change)
-  components <- list(
-    smooth_daily = exp(Kf$xtT[1,]),
-    smooth_dynamic = exp(Kf$xtT[2,]),
-    smooth_seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+  smooth_components <- list(
+    daily = exp(Kf$xtT[1,]),
+    dynamic = exp(Kf$xtT[2,]),
+    seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  smooth_signal <- components$smooth_daily * 
-    components$smooth_dynamic * components$smooth_seasonal
+  smooth_signal <- smooth_components$daily * 
+    smooth_components$dynamic * smooth_components$seasonal
   original_signal <- as.vector(data)
-  components$residual <- original_signal / smooth_signal
+  smooth_components$residual <- original_signal / smooth_signal
   error <- list(
     mae = calculate_mae(original_signal, smooth_signal),
     mape = calculate_mape(original_signal, smooth_signal),
@@ -188,7 +163,7 @@ smooth_volume_model <- function(data, volume_model) {
   res <- list(
     original_signal = original_signal,
     smooth_signal = smooth_signal,
-    components = components,
+    smooth_components = smooth_components,
     error = error
   )
   
@@ -222,14 +197,14 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   Kf <- uniss_kalman(uniss_obj, "filter")
   
   # tidy up components (scale change)
-  components <- list(
-    forecast_daily = exp(Kf$xtt1[1,]),
-    forecast_dynamic = exp(Kf$xtt1[2,]),
-    forecast_seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+  forecast_components <- list(
+    daily = exp(Kf$xtt1[1,]),
+    dynamic = exp(Kf$xtt1[2,]),
+    seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  components_out <- lapply(components, function (c) tail(c, nrow(data) * (ncol(data) - burn_in_days)))
-  forecast_signal <- components_out$forecast_daily * 
-    components_out$forecast_dynamic * components_out$forecast_seasonal
+  components_out <- lapply(forecast_components, function (c) tail(c, nrow(data) * (ncol(data) - burn_in_days)))
+  forecast_signal <- components_out$daily * 
+    components_out$dynamic * components_out$seasonal
   
   # error measures
   original_signal <- tail(as.vector(as.matrix(data)), nrow(data) * (ncol(data) - burn_in_days))
@@ -244,7 +219,7 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   res <- list(
     original_signal = original_signal,
     forecast_signal = forecast_signal,
-    components = components_out,
+    forecast_components = components_out,
     error = error
   )
   
