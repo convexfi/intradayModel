@@ -64,7 +64,7 @@ estimates.
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
-plots <- generate_plot(analysis_result)
+plots <- generate_plots(analysis_result)
 plots$log_components
 ```
 
@@ -78,7 +78,7 @@ set.
 forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # visualization
-plots <- generate_plot(forecast_result)
+plots <- generate_plots(forecast_result)
 plots$original_and_forecast
 ```
 

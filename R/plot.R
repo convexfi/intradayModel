@@ -1,6 +1,6 @@
 #' @title Plot Analysis and Forecast Result
 #'
-#' @description generate_plot the results of analysis and forecast.
+#' @description generate_plots the results of analysis and forecast.
 #'
 #' @param analysis_forecast_result Analysis/forecast result from \code{decompose_volume}.
 #'
@@ -27,11 +27,11 @@
 #' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 #' 
 #' # Plot components
-#' generate_plot(analysis_result)
-#' generate_plot(forecast_result)
+#' generate_plots(analysis_result)
+#' generate_plots(forecast_result)
 #' }
 #' @export
-generate_plot <- function(analysis_forecast_result) {
+generate_plots <- function(analysis_forecast_result) {
   plot_list <- list()
   
   plot_list$components <- plot_components(analysis_forecast_result, log = FALSE)

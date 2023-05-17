@@ -62,7 +62,7 @@ Once the model is fitted, we can analyze the hidden components of any intraday s
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
-plots <- generate_plot(analysis_result)
+plots <- generate_plots(analysis_result)
 plots$log_components
 ```
 
@@ -72,7 +72,7 @@ To see how well our model performs on new data, we call `forecast_volume` functi
 forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # visualization
-plots <- generate_plot(forecast_result)
+plots <- generate_plots(forecast_result)
 plots$original_and_forecast
 ```
 

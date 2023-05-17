@@ -8,7 +8,7 @@
 #' @section Functions:
 #' \code{\link{fit_volume}}, 
 #' \code{\link{decompose_volume}}, 
-#' \code{\link{generate_plot}}
+#' \code{\link{generate_plots}}
 #'
 #' @section Data:
 #' \code{\link{aapl_volume}},
