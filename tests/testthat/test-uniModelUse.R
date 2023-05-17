@@ -6,8 +6,8 @@ test_that("forecast_volume_model, stock = ADBE", {
   modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(use_model("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
-  log_volume_pred_acc <- log(use_model("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
+  log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
+  log_volume_pred_acc <- log(decompose_volume("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -29,8 +29,8 @@ test_that("forecast_volume_model, ACN", {
   modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(use_model("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
-  log_volume_pred_acc <- log(use_model("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
+  log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
+  log_volume_pred_acc <- log(decompose_volume("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
   log_volume_real <- log(tail(as.vector(as.matrix(data.pred)), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
@@ -53,8 +53,8 @@ test_that("forecast_volume_model, stock = CVS", {
   
   modelSpec.fit_acc <- fit_volume(data, init_pars = list(a_mu = 0), control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
-  log_volume_pred <- log(use_model("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
-  log_volume_pred_acc <- log(use_model("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
+  log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
+  log_volume_pred_acc <- log(decompose_volume("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
   log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)

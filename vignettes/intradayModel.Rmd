@@ -77,24 +77,24 @@ Next, we fit a univariate state-space model using `fit_volume` function.
 model_fit <- fit_volume(aapl_volume_training)
 ```
 
-Once the model is fitted, we can analyze the hidden components of any intraday signal based on all its observations. By calling `use_model` function with `purpose = analysis`, we obtain the smoothed daily, seasonal, and intraday dynamic components. This procedure helps us better identify the underlying information of the intraday signal.
+Once the model is fitted, we can analyze the hidden components of any intraday signal based on all its observations. By calling `decompose_volume` function with `purpose = "analysis"`, we obtain the smoothed daily, seasonal, and intraday dynamic components. It involves incorporating both past and future observations to refine the state estimates.
 
 ```{r, out.width="100%"}
-analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
-plots <- autoplot(analysis_result)
-plots$log_components # plot smoothed hidden components (in log scale)
+plots <- generate_plot(analysis_result)
+plots$log_components
 ```
 
-To see how well our model performs on new data, we call `use_model` function with `purpose = forecast` to do one-bin-ahead forecast on the testing set.
+To see how well our model performs on new data, we call `forecast_volume` function to do one-bin-ahead forecast on the testing set.
 
 ```{r, out.width="100%"}
-forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # visualization
-plots <- autoplot(forecast_result)
-plots$original_and_resultant # plot forecast result
+plots <- generate_plot(forecast_result)
+plots$original_and_forecast
 ```
 
 Now that you have a quick start on using the package, let's explore the details and dive deeper into its functionalities and features.
@@ -195,13 +195,30 @@ model_fit <- fit_volume(fdx_volume_training, verbose = 2, control = list(acceler
 
 Trading days with missing bins are automatically removed. They are 2019-07-03 (Independence Day) and 2019-11-29 (Thanksgiving Day) which have early close.
 
-## Analysis
+## Decomposition
 
-> **use_model**(purpose = "analysis", model, data)
+> **decompose_volume**(purpose, model, data, burn_in_days = 0)
 
-`use_model` function with `purpose = analysis` and a fitted model allows you to analyze every dataset based on all its observations. It applies the technique called Kalman smoothing.
+`decompose_volume` function allows you to decomposes the intraday volume into its daily, seasonal, and intraday dynamic components. 
 
-This step decomposes the intraday trading signal into its daily, seasonal, and intraday dynamic components. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{\tau}\}_{\tau=1}^{N}]$, where $N$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
+With `purpose = "analysis"`, it applies Kalman smoothing to estimate the hidden states given all available observations up to a certain point in time. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{j}\}_{j=1}^{M}]$, where $M$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
+
+
+```{r}
+analysis_result <- decompose_volume(purpose = "analysis", model_fit, fdx_volume_training)
+str(analysis_result)
+```
+
+Function `generate_plot` visualizes the smoothed components and the smoothing performance.
+
+```{r}
+plots <- generate_plot(analysis_result)
+plots$log_components
+plots$original_and_smooth
+```
+
+
+With `purpose = "forecast"`, it applies Kalman forecasting to estimate the hidden state based on the available observations, which is mathematically denoted by $\mathbb{E}[\mathbf{x}_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. Details can be found in the next subsection.
 
 This function also helps to evaluate the smoothing performance with the following measures:
   
@@ -211,42 +228,28 @@ This function also helps to evaluate the smoothing performance with the followin
 
 - Root mean square error (RMSE): $\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_\tau - y_\tau\right)^2}{M}}$.
 
-Here $M$ is the total number of bins.
-
-```{r}
-analysis_result <- use_model(purpose = "analysis", model_fit, fdx_volume_training)
-str(analysis_result)
-```
-
-Function `autoplot` visualizes the smoothed components and the smoothing performance.
-
-```{r}
-plots <- autoplot(analysis_result)
-plots$log_components
-plots$original_and_resultant
-```
-
 ## Forecasting
 
-> **use_model**(purpose = "forecast", model, data, burn_in_days = 0)
+> **forecast_volume**(model, data, burn_in_days = 0)
 
-`use_model` function with `purpose = forecast` and a fitted model allows you to forecast the intraday signal one-bin-ahead on a new dataset. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. 
+`forecast_volume` function is a wrapper of `decompose_volume` function with `purpose = "forecast"`. It forecasts the intraday volume one-bin-ahead on a new dataset. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. 
 
 In general, when encountering a new dataset with different statistical characteristics or from different stocks, the state space model may not initially start in an optimal state. To address this, the first `burn_in_days` days in the data can be utilized to warm up the Kalman filter, allowing it to reach the desired state. These initial days will be discarded after initialization.
 
 
 ```{r}
 # use training data for burn-in
-forecast_result <- use_model(purpose = "forecast", model_fit, fdx_volume, burn_in_days = 105) 
+forecast_result <- forecast_volume(model_fit, fdx_volume, burn_in_days = 105) 
+
 str(forecast_result)
 ```
 
-Function `autoplot` visualize the one-bin-ahead forecast components and the forecasting performance.
+Function `generate_plot` visualizes the one-bin-ahead forecast components and the forecasting performance.
 
 ```{r}
-plots <- autoplot(forecast_result)
+plots <- generate_plot(forecast_result)
 plots$log_components
-plots$original_and_resultant
+plots$original_and_forecast
 ```
 
 

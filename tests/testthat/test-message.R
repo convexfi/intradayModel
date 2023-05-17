@@ -12,19 +12,19 @@ test_that("is_volume_model works", {
   modelSpec <- spec_volume_model(fixed_pars = fixed_pars)
   
   modelSpec_check1 <- modelSpec[c("par", "init")]
-  expect_error(is_volume_model(modelSpec_check1), "Elements fit_request are missing from the model.\n")
+  expect_error(is_volume_model(modelSpec_check1), "Elements converged are missing from the model.\n")
   
   modelSpec_check2 <- modelSpec
   modelSpec_check2$par[["x0"]] <- NULL
   expect_error(is_volume_model(modelSpec_check2),"Elements x0 are missing from volume_model[$]par.\n")
   
   modelSpec_check3 <- modelSpec
-  modelSpec_check3$fit_request[["var_eta"]] <- TRUE
-  expect_error(is_volume_model(modelSpec_check3), "volume_model[$]par[$]var_eta and volume_model[$]fit_request[$]var_eta are conflicted.\n")
-  modelSpec_check3$fit_request[["a_eta"]] <- Inf
-  expect_error(is_volume_model(modelSpec_check3), "Elements in volume_model[$]fit_request must be TRUE/FALSE.\n")
-  modelSpec_check3$fit_request[["a_eta"]] <- NA
-  expect_error(is_volume_model(modelSpec_check3), "Elements in volume_model[$]fit_request must be TRUE/FALSE.\n")
+  modelSpec_check3$converged[["var_eta"]] <- FALSE
+  expect_error(is_volume_model(modelSpec_check3), "volume_model[$]par[$]var_eta and volume_model[$]converged[$]var_eta are conflicted.\n")
+  modelSpec_check3$converged[["a_eta"]] <- Inf
+  expect_error(is_volume_model(modelSpec_check3), "Elements in volume_model[$]converged must be TRUE/FALSE.\n")
+  modelSpec_check3$converged[["a_eta"]] <- NA
+  expect_error(is_volume_model(modelSpec_check3), "Elements in volume_model[$]converged must be TRUE/FALSE.\n")
   
   
   modelSpec_check4 <- modelSpec
@@ -79,7 +79,7 @@ test_that("spec_volume_model message", {
   #                              "x0" = rep(NA, 2),
   #                              "V0" = c(1,0,1))
   # predefinde_model$init <- list("a_eta" =  1)
-  # predefinde_model$fit_request <- list("a_eta" =  TRUE, "a_mu" = TRUE,
+  # predefinde_model$converged <- list("a_eta" =  TRUE, "a_mu" = TRUE,
   #                                      "var_eta" = FALSE, "var_mu" = TRUE,
   #                                      "r" = TRUE, "phi" = TRUE,
   #                                      "x0" = TRUE, "V0" = FALSE)

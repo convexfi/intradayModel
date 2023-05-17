@@ -1,16 +1,21 @@
-#' @title Use a Fitted Model for Analysis and Forecast
+#' @title Decompose Intraday Volume into Several Components
 #'
-#' @description If \code{purpose = analysis} (aka Kalman smoothing), the optimal components of the intraday signal conditioned on all the data are estimated.
-#'              If \code{purpose = forecast} (aka forecast in state-space model), the default one-bin-ahead forecast signal is provided, mathematically denoted by \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
-#'              Three measures are used to evaluate the performance:
+#' @description This function decomposes the intraday volume into daily, seasonal, and intraday dynamic components according to (Chen et al., 2016).
+#' If \code{purpose = “analysis”} (aka Kalman smoothing), the optimal components are conditioned on both the past and future observations.
+#' Its mathematical expression is \eqn{\hat{x}_{\tau} = E[x_{\tau}|\{y_{j}\}_{j=1}^{M}]}{x*(\tau) = E[x(\tau) | y(j), j = 1, ... , M]}, 
+#'              where \eqn{M} is the total number of bins in the dataset.
+#'              
+#'              If \code{purpose = “forecast”} (aka Kalman forecasting), the optimal components are conditioned on only the past observations. 
+#'              Its mathematical expression is \eqn{\hat{x}_{\tau+1} = E[x_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{x*(\tau+1) = E[x(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#'              
+#'              Three measures are used to evaluate the model performance:
 #'              \itemize{\item{Mean absolute error (MAE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M|\hat{y}_{\tau} - y_{\tau}|}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
 #'                       \item{Mean absolute percent error (MAPE):
 #'                             \eqn{\frac{1}{M}\sum_{\tau=1}^M\frac{|\hat{y}_{\tau} - y_{\tau}|}{y_{\tau}}}{\sum (|y*(\tau) - y(\tau)| / y(\tau)) / M} ;}
 #'                       \item{Root mean square error (RMSE):
-#'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} ,}
+#'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} .}
 #'              }
-#'              where \eqn{M} is the number of bins.
 #'
 #'
 #' @param purpose String \code{analysis/forecast}. Indicates the purpose of using the provided model.
@@ -19,32 +24,13 @@
 #' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.
 #'
 #'
-#' @return If \code{purpose = analysis}: A list containing the following elements:
+#' @return A list containing the following elements:
 #'        \itemize{
 #'        \item{\code{original_signal}: }{A vector of original intraday signal;}
-#'        \item{\code{smooth_signal}: }{A vector of smoothed intraday signal;}
-#'        \item{\code{components}: }{A list of the three smoothed components:
-#'              \itemize{ \item{\code{smooth_daily}}
-#'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}
-#'                        \item{\code{residual}}}}
-#'        \item{\code{error}: }{A list of three error measures:
-#'              \itemize{ \item{\code{mae}}
-#'                        \item{\code{mape}}
-#'                        \item{\code{rmse}}}}}   
-#'        If \code{purpose = forecast}: A list containing the following elements:
-#'        \itemize{
-#'         \item{\code{original_signal}: }{A vector of original intraday signal;}
-#'         \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
-#'         \item{\code{components}: }{A list of the three forecast components:
-#'              \itemize{ \item{\code{smooth_daily}}
-#'                        \item{\code{smooth_seasonal}}
-#'                        \item{\code{smooth_dynamic}}
-#'                        \item{\code{residual}}}} 
-#'         \item{\code{error}: }{A list of three error measures:
-#'              \itemize{ \item{\code{mae}}
-#'                        \item{\code{mape}}
-#'                        \item{\code{rmse}}}}}
+#'        \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday signal;}
+#'        \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual.}
+#'        \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
+#'        }
 #'         
 #' 
 #' @references
@@ -60,29 +46,79 @@
 #' model_fit <- fit_volume(aapl_volume_training)
 #' 
 #' # analyze training volume
-#' analysis_result <- use_model(purpose = "analysis", model_fit, aapl_volume_training)
+#' analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 #' 
 #' # forecast testing volume
-#' forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume_testing)
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 #' 
 #' # forecast testing volume with burn-in 
-#' forecast_result <- use_model(purpose = "forecast", model_fit, aapl_volume,
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
 #'                              burn_in_days = 104)
 #' 
 #' }
 #' 
 #' @export
-use_model <- function(purpose, model, data, burn_in_days = 0) {
+decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
   if (tolower(purpose) == "analysis") {
     res <- smooth_volume_model(data = data, volume_model = model)
+    attr(res, "type") <- c("analysis", "smooth")
   } else if (tolower(purpose) == "forecast") {
     res <- forecast_volume_model(data = data, volume_model = model, burn_in_days = burn_in_days)
+    attr(res, "type") <- "forecast"
   } else {
-    warning("Wrong purpose for use_model function.\n")
+    warning("Wrong purpose for decompose_volume function.\n")
   }
   
   return(res)
 }
+
+
+#' @title Forecast One-bin-ahead Intraday Volume
+#'
+#' @description This function forecasts one-bin-ahead intraday volume. 
+#' Its mathematical expression is \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#'
+#' @param model A model object from fitting functions including \code{fit_volume}.
+#' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
+#' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.
+#'
+#'
+#' @return A list containing the following elements:
+#'        \itemize{
+#'         \item{\code{original_signal}: }{A vector of original intraday signal;}
+#'         \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
+#'         \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, dynamic, and residual.} 
+#'         \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
+#'         }
+#'         
+#' 
+#' @references
+#' Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A Kalman filter approach. Available at SSRN 3101695.
+#' 
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' data(aapl_volume)
+#' aapl_volume_training <- aapl_volume[, 1:104]
+#' aapl_volume_testing <- aapl_volume[, 105:124]
+#' model_fit <- fit_volume(aapl_volume_training)
+#' 
+#' # forecast testing volume
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
+#' 
+#' # forecast testing volume with burn-in 
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
+#'                              burn_in_days = 104)
+#' 
+#' }
+#' 
+#' @export
+forecast_volume <- function(model, data, burn_in_days = 0) {
+  res <- decompose_volume("forecast", model, data, burn_in_days)
+  return(res)
+}
+
 
 smooth_volume_model <- function(data, volume_model) {
   # error control of data
@@ -94,9 +130,9 @@ smooth_volume_model <- function(data, volume_model) {
   is_volume_model(volume_model, nrow(data))
 
   # if model isn't optimally fitted (no convergence), it cannot filter
-  if (Reduce("+", volume_model$fit_request) != 0) {
+  if (Reduce("+", volume_model$converged) != 8) {
     msg <- c("All parameters must be optimally fitted. ",
-             "Parameters ", paste(names(volume_model$fit_request[volume_model$fit_request == TRUE]), collapse = ", "), " are not optimally fitted.")
+             "Parameters ", paste(names(volume_model$converged[volume_model$converged == FALSE]), collapse = ", "), " are not optimally fitted.")
     stop(msg)
   }
 
@@ -109,15 +145,15 @@ smooth_volume_model <- function(data, volume_model) {
   Kf <- uniss_kalman(uniss_obj, "smoother")
   
   # tidy up components (scale change)
-  components <- list(
-    smooth_daily = exp(Kf$xtT[1,]),
-    smooth_dynamic = exp(Kf$xtT[2,]),
-    smooth_seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+  smooth_components <- list(
+    daily = exp(Kf$xtT[1,]),
+    dynamic = exp(Kf$xtT[2,]),
+    seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  smooth_signal <- components$smooth_daily * 
-    components$smooth_dynamic * components$smooth_seasonal
+  smooth_signal <- smooth_components$daily * 
+    smooth_components$dynamic * smooth_components$seasonal
   original_signal <- as.vector(data)
-  components$residual <- original_signal / smooth_signal
+  smooth_components$residual <- original_signal / smooth_signal
   error <- list(
     mae = calculate_mae(original_signal, smooth_signal),
     mape = calculate_mape(original_signal, smooth_signal),
@@ -127,7 +163,7 @@ smooth_volume_model <- function(data, volume_model) {
   res <- list(
     original_signal = original_signal,
     smooth_signal = smooth_signal,
-    components = components,
+    smooth_components = smooth_components,
     error = error
   )
   
@@ -146,9 +182,9 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   is_volume_model(volume_model, nrow(data))
   
   # check if fit is necessary
-  if (Reduce("+", volume_model$fit_request) != 0) {
+  if (Reduce("+", volume_model$converged) != 8) {
     msg <- c("All parameters must be fitted.\n ",
-             "Parameter ", paste(names(volume_model$fit_request[volume_model$fit_request == TRUE]), collapse = ", "), " is not fitted.")
+             "Parameter ", paste(names(volume_model$converged[volume_model$converged == FALSE]), collapse = ", "), " is not fitted.")
     stop(msg)
   }
   
@@ -161,14 +197,14 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   Kf <- uniss_kalman(uniss_obj, "filter")
   
   # tidy up components (scale change)
-  components <- list(
-    forecast_daily = exp(Kf$xtt1[1,]),
-    forecast_dynamic = exp(Kf$xtt1[2,]),
-    forecast_seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
+  forecast_components <- list(
+    daily = exp(Kf$xtt1[1,]),
+    dynamic = exp(Kf$xtt1[2,]),
+    seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  components_out <- lapply(components, function (c) tail(c, nrow(data) * (ncol(data) - burn_in_days)))
-  forecast_signal <- components_out$forecast_daily * 
-    components_out$forecast_dynamic * components_out$forecast_seasonal
+  components_out <- lapply(forecast_components, function (c) tail(c, nrow(data) * (ncol(data) - burn_in_days)))
+  forecast_signal <- components_out$daily * 
+    components_out$dynamic * components_out$seasonal
   
   # error measures
   original_signal <- tail(as.vector(as.matrix(data)), nrow(data) * (ncol(data) - burn_in_days))
@@ -183,7 +219,7 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   res <- list(
     original_signal = original_signal,
     forecast_signal = forecast_signal,
-    components = components_out,
+    forecast_components = components_out,
     error = error
   )
   
