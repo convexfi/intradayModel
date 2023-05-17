@@ -308,7 +308,7 @@ is_volume_model <- function(volume_model, n_bin = NULL) {
   if (!is.null(msg)) { # rest of the tests won't work so stop now
     stop(msg)
   }
-  
+
   # check converged
   logical_check <- lapply(volume_model$converged, function(f) isTRUE(f) | identical(f, FALSE))
   if (any(logical_check == FALSE)) {
