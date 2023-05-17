@@ -11,9 +11,9 @@ decompose_volume(purpose, model, data, burn_in_days = 0)
 
 \item{model}{A model object from fitting functions including \code{fit_volume}.}
 
-\item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
+\item{data}{A n_bin * n_day matrix or an \code{xts} object storing intraday signal.}
 
-\item{burn_in_days}{Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.}
+\item{burn_in_days}{Number of initial days in the burn-in period for \code{forecast}. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.}
 }
 \value{
 A list containing the following elements:
@@ -65,4 +65,7 @@ forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume
 }
 \references{
 Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A Kalman filter approach. Available at SSRN 3101695.
+}
+\author{
+Shengjie Xiu, Yifan Yu and Daniel P. Palomar
 }

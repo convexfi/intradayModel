@@ -5,7 +5,7 @@
 \alias{fdx_volume}
 \title{15-min intraday volume of FDX}
 \format{
-An xts object.
+An \code{xts} object.
 }
 \source{
 \href{https://www.barchart.com}{barchart}
@@ -14,6 +14,6 @@ An xts object.
 data(fdx_volume)
 }
 \description{
-An xts object including 15-min trading volume of FDX from 2019-07-01 to 2019-12-31.
+An \code{xts} object including 15-min trading volume of FDX from 2019-07-01 to 2019-12-31.
 }
 \keyword{dataset}

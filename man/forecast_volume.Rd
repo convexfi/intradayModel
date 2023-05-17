@@ -9,9 +9,9 @@ forecast_volume(model, data, burn_in_days = 0)
 \arguments{
 \item{model}{A model object from fitting functions including \code{fit_volume}.}
 
-\item{data}{A n_bin * n_day matrix or an xts object storing intraday signal.}
+\item{data}{A n_bin * n_day matrix or an \code{xts} object storing intraday signal.}
 
-\item{burn_in_days}{Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.}
+\item{burn_in_days}{Number of initial days in the burn-in period. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.}
 }
 \value{
 A list containing the following elements:
@@ -35,10 +35,10 @@ aapl_volume_testing <- aapl_volume[, 105:124]
 model_fit <- fit_volume(aapl_volume_training)
 
 # forecast testing volume
-forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
+forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # forecast testing volume with burn-in 
-forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
+forecast_result <- forecast_volume(model_fit, aapl_volume,
                              burn_in_days = 104)
 
 }
@@ -46,4 +46,7 @@ forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume
 }
 \references{
 Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume: A Kalman filter approach. Available at SSRN 3101695.
+}
+\author{
+Shengjie Xiu, Yifan Yu and Daniel P. Palomar
 }

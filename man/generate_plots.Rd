@@ -7,7 +7,7 @@
 generate_plots(analysis_forecast_result)
 }
 \arguments{
-\item{analysis_forecast_result}{Analysis/forecast result from \code{decompose_volume}.}
+\item{analysis_forecast_result}{Analysis/forecast result from \code{decompose_volume} or \code{forecast_volume}.}
 }
 \value{
 A list of \code{patchwork} objects:
@@ -17,7 +17,7 @@ A list of \code{patchwork} objects:
        \item{\code{original_and_smooth} / \code{original_and_forecast}: }{Plot of the original and the smooth/forecast signals.}}
 }
 \description{
-generate_plots the results of analysis and forecast.
+Generate plots of the analysis and forecast results.
 }
 \examples{
 \dontrun{
@@ -29,10 +29,13 @@ aapl_volume_testing <- aapl_volume[, 105:124]
 # Obtain smoothing and forecasting result
 model_fit <- fit_volume(aapl_volume_training)
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
-forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
+forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # Plot components
 generate_plots(analysis_result)
 generate_plots(forecast_result)
 }
+}
+\author{
+Shengjie Xiu, Yifan Yu and Daniel P. Palomar
 }

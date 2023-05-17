@@ -92,3 +92,6 @@ Chen, R., Feng, Y., and Palomar, D. (2016). Forecasting intraday trading volume:
 Varadhan, R., and Roland, C. (2008). Simple and globally convergent methods for accelerating the convergence of any EM algorithm. 
 Scandinavian Journal of Statistics, 35(2), 335–353.
 }
+\author{
+Shengjie Xiu, Yifan Yu and Daniel P. Palomar
+}
