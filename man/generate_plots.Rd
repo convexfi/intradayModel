@@ -14,10 +14,10 @@ A list of \code{patchwork} objects:
        \itemize{
        \item{\code{components}: }{Plot of components of intraday volume;}
        \item{\code{log_components}: }{Plot of components of intraday volume in their log10 scale;}
-       \item{\code{original_and_smooth} / \code{original_and_forecast}: }{Plot of the original and the smooth/forecast volume.}}
+       \item{\code{original_and_smooth} / \code{original_and_forecast}: }{Plot of the original and the smooth/forecast intraday volume.}}
 }
 \description{
-Generate plots of the analysis and forecast results.
+Generate plots for the analysis and forecast results.
 }
 \examples{
 \dontrun{
@@ -26,12 +26,12 @@ data(aapl_volume)
 aapl_volume_training <- aapl_volume[, 1:104]
 aapl_volume_testing <- aapl_volume[, 105:124]
 
-# Obtain analysis and forecast result
+# obtain analysis and forecast result
 model_fit <- fit_volume(aapl_volume_training)
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
-# Plot the analysis and forecast result
+# plot the analysis and forecast result
 generate_plots(analysis_result)
 generate_plots(forecast_result)
 }

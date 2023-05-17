@@ -20,19 +20,19 @@ A list containing the following elements:
        \itemize{
        \item{\code{original_signal}: }{A vector of original intraday volume;}
        \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday volume;}
-       \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual components.}
+       \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, intraday dynamic, and residual components.}
        \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
        }
 }
 \description{
 This function decomposes the intraday volume into daily, seasonal, and intraday dynamic components according to (Chen et al., 2016).
 If \code{purpose = “analysis”} (aka Kalman smoothing), the optimal components are conditioned on both the past and future observations.
-Its mathematical expression is \eqn{\hat{x}_{\tau} = E[x_{\tau}|\{y_{j}\}_{j=1}^{M}]}{x*(\tau) = E[x(\tau) | y(j), j = 1, ... , M]}, 
+Its mathematical expression is \eqn{\hat{x}_{\tau} = E[x_{\tau}|\{y_{j}\}_{j=1}^{M}]}{x*(\tau) = E[x(\tau) | y(j), j = 1, ... , M]},
              where \eqn{M} is the total number of bins in the dataset.
-             
-             If \code{purpose = “forecast”} (aka Kalman forecasting), the optimal components are conditioned on only the past observations. 
+
+             If \code{purpose = “forecast”} (aka Kalman forecasting), the optimal components are conditioned on only the past observations.
              Its mathematical expression is \eqn{\hat{x}_{\tau+1} = E[x_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{x*(\tau+1) = E[x(\tau + 1) | y(j), j = 1, ... , \tau]}.
-             
+
              Three measures are used to evaluate the model performance:
              \itemize{\item{Mean absolute error (MAE):
                             \eqn{\frac{1}{M}\sum_{\tau=1}^M|\hat{y}_{\tau} - y_{\tau}|}{\sum (|y*(\tau) - y(\tau)|) / M} ;}
@@ -56,7 +56,7 @@ analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume
 # forecast testing volume
 forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 
-# forecast testing volume with burn-in 
+# forecast testing volume with burn-in
 forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
                              burn_in_days = 104)
 

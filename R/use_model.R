@@ -29,7 +29,7 @@
 #'        \itemize{
 #'        \item{\code{original_signal}: }{A vector of original intraday volume;}
 #'        \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday volume;}
-#'        \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual components.}
+#'        \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, intraday dynamic, and residual components.}
 #'        \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
 #'        }
 #'
@@ -91,7 +91,7 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #'        \itemize{
 #'         \item{\code{original_signal}: }{A vector of original intraday volume;}
 #'         \item{\code{forecast_signal}: }{A vector of forecast intraday volume;}
-#'         \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, dynamic, and residual components.}
+#'         \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, intraday dynamic, and residual components.}
 #'         \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
 #'         }
 #'
