@@ -14,7 +14,7 @@
 #'
 #' @import patchwork
 #' @import ggplot2
-#' @import scales
+#' @importFrom scales trans_breaks trans_format math_format
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
@@ -29,11 +29,11 @@
 #' forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 #' 
 #' # Plot components
-#' generate_plot(analysis_result)
-#' generate_plot(forecast_result)
+#' generate_plots(analysis_result)
+#' generate_plots(forecast_result)
 #' }
 #' @export
-generate_plot <- function(analysis_forecast_result) {
+generate_plots <- function(analysis_forecast_result) {
   plot_list <- list()
   
   plot_list$components <- plot_components(analysis_forecast_result, log = FALSE)
@@ -264,7 +264,7 @@ plot_performance <- function(analysis_forecast_result) {
       labels = trans_format("log10", math_format(10^.x))
     ) +
     xlab("time (bins)") +
-    ylab("Intraday Signal") +
+    ylab("Intraday Volume") +
     theme_bw() +
     theme(
       axis.title = element_text(size = text_size, face = "bold"),

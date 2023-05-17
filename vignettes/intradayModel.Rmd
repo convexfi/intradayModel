@@ -3,7 +3,7 @@ title: "intradayModel: Modeling and Forecasting Financial Intraday Signals"
 author: |
   | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
   | The Hong Kong University of Science and Technology (HKUST)
-date: "`r Sys.Date()`"
+date: "2023-05-17"
 output: 
   cleanrmd::html_document_clean:
     theme: "bamboo"
@@ -60,7 +60,7 @@ body {
 
 # Quick start
 
-To get started, we load our package and some sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days. We use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
+To get started, we load our package and sample data: the 15-minute intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering 124 trading days. We use the first 104 trading days for fitting, and the last 20 days for evaluation of forecasting performance.
 
 ```{r, message = FALSE}
 library(intradayModel)
@@ -71,29 +71,29 @@ aapl_volume_training <- aapl_volume[, 1:104]
 aapl_volume_testing <- aapl_volume[, 105:124]
 ```
 
-Next, we fit a univariate state-space model using `fit_volume` function. 
+Next, we fit a univariate state-space model using `fit_volume( )` function. 
 
 ```{r}
 model_fit <- fit_volume(aapl_volume_training)
 ```
 
-Once the model is fitted, we can analyze the hidden components of any intraday signal based on all its observations. By calling `decompose_volume` function with `purpose = "analysis"`, we obtain the smoothed daily, seasonal, and intraday dynamic components. It involves incorporating both past and future observations to refine the state estimates.
+Once the model is fitted, we can analyze the hidden components of any intraday volume based on all its observations. By calling `decompose_volume( )` function with `purpose = "analysis"`, we obtain the smoothed daily, seasonal, and intraday dynamic components. It involves incorporating both past and future observations to refine the state estimates.
 
 ```{r, out.width="100%"}
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
-plots <- generate_plot(analysis_result)
+plots <- generate_plots(analysis_result)
 plots$log_components
 ```
 
-To see how well our model performs on new data, we call `forecast_volume` function to do one-bin-ahead forecast on the testing set.
+To see how well our model performs on new data, we call `forecast_volume( )` function to do one-bin-ahead forecast on the testing set.
 
 ```{r, out.width="100%"}
 forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # visualization
-plots <- generate_plot(forecast_result)
+plots <- generate_plots(forecast_result)
 plots$original_and_forecast
 ```
 
@@ -107,18 +107,18 @@ Now that you have a quick start on using the package, let's explore the details 
 
 Intraday observations of trading volume are divided into days, indexed by $t\in\{1,\dots,T\}$. Each day is further divided into bins, indexed by $i\in\{1,\dots,I\}$. To refer to a specific observation, we use the index $\tau = I \times (t-1) + i$.
 
-Our package uses a state-space model to extract several components of intraday signals. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
+Our package uses a state-space model to extract several components of intraday volume. These components include the daily component, which adjusts the mean level of the time series; the seasonal component, which captures the U-shaped intraday periodic pattern; and the intraday dynamic component, which represents movements within a day.
 
 
-The observed intraday signal can be written in a multiplicative combination of the components [@brownlees2011intra]:
+The observed intraday volume can be written in a multiplicative combination of the components [@brownlees2011intra]:
 
 $$
 \large
-\text{intraday signal} = \text{daily} \times \text{seasonal} \times \text{intraday dynamic} \times \text{noise}. \tag{1}
+\text{intraday volume} = \text{daily} \times \text{seasonal} \times \text{intraday dynamic} \times \text{noise}. \tag{1}
 \small
 $$
 
-Alternatively, by taking the logarithm transform, the intraday signal can be also regarded as an addictive combination of these components:
+Alternatively, by taking the logarithm transform, the intraday volume can be also regarded as an addictive combination of these components:
 
 $$
 \large
@@ -126,7 +126,7 @@ y_{\tau} = \eta_{\tau} + \phi_i + \mu_{t,i} + v_{t,i}. \tag{2}
 \small
 $$
 
-The univariate model proposed by [@chen2016forecasting] is defined on Equation (2) as
+The state-space model proposed by [@chen2016forecasting] is defined on Equation (2) as
 $$
 \large
 \begin{aligned}
@@ -174,7 +174,7 @@ tail(fdx_volume)
 
 > **fit_volume**(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, control = NULL)
 
-To fit a univariate state-space model on intraday volume, you should use `fit_volume` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed_pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init_pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
+To fit a univariate state-space model on intraday volume, you should use `fit_volume( )` function. If you want to fix some parameters to specific values, you can provide a list of values to `fixed_pars`. If you have prior knowledge of the initial values for the unfitted parameters, you can provide it through `init_pars`. Besides, `verbose` controls the level of print, and more control options can be set via `control`. 
 
 The fitting process stops when either the maximum number of iterations is reached or the termination criteria is met $\|\Delta \boldsymbol{\Theta}_i\| \le \text{abstol}$.
 
@@ -199,28 +199,29 @@ Trading days with missing bins are automatically removed. They are 2019-07-03 (I
 
 > **decompose_volume**(purpose, model, data, burn_in_days = 0)
 
-`decompose_volume` function allows you to decomposes the intraday volume into its daily, seasonal, and intraday dynamic components. 
+`decompose_volume( )` function allows you to decomposes the intraday volume into its daily, seasonal, and intraday dynamic components. 
 
 With `purpose = "analysis"`, it applies Kalman smoothing to estimate the hidden states given all available observations up to a certain point in time. The daily component and intraday dynamic component at time $\tau$ are the smoothed state estimate conditioned on all the data, and denoted by $\mathbb{E}[\mathbf{x}_{\tau}|\{y_{j}\}_{j=1}^{M}]$, where $M$ is the total number of bins in the dataset. Besides, the seasonal component has the value of $\boldsymbol{\phi}$.
 
 
 ```{r}
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, fdx_volume_training)
+
 str(analysis_result)
 ```
 
-Function `generate_plot` visualizes the smoothed components and the smoothing performance.
+Function `generate_plots( )` visualizes the smooth components and the smoothing performance.
 
 ```{r}
-plots <- generate_plot(analysis_result)
+plots <- generate_plots(analysis_result)
 plots$log_components
 plots$original_and_smooth
 ```
 
 
-With `purpose = "forecast"`, it applies Kalman forecasting to estimate the hidden state based on the available observations, which is mathematically denoted by $\mathbb{E}[\mathbf{x}_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. Details can be found in the next subsection.
+With `purpose = "forecast"`, it applies Kalman forecasting to estimate the one-bin-ahead hidden state based on the available observations, which is mathematically denoted by $\mathbb{E}[\mathbf{x}_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. Details can be found in the next subsection.
 
-This function also helps to evaluate the smoothing performance with the following measures:
+This function also helps to evaluate the model performance with the following measures:
   
   - Mean absolute error (MAE): $\frac{1}{M}\sum_{\tau=1}^M\lvert\hat{y}_\tau - y_\tau\rvert$.
 
@@ -232,9 +233,9 @@ This function also helps to evaluate the smoothing performance with the followin
 
 > **forecast_volume**(model, data, burn_in_days = 0)
 
-`forecast_volume` function is a wrapper of `decompose_volume` function with `purpose = "forecast"`. It forecasts the intraday volume one-bin-ahead on a new dataset. The one-bin-ahead prediction is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. 
+`forecast_volume( )` function is a wrapper of `decompose_volume(purpose = "forecast", ...)`. It forecasts the one-bin-ahead intraday volume on a new dataset. The one-bin-ahead forecast is mathematically denoted by $\hat{y}_{\tau+1} = \mathbb{E}[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]$. 
 
-In general, when encountering a new dataset with different statistical characteristics or from different stocks, the state space model may not initially start in an optimal state. To address this, the first `burn_in_days` days in the data can be utilized to warm up the Kalman filter, allowing it to reach the desired state. These initial days will be discarded after initialization.
+When encountering a new dataset with different statistical characteristics or from different stocks, the state space model may not initially start in an optimal state. To address this, the first `burn_in_days` days in the data can be utilized to warm up the Kalman filter, allowing it to reach the desired state. These initial days will be discarded after initialization.
 
 
 ```{r}
@@ -244,10 +245,10 @@ forecast_result <- forecast_volume(model_fit, fdx_volume, burn_in_days = 105)
 str(forecast_result)
 ```
 
-Function `generate_plot` visualizes the one-bin-ahead forecast components and the forecasting performance.
+Function `generate_plots( )` visualizes the one-bin-ahead forecast components and the forecasting performance.
 
 ```{r}
-plots <- generate_plot(forecast_result)
+plots <- generate_plots(forecast_result)
 plots$log_components
 plots$original_and_forecast
 ```

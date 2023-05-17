@@ -1,3 +1,3 @@
-## Changes in intradayModel version 0.0.1 (2023-04-17)
+## Changes in intradayModel version 0.0.1 (2023-05-17)
 
-* Initial bare-bone implementation (not publicly released).
+* Initial bare-bone implementation for intraday volume (Chen 2016).

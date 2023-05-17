@@ -14,7 +14,7 @@ It is a valuable tool for anyone interested in exploring intraday, algorithmic, 
 
 \code{\link{fit_volume}}, 
 \code{\link{decompose_volume}}, 
-\code{\link{generate_plot}}
+\code{\link{generate_plots}}
 }
 
 \section{Data}{
