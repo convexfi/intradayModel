@@ -3,7 +3,7 @@
 \docType{data}
 \name{aapl_volume}
 \alias{aapl_volume}
-\title{15-min intraday volume of AAPL}
+\title{15-min Intraday Volume of AAPL}
 \format{
 A 26 * 124 matrix.
 }

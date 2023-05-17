@@ -1,4 +1,4 @@
-#' 15-min intraday volume of FDX
+#' 15-min Intraday Volume of FDX
 #'
 #' @description An \code{xts} object including 15-min trading volume of FDX from 2019-07-01 to 2019-12-31.
 #'

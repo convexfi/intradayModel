@@ -13,7 +13,7 @@ fit_volume(
 )
 }
 \arguments{
-\item{data}{A n_bin * n_day matrix or an xts object storing intraday trading volume.}
+\item{data}{An n_bin * n_day matrix or an \code{xts} object storing intraday trading volume.}
 
 \item{fixed_pars}{A list of parameters' fixed values. The allowed parameters are listed below,
 \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;
@@ -41,10 +41,11 @@ If the user does not assign initial values for the unfitted parameters, default 
 }
 \value{
 A list of class "\code{volume_model}" with the following elements (if the algorithm converges):
-        \item{\code{par}}{A list of parameters' fitted values.}
-        \item{\code{init}}{A list of valid initial values from users.}
-        \item{\code{par_log}}{A list of intermediate parameters' values if \code{log_switch = TRUE}.} 
-        \item{\code{converged}}{A list of logical values indicating whether each parameter is fitted.}
+        \itemize{\item{\code{par}: }{A list of parameters' fitted values.}
+        \item{\code{init}: }{A list of valid initial values from users.}
+        \item{\code{par_log}: }{A list of intermediate parameters' values if \code{log_switch = TRUE}.} 
+        \item{\code{converged}: }{A list of logical values indicating whether each parameter is fitted.}
+        }
 }
 \description{
 The main function for defining and fitting a univaraite state-space model on intraday trading volume. The model is proposed in (Chen et al., 2016) as
@@ -62,7 +63,7 @@ The main function for defining and fitting a univaraite state-space model on int
                             and \eqn{\sigma_\tau^{\eta} = \left\{\begin{array}{cl} \sigma^{\eta} & t = kI, k = 1,2,\dots\\0 & \textrm{otherwise};\end{array}\right.}{\sigma.\eta(\tau) = \sigma.\eta, when \tau = kI, k = 1, 2, ... , and zero otherwise;}}
                        \item{\eqn{v_\tau \sim \mathcal{N}(0, r)}{v(\tau) ~ N(0, r)} is the i.i.d. Gaussian noise in the observation;}
                        \item{\eqn{\mathbf{x}_1}{x(1)} is the initial state at \eqn{\tau = 1}{\tau = 1}, and it follows \eqn{\mathcal{N}(\mathbf{x}_0, \mathbf{V}_0)}{N(x(0), V(0))}}.}
-            In the model, \eqn{\boldsymbol{\theta} = \left\{a^{\eta},a^{\mu},\sigma^{\eta},\sigma^{\mu},r,\boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0\right\}}{\Theta = {a.\eta, a.\mu, (\sigma.\eta)^2, (\sigma.\mu)^2, r, \phi, x(0), V(0)}} 
+            In the model, \eqn{\boldsymbol{\Theta} = \left\{a^{\eta},a^{\mu},\sigma^{\eta},\sigma^{\mu},r,\boldsymbol{\phi}, \mathbf{x}_0, \mathbf{V}_0\right\}}{\Theta = {a.\eta, a.\mu, (\sigma.\eta)^2, (\sigma.\mu)^2, r, \phi, x(0), V(0)}} 
             are treated as parameters.
 The model is fitted by expectation-maximization (EM) algorithms. The implementation follows (Chen et al., 2016), and the accelerated scheme is provided in (Varadhan and Roland, 2008).
 The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \textrm{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.

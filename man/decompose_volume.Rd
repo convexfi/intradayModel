@@ -7,20 +7,20 @@
 decompose_volume(purpose, model, data, burn_in_days = 0)
 }
 \arguments{
-\item{purpose}{String \code{analysis/forecast}. Indicates the purpose of using the provided model.}
+\item{purpose}{String \code{"analysis"/"forecast"}. Indicates the purpose of using the provided model.}
 
-\item{model}{A model object from fitting functions including \code{fit_volume}.}
+\item{model}{A model object of class "\code{volume_model}" from \code{fit_volume()}.}
 
-\item{data}{A n_bin * n_day matrix or an \code{xts} object storing intraday signal.}
+\item{data}{An n_bin * n_day matrix or an \code{xts} object storing intraday volume.}
 
-\item{burn_in_days}{Number of initial days in the burn-in period for \code{forecast}. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.}
+\item{burn_in_days}{Number of initial days in the burn-in period for forecast. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.}
 }
 \value{
 A list containing the following elements:
        \itemize{
-       \item{\code{original_signal}: }{A vector of original intraday signal;}
-       \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday signal;}
-       \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual.}
+       \item{\code{original_signal}: }{A vector of original intraday volume;}
+       \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday volume;}
+       \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual components.}
        \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
        }
 }

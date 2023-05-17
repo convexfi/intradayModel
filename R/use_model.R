@@ -19,17 +19,17 @@
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
 #'
-#' @param purpose String \code{analysis/forecast}. Indicates the purpose of using the provided model.
-#' @param model A model object from fitting functions including \code{fit_volume}.
-#' @param data A n_bin * n_day matrix or an \code{xts} object storing intraday signal.
-#' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.
+#' @param purpose String \code{"analysis"/"forecast"}. Indicates the purpose of using the provided model.
+#' @param model A model object of class "\code{volume_model}" from \code{fit_volume()}.
+#' @param data An n_bin * n_day matrix or an \code{xts} object storing intraday volume.
+#' @param burn_in_days  Number of initial days in the burn-in period for forecast. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.
 #'
 #'
 #' @return A list containing the following elements:
 #'        \itemize{
-#'        \item{\code{original_signal}: }{A vector of original intraday signal;}
-#'        \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday signal;}
-#'        \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual.}
+#'        \item{\code{original_signal}: }{A vector of original intraday volume;}
+#'        \item{\code{smooth_signal} / \code{forecast_signal}: }{A vector of smooth/forecast intraday volume;}
+#'        \item{\code{smooth_components} /\code{forecast_components}: }{A list of smooth/forecast components: daily, seasonal, dynamic, and residual components.}
 #'        \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
 #'        }
 #'         
@@ -78,19 +78,20 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #'
 #' @description This function forecasts one-bin-ahead intraday volume. 
 #' Its mathematical expression is \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+#' It is a wrapper of \code{decompose_volume()} with \code{purpose = "forecast"}.
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
 #' 
-#' @param model A model object from fitting functions including \code{fit_volume}.
-#' @param data A n_bin * n_day matrix or an \code{xts} object storing intraday signal.
+#' @param model A model object of class "\code{volume_model}" from \code{fit_volume()}.
+#' @param data An n_bin * n_day matrix or an \code{xts} object storing intraday volume.
 #' @param burn_in_days  Number of initial days in the burn-in period. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.
 #'
 #'
 #' @return A list containing the following elements:
 #'        \itemize{
-#'         \item{\code{original_signal}: }{A vector of original intraday signal;}
-#'         \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
-#'         \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, dynamic, and residual.} 
+#'         \item{\code{original_signal}: }{A vector of original intraday volume;}
+#'         \item{\code{forecast_signal}: }{A vector of forecast intraday volume;}
+#'         \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, dynamic, and residual components.} 
 #'         \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
 #'         }
 #'         
@@ -111,8 +112,7 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #' forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 #' 
 #' # forecast testing volume with burn-in 
-#' forecast_result <- forecast_volume(model_fit, aapl_volume,
-#'                              burn_in_days = 104)
+#' forecast_result <- forecast_volume(model_fit, aapl_volume, burn_in_days = 104)
 #' 
 #' }
 #' 

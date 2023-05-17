@@ -4,13 +4,13 @@
 #'
 #' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
 #'
-#' @param analysis_forecast_result Analysis/forecast result from \code{decompose_volume} or \code{forecast_volume}.
+#' @param analysis_forecast_result Analysis/forecast result from \code{decompose_volume()} or \code{forecast_volume()}.
 #'
 #' @return A list of \code{patchwork} objects:
 #'        \itemize{
-#'        \item{\code{components}: }{Plot of components of intraday signal;}
-#'        \item{\code{log_components}: }{Plot of components of intraday signal in their log10 scale;}
-#'        \item{\code{original_and_smooth} / \code{original_and_forecast}: }{Plot of the original and the smooth/forecast signals.}}
+#'        \item{\code{components}: }{Plot of components of intraday volume;}
+#'        \item{\code{log_components}: }{Plot of components of intraday volume in their log10 scale;}
+#'        \item{\code{original_and_smooth} / \code{original_and_forecast}: }{Plot of the original and the smooth/forecast volume.}}
 #'
 #' @import patchwork
 #' @import ggplot2
@@ -23,12 +23,12 @@
 #' aapl_volume_training <- aapl_volume[, 1:104]
 #' aapl_volume_testing <- aapl_volume[, 105:124]
 #'
-#' # Obtain smoothing and forecasting result
+#' # Obtain analysis and forecast result
 #' model_fit <- fit_volume(aapl_volume_training)
 #' analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 #' forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 #' 
-#' # Plot components
+#' # Plot the analysis and forecast result
 #' generate_plots(analysis_result)
 #' generate_plots(forecast_result)
 #' }

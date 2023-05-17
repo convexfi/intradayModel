@@ -7,24 +7,25 @@
 forecast_volume(model, data, burn_in_days = 0)
 }
 \arguments{
-\item{model}{A model object from fitting functions including \code{fit_volume}.}
+\item{model}{A model object of class "\code{volume_model}" from \code{fit_volume()}.}
 
-\item{data}{A n_bin * n_day matrix or an \code{xts} object storing intraday signal.}
+\item{data}{An n_bin * n_day matrix or an \code{xts} object storing intraday volume.}
 
 \item{burn_in_days}{Number of initial days in the burn-in period. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.}
 }
 \value{
 A list containing the following elements:
        \itemize{
-        \item{\code{original_signal}: }{A vector of original intraday signal;}
-        \item{\code{forecast_signal}: }{A vector of forecast intraday signal;}
-        \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, dynamic, and residual.} 
+        \item{\code{original_signal}: }{A vector of original intraday volume;}
+        \item{\code{forecast_signal}: }{A vector of forecast intraday volume;}
+        \item{\code{forecast_components}: }{A list of the three forecast components: daily, seasonal, dynamic, and residual components.} 
         \item{\code{error}: }{A list of three error measures: mae, mape, and rmse.}
         }
 }
 \description{
 This function forecasts one-bin-ahead intraday volume. 
 Its mathematical expression is \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
+It is a wrapper of \code{decompose_volume()} with \code{purpose = "forecast"}.
 }
 \examples{
 \dontrun{
@@ -38,8 +39,7 @@ model_fit <- fit_volume(aapl_volume_training)
 forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # forecast testing volume with burn-in 
-forecast_result <- forecast_volume(model_fit, aapl_volume,
-                             burn_in_days = 104)
+forecast_result <- forecast_volume(model_fit, aapl_volume, burn_in_days = 104)
 
 }
 

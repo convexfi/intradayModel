@@ -3,7 +3,7 @@
 \docType{data}
 \name{fdx_volume}
 \alias{fdx_volume}
-\title{15-min intraday volume of FDX}
+\title{15-min Intraday Volume of FDX}
 \format{
 An \code{xts} object.
 }
