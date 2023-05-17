@@ -262,7 +262,7 @@ plot_performance <- function(analysis_forecast_result) {
       labels = trans_format("log10", math_format(10^.x))
     ) +
     xlab("time (bins)") +
-    ylab("Intraday Signal") +
+    ylab("Intraday Volume") +
     theme_bw() +
     theme(
       axis.title = element_text(size = text_size, face = "bold"),
