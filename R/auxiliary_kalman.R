@@ -3,8 +3,8 @@
 # The engine of Kalman filter & smoother & em updates.
 #
 # Its object is names "uniss_obj", it stores all the required information
-# in the state-space world. 
-# The user's "volume_model" is for user interface, and its detailed information 
+# in the state-space world.
+# The user's "volume_model" is for user interface, and its detailed information
 # is stored in "uniss_obj".
 # --------------------------------------------------
 
@@ -168,7 +168,7 @@ uniss_kalman <- function(uniss_obj, type = "em_update") {
     Ptt1[, , n] <- VtT[, , n] %*% t(Lt[, , n - 1]) + xtT[, n] %*% t(xtT[, n - 1])
   }
   jump_interval <- seq(uniss_obj$n_bin + 1, uniss_obj$n_bin_total, uniss_obj$n_bin)
-  
+
   new_par <- uniss_obj$par
   for (name in unfitted_pars) {
     switch(name,
@@ -226,7 +226,7 @@ uniss_kalman <- function(uniss_obj, type = "em_update") {
       }
     )
   }
-  
+
   result$new_par <- new_par
   return(result)
 }

@@ -1,4 +1,4 @@
-#' 15-min intraday volume of AAPL
+#' 15-min Intraday Volume of AAPL
 #'
 #' @description A 26 * 124 matrix including 15-min trading volume of AAPL from 2019-01-02 to 2019-06-28.
 #' 

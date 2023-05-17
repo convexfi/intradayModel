@@ -27,7 +27,7 @@ citation("intradayModel")
 
 ## Quick Start
 
-To get started, we load our package and some sample data: the 15-minute
+To get started, we load our package and sample data: the 15-minute
 intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
 124 trading days. We use the first 104 trading days for fitting, and the
 last 20 days for evaluation of forecasting performance.
@@ -47,15 +47,16 @@ aapl_volume_training <- aapl_volume[, 1:104]
 aapl_volume_testing <- aapl_volume[, 105:124]
 ```
 
-Next, we fit a univariate state-space model using `fit_volume` function.
+Next, we fit a univariate state-space model using `fit_volume()`
+function.
 
 ``` r
 model_fit <- fit_volume(aapl_volume_training)
 ```
 
 Once the model is fitted, we can analyze the hidden components of any
-intraday signal based on all its observations. By calling
-`decompose_volume` function with `purpose = "analysis"`, we obtain the
+intraday volume based on all its observations. By calling
+`decompose_volume()` function with `purpose = "analysis"`, we obtain the
 smoothed daily, seasonal, and intraday dynamic components. It involves
 incorporating both past and future observations to refine the state
 estimates.
@@ -64,28 +65,25 @@ estimates.
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
 
 # visualization
-plots <- generate_plot(analysis_result)
+plots <- generate_plots(analysis_result)
 plots$log_components
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
 
 To see how well our model performs on new data, we call
-`forecast_volume` function to do one-bin-ahead forecast on the testing
+`forecast_volume()` function to do one-bin-ahead forecast on the testing
 set.
 
 ``` r
 forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 
 # visualization
-plots <- generate_plot(forecast_result)
+plots <- generate_plots(forecast_result)
 plots$original_and_forecast
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" />
-
-Now that you have a quick start on using the package, let’s explore the
-details and dive deeper into its functionalities and features.
 
 ## Contributing
 
