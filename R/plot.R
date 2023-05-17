@@ -12,7 +12,7 @@
 #'
 #' @import patchwork
 #' @import ggplot2
-#' @import scales
+#' @importFrom scales trans_breaks trans_format math_format
 #' @importFrom magrittr %>%
 #' @examples
 #' \dontrun{
