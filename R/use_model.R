@@ -173,7 +173,6 @@ smooth_volume_model <- function(data, volume_model) {
   return(res)
 }
 
-#' @importFrom utils tail
 forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
   # error control of data
   if (!is.xts(data) & !is.matrix(data)) {
@@ -205,12 +204,12 @@ forecast_volume_model <- function(data, volume_model, burn_in_days = 0) {
     dynamic = exp(Kf$xtt1[2,]),
     seasonal = exp(rep(uniss_obj$par$phi, uniss_obj$n_day))
   )
-  components_out <- lapply(forecast_components, function (c) tail(c, nrow(data) * (ncol(data) - burn_in_days)))
+  components_out <- lapply(forecast_components, function (c) utils::tail(c, nrow(data) * (ncol(data) - burn_in_days)))
   forecast_signal <- components_out$daily * 
     components_out$dynamic * components_out$seasonal
   
   # error measures
-  original_signal <- tail(as.vector(as.matrix(data)), nrow(data) * (ncol(data) - burn_in_days))
+  original_signal <- utils::tail(as.vector(as.matrix(data)), nrow(data) * (ncol(data) - burn_in_days))
   components_out$residual <- original_signal / forecast_signal
   error <- list(
     mae = calculate_mae(original_signal, forecast_signal),

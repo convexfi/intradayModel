@@ -8,7 +8,7 @@ test_that("forecast_volume_model, stock = ADBE", {
   
   log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
   log_volume_pred_acc <- log(decompose_volume("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
-  log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
+  log_volume_real <- log(utils::tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
   mape <- calculate_mape(log_volume_real, log_volume_pred)
@@ -31,7 +31,7 @@ test_that("forecast_volume_model, ACN", {
   
   log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
   log_volume_pred_acc <- log(decompose_volume("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
-  log_volume_real <- log(tail(as.vector(as.matrix(data.pred)), 26 * 20))
+  log_volume_real <- log(utils::tail(as.vector(as.matrix(data.pred)), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
   mape <- calculate_mape(log_volume_real, log_volume_pred)
@@ -55,7 +55,7 @@ test_that("forecast_volume_model, stock = CVS", {
   
   log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
   log_volume_pred_acc <- log(decompose_volume("forecast", modelSpec.fit_acc,data.pred, 104)$forecast_signal)
-  log_volume_real <- log(tail(as.vector(data.pred), 26 * 20))
+  log_volume_real <- log(utils::tail(as.vector(data.pred), 26 * 20))
   
   mae <-calculate_mae(log_volume_real, log_volume_pred)
   mape <- calculate_mape(log_volume_real, log_volume_pred)

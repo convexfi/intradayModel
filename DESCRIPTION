@@ -28,7 +28,6 @@ Imports:
     patchwork,
     reshape2,
     rlist,
-    utils,
     scales,
     xts,
     zoo
