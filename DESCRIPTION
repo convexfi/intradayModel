@@ -29,7 +29,8 @@ Imports:
     reshape2,
     scales,
     xts,
-    zoo
+    zoo,
+    utils
 Suggests:
     knitr,
     rmarkdown,
