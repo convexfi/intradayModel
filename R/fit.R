@@ -121,7 +121,7 @@ fit_volume <- function(data, fixed_pars  = NULL, init_pars = NULL, verbose = 0, 
   args <- append(args, list(
     uniss_obj = uniss_obj,
     verbose = verbose,
-    control = rlist::list.append(control_final)
+    control = control_final
   ))
   if (control_final$acceleration == FALSE) {
     em_result <- do.call(uniss_em_alg, args)
@@ -172,7 +172,7 @@ uniss_em_alg <- function(...) {
     
     ## logging
     if (control$log_switch == TRUE) {
-      par_log <- rlist::list.append(par_log, new_par)
+      par_log <- append(par_log, new_par)
     }
     
     ## verbose & stopping criteria
@@ -263,7 +263,7 @@ uniss_em_alg_acc <- function(...) {
     
     ## logging
     if (control$log_switch == TRUE) {
-      par_log <- rlist::list.append(par_log, new_par)
+      par_log <- append(par_log, new_par)
     }
     
     ## verbose & stopping criteria

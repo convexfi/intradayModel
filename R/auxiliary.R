@@ -248,7 +248,7 @@ check_pars_list <- function(volume_model, n_bin = NULL) {
   len_expect <- list("a_eta" = 1L, "a_mu" = 1L, "var_eta" = 1L, "var_mu" = 1L, "r" = 1L, "x0" = 2L, "V0" = 3L)
   if (!identical(n_bin, NULL)) {
     all_par_list <- append(all_par_list, "phi")
-    len_expect <- rlist::list.append(len_expect, "phi" = as.integer(n_bin))
+    len_expect <- append(len_expect, list("phi" = as.integer(n_bin)))
   }
   unfixed <- intersect(names(converged_list[converged_list == FALSE]), all_par_list)
   fixed <- intersect(names(converged_list[converged_list == TRUE]), all_par_list)
@@ -326,7 +326,7 @@ is_volume_model <- function(volume_model, n_bin = NULL) {
 fetch_par_log <- function(par_log, index) {
   par_list <- list()
   for (i in 1:length(par_log)) {
-    par_list <- rlist::list.append(par_list, par_log[[i]][[index]])
+    par_list <- append(par_list, par_log[[i]][[index]])
   }
   return(do.call(cbind, par_list))
 }

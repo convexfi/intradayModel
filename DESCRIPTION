@@ -27,7 +27,6 @@ Imports:
     magrittr,
     patchwork,
     reshape2,
-    rlist,
     scales,
     xts,
     zoo
