@@ -20,6 +20,8 @@
 #' The model is fitted by expectation-maximization (EM) algorithms. The implementation follows (Chen et al., 2016), and the accelerated scheme is provided in (Varadhan and Roland, 2008).
 #' The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \textrm{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 #'
+#' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
+#'
 #' @param data A n_bin * n_day matrix or an xts object storing intraday trading volume.
 #' @param fixed_pars A list of parameters' fixed values. The allowed parameters are listed below,
 #'                  \itemize{\item{\code{"a_eta"}: \eqn{a^{\eta}}{a.\eta}} of size 1 ;

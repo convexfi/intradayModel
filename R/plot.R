@@ -1,8 +1,10 @@
 #' @title Plot Analysis and Forecast Result
 #'
-#' @description generate_plot the results of analysis and forecast.
+#' @description Generate plots of the analysis and forecast results.
 #'
-#' @param analysis_forecast_result Analysis/forecast result from \code{decompose_volume}.
+#' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
+#'
+#' @param analysis_forecast_result Analysis/forecast result from \code{decompose_volume} or \code{forecast_volume}.
 #'
 #' @return A list of \code{patchwork} objects:
 #'        \itemize{
@@ -24,7 +26,7 @@
 #' # Obtain smoothing and forecasting result
 #' model_fit <- fit_volume(aapl_volume_training)
 #' analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
-#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
+#' forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 #' 
 #' # Plot components
 #' generate_plot(analysis_result)

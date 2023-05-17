@@ -17,11 +17,12 @@
 #'                             \eqn{\sqrt{\sum_{\tau=1}^M\frac{\left(\hat{y}_{\tau} - y_{\tau}\right)^2}{M}}}{[\sum ((y*(\tau) - y(\tau))^2 / M)]^0.5} .}
 #'              }
 #'
+#' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
 #'
 #' @param purpose String \code{analysis/forecast}. Indicates the purpose of using the provided model.
 #' @param model A model object from fitting functions including \code{fit_volume}.
-#' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.
+#' @param data A n_bin * n_day matrix or an \code{xts} object storing intraday signal.
+#' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.
 #'
 #'
 #' @return A list containing the following elements:
@@ -78,9 +79,11 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #' @description This function forecasts one-bin-ahead intraday volume. 
 #' Its mathematical expression is \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j=1}^{\tau}]}{y*(\tau+1) = E[y(\tau + 1) | y(j), j = 1, ... , \tau]}.
 #'
+#' @author Shengjie Xiu, Yifan Yu and Daniel P. Palomar
+#' 
 #' @param model A model object from fitting functions including \code{fit_volume}.
-#' @param data A n_bin * n_day matrix or an xts object storing intraday signal.
-#' @param burn_in_days  Number of initial days in the burn-in period for \code{forecast}. Samples from the first burn_in_days are used to warm up the model and then are discarded.
+#' @param data A n_bin * n_day matrix or an \code{xts} object storing intraday signal.
+#' @param burn_in_days  Number of initial days in the burn-in period. Samples from the first \code{burn_in_days} are used to warm up the model and then are discarded.
 #'
 #'
 #' @return A list containing the following elements:
@@ -105,10 +108,10 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #' model_fit <- fit_volume(aapl_volume_training)
 #' 
 #' # forecast testing volume
-#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
+#' forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 #' 
 #' # forecast testing volume with burn-in 
-#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
+#' forecast_result <- forecast_volume(model_fit, aapl_volume,
 #'                              burn_in_days = 104)
 #' 
 #' }
