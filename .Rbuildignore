@@ -12,5 +12,3 @@
 ^LICENSE$
 ^vignettes/intradayModel_cache$
 ^vignettes/intradayModel_files$
-^vignettes/reference\.bib$
-^vignettes/apalike\.csl$
