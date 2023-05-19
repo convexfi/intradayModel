@@ -3,7 +3,7 @@ test_that("forecast_volume_model, stock = ADBE", {
   data.pred <- readRDS(test_path("fixtures", "ADBE_volume"))
   data <- data.pred[,1:104]
 
-  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = FALSE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
@@ -26,7 +26,7 @@ test_that("forecast_volume_model, ACN", {
   data.pred <- readRDS(test_path("fixtures", "ACN_volume"))
   data <- data.pred[,1:104]
 
-  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = FALSE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   log_volume_pred <- log(decompose_volume("forecast",  modelSpec.fit, data.pred, 104)$forecast_signal)
@@ -49,7 +49,7 @@ test_that("forecast_volume_model, stock = CVS", {
   data.pred <- readRDS(test_path("fixtures", "CVS_volume"))
   data <- data.pred[,1:104]
 
-  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = FALSE))
   
   modelSpec.fit_acc <- fit_volume(data, init_pars = list(a_mu = 0), control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
