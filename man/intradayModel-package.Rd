@@ -20,8 +20,8 @@ It is a valuable tool for anyone interested in exploring intraday, algorithmic, 
 
 \section{Data}{
 
-\code{\link{aapl_volume}},
-\code{\link{fdx_volume}}
+\code{\link{volume_aapl}},
+\code{\link{volume_fdx}}
 }
 
 \section{Help}{

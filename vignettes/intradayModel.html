@@ -190,8 +190,8 @@ intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
 124 trading days. We use the first 104 trading days for fitting, and the
 last 20 days for evaluation of forecasting performance.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(intradayModel)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(aapl_volume)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>aapl_volume[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># print the head of data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(volume_aapl)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>volume_aapl[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># print the head of data</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 09:30 AM   10142172    3434769   20852127   15463747   14719388</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 09:45 AM    5691840   19751251   13374784    9962816    9515796</span></span>
@@ -199,18 +199,18 @@ last 20 days for evaluation of forecasting performance.</p>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10:15 AM    5273488   14841012   16024512    7270399    6031988</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10:30 AM    4587159   18041115    8686059    7130980    5479852</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>aapl_volume_training <span class="ot">&lt;-</span> aapl_volume[, <span class="dv">1</span><span class="sc">:</span><span class="dv">104</span>]</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>aapl_volume_testing <span class="ot">&lt;-</span> aapl_volume[, <span class="dv">105</span><span class="sc">:</span><span class="dv">124</span>]</span></code></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>volume_aapl_training <span class="ot">&lt;-</span> volume_aapl[, <span class="dv">1</span><span class="sc">:</span><span class="dv">104</span>]</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>volume_aapl_testing <span class="ot">&lt;-</span> volume_aapl[, <span class="dv">105</span><span class="sc">:</span><span class="dv">124</span>]</span></code></pre></div>
 <p>Next, we fit a univariate state-space model using
 <code>fit_volume( )</code> function.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>model_fit <span class="ot">&lt;-</span> <span class="fu">fit_volume</span>(aapl_volume_training)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>model_fit <span class="ot">&lt;-</span> <span class="fu">fit_volume</span>(volume_aapl_training)</span></code></pre></div>
 <p>Once the model is fitted, we can analyze the hidden components of any
 intraday volume based on all its observations. By calling
 <code>decompose_volume( )</code> function with
 <code>purpose = &quot;analysis&quot;</code>, we obtain the smoothed daily,
 seasonal, and intraday dynamic components. It involves incorporating
 both past and future observations to refine the state estimates.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>analysis_result <span class="ot">&lt;-</span> <span class="fu">decompose_volume</span>(<span class="at">purpose =</span> <span class="st">&quot;analysis&quot;</span>, model_fit, aapl_volume_training)</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>analysis_result <span class="ot">&lt;-</span> <span class="fu">decompose_volume</span>(<span class="at">purpose =</span> <span class="st">&quot;analysis&quot;</span>, model_fit, volume_aapl_training)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># visualization</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">&lt;-</span> <span class="fu">generate_plots</span>(analysis_result)</span>
@@ -219,7 +219,7 @@ both past and future observations to refine the state estimates.</p>
 <p>To see how well our model performs on new data, we call
 <code>forecast_volume( )</code> function to do one-bin-ahead forecast on
 the testing set.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>forecast_result <span class="ot">&lt;-</span> <span class="fu">forecast_volume</span>(model_fit, aapl_volume_testing)</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>forecast_result <span class="ot">&lt;-</span> <span class="fu">forecast_volume</span>(model_fit, volume_aapl_testing)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># visualization</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">&lt;-</span> <span class="fu">generate_plots</span>(forecast_result)</span>
@@ -308,10 +308,10 @@ parameters.</p>
 <li><p>an xts object.</p></li>
 </ul>
 <p>To help you get started, we provide two sample datasets: a
-matrix-class <code>aapl_volume</code> and an xts-class
-<code>fdx_volume</code>. Here, we elaborate on the later one.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(fdx_volume)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdx_volume)</span>
+matrix-class <code>volume_aapl</code> and an xts-class
+<code>volume_fdx</code>. Here, we elaborate on the later one.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(volume_fdx)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(volume_fdx)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     FDX.Volume</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2019-07-01 09:30:00      78590</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2019-07-01 09:45:00      81203</span></span>
@@ -319,7 +319,7 @@ matrix-class <code>aapl_volume</code> and an xts-class
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2019-07-01 10:15:00      54344</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2019-07-01 10:30:00      47637</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2019-07-01 10:45:00      36240</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(fdx_volume)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(volume_fdx)</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     FDX.Volume</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2019-12-31 14:30:00      19284</span></span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2019-12-31 14:45:00      18030</span></span>
@@ -352,8 +352,8 @@ iterations is reached or the termination criteria is met <span class="math inlin
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>init_pars <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>init_pars<span class="sc">$</span><span class="st">&quot;a_eta&quot;</span> <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>fdx_volume_training <span class="ot">&lt;-</span> fdx_volume[<span class="st">&#39;2019-07-01/2019-11-30&#39;</span>]</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>model_fit <span class="ot">&lt;-</span> <span class="fu">fit_volume</span>(fdx_volume_training, <span class="at">verbose =</span> <span class="dv">2</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">acceleration =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>volume_fdx_training <span class="ot">&lt;-</span> volume_fdx[<span class="st">&#39;2019-07-01/2019-11-30&#39;</span>]</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>model_fit <span class="ot">&lt;-</span> <span class="fu">fit_volume</span>(volume_fdx_training, <span class="at">verbose =</span> <span class="dv">2</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">acceleration =</span> <span class="cn">TRUE</span>))</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in intraday_xts_to_matrix(data): For input xts:</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Remove trading days with missing bins: 2019-07-03, 2019-11-29.</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; iter:5 diff:0.002073476</span></span>
@@ -394,7 +394,7 @@ smoothed state estimate conditioned on all the data, and denoted by
 <span class="math inline">\(\mathbb{E}[\mathbf{x}_{\tau}|\{y_{j}\}_{j=1}^{M}]\)</span>,
 where <span class="math inline">\(M\)</span> is the total number of bins
 in the dataset. Besides, the seasonal component has the value of <span class="math inline">\(\boldsymbol{\phi}\)</span>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>analysis_result <span class="ot">&lt;-</span> <span class="fu">decompose_volume</span>(<span class="at">purpose =</span> <span class="st">&quot;analysis&quot;</span>, model_fit, fdx_volume_training)</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>analysis_result <span class="ot">&lt;-</span> <span class="fu">decompose_volume</span>(<span class="at">purpose =</span> <span class="st">&quot;analysis&quot;</span>, model_fit, volume_fdx_training)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in intraday_xts_to_matrix(data): For input xts:</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Remove trading days with missing bins: 2019-07-03, 2019-11-29.</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -449,7 +449,7 @@ initially start in an optimal state. To address this, the first
 the Kalman filter, allowing it to reach the desired state. These initial
 days will be discarded after initialization.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use training data for burn-in</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>forecast_result <span class="ot">&lt;-</span> <span class="fu">forecast_volume</span>(model_fit, fdx_volume, <span class="at">burn_in_days =</span> <span class="dv">105</span>) </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>forecast_result <span class="ot">&lt;-</span> <span class="fu">forecast_volume</span>(model_fit, volume_fdx, <span class="at">burn_in_days =</span> <span class="dv">105</span>) </span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in intraday_xts_to_matrix(data): For input xts:</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Remove trading days with missing bins: 2019-07-03, 2019-11-29, 2019-12-24.</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>

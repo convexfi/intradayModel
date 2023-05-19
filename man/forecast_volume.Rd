@@ -29,17 +29,17 @@ It is a wrapper of \code{decompose_volume()} with \code{purpose = "forecast"}.
 }
 \examples{
 library(intradayModel)
-data(aapl_volume)
-aapl_volume_training <- aapl_volume[, 1:20]
-aapl_volume_testing <- aapl_volume[, 21:50]
-model_fit <- fit_volume(aapl_volume_training, fixed_pars = list(a_mu = 0.5, var_mu = 0.05),
+data(volume_aapl)
+volume_aapl_training <- volume_aapl[, 1:20]
+volume_aapl_testing <- volume_aapl[, 21:50]
+model_fit <- fit_volume(volume_aapl_training, fixed_pars = list(a_mu = 0.5, var_mu = 0.05),
                         init_pars = list(a_eta = 0.5))
                         
 # forecast testing volume
-forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
+forecast_result <- forecast_volume(model_fit, volume_aapl_testing)
 
 # forecast testing volume with burn-in
-forecast_result <- forecast_volume(model_fit, aapl_volume[, 1:50], burn_in_days = 20)
+forecast_result <- forecast_volume(model_fit, volume_aapl[, 1:50], burn_in_days = 20)
 
 }
 \references{

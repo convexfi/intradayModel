@@ -42,23 +42,23 @@ To get started, we load our package and sample data: the 15-minute intraday trad
 
 ```{r, message = FALSE}
 library(intradayModel)
-data(aapl_volume)
-aapl_volume[1:5, 1:5] # print the head of data
+data(volume_aapl)
+volume_aapl[1:5, 1:5] # print the head of data
 
-aapl_volume_training <- aapl_volume[, 1:104]
-aapl_volume_testing <- aapl_volume[, 105:124]
+volume_aapl_training <- volume_aapl[, 1:104]
+volume_aapl_testing <- volume_aapl[, 105:124]
 ```
 
 Next, we fit a univariate state-space model using `fit_volume()` function. 
 
 ```{r}
-model_fit <- fit_volume(aapl_volume_training)
+model_fit <- fit_volume(volume_aapl_training)
 ```
 
 Once the model is fitted, we can analyze the hidden components of any intraday volume based on all its observations. By calling `decompose_volume()` function with `purpose = "analysis"`, we obtain the smoothed daily, seasonal, and intraday dynamic components. It involves incorporating both past and future observations to refine the state estimates.
 
 ```{r, out.width="100%"}
-analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
+analysis_result <- decompose_volume(purpose = "analysis", model_fit, volume_aapl_training)
 
 # visualization
 plots <- generate_plots(analysis_result)
@@ -68,7 +68,7 @@ plots$log_components
 To see how well our model performs on new data, we call `forecast_volume()` function to do one-bin-ahead forecast on the testing set.
 
 ```{r, out.width="100%"}
-forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
+forecast_result <- forecast_volume(model_fit, volume_aapl_testing)
 
 # visualization
 plots <- generate_plots(forecast_result)
