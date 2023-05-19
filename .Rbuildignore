@@ -14,3 +14,4 @@
 ^vignettes/intradayModel_files$
 ^vignettes/intradayModel\.Rmd$
 ^vignettes/reference\.bib$
+^vignettes/apalike\.csl$

@@ -3,7 +3,7 @@ title: "intradayModel: Modeling and Forecasting Financial Intraday Signals"
 author: |
   | Shengjie Xiu, Yifan Yu, and Daniel P. Palomar
   | The Hong Kong University of Science and Technology (HKUST)
-date: "2023-05-17"
+date: "2023-05-19"
 output: 
   cleanrmd::html_document_clean:
     theme: "bamboo"
