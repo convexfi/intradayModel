@@ -16,7 +16,7 @@ opts_chunk$set(
   fig.path = "man/figures/README-",
   fig.align = "center",
   fig.retina = 2,
-  out.width = "75%",
+  out.width = "100%",
   dpi = 96
 )
 knit_hooks$set(pngquant = hook_pngquant)
@@ -57,7 +57,7 @@ model_fit <- fit_volume(volume_aapl_training)
 
 Once the model is fitted, we can analyze the hidden components of any intraday volume based on all its observations. By calling `decompose_volume()` function with `purpose = "analysis"`, we obtain the smoothed daily, seasonal, and intraday dynamic components. It involves incorporating both past and future observations to refine the state estimates.
 
-```{r, out.width="100%"}
+```{r}
 analysis_result <- decompose_volume(purpose = "analysis", model_fit, volume_aapl_training)
 
 # visualization
@@ -67,7 +67,7 @@ plots$log_components
 
 To see how well our model performs on new data, we call `forecast_volume()` function to do one-bin-ahead forecast on the testing set.
 
-```{r, out.width="100%"}
+```{r}
 forecast_result <- forecast_volume(model_fit, volume_aapl_testing)
 
 # visualization
