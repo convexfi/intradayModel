@@ -39,12 +39,12 @@
 #'
 #'
 #' @examples
-#' \dontrun{
-#'
+#' library(intradayModel)
 #' data(aapl_volume)
-#' aapl_volume_training <- aapl_volume[, 1:104]
-#' aapl_volume_testing <- aapl_volume[, 105:124]
-#' model_fit <- fit_volume(aapl_volume_training)
+#' aapl_volume_training <- aapl_volume[, 1:20]
+#' aapl_volume_testing <- aapl_volume[, 21:50]
+#' model_fit <- fit_volume(aapl_volume_training, fixed_pars = list(a_mu = 0.5, var_mu = 0.05),
+#'                         init_pars = list(a_eta = 0.5))
 #'
 #' # analyze training volume
 #' analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
@@ -53,10 +53,8 @@
 #' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume_testing)
 #'
 #' # forecast testing volume with burn-in
-#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume,
-#'                              burn_in_days = 104)
-#' 
-#' }
+#' forecast_result <- decompose_volume(purpose = "forecast", model_fit, aapl_volume[, 1:50],
+#'                              burn_in_days = 20)
 #'
 #' @export
 decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
@@ -101,20 +99,18 @@ decompose_volume <- function(purpose, model, data, burn_in_days = 0) {
 #'
 #'
 #' @examples
-#' \dontrun{
-#'
+#' library(intradayModel)
 #' data(aapl_volume)
-#' aapl_volume_training <- aapl_volume[, 1:104]
-#' aapl_volume_testing <- aapl_volume[, 105:124]
-#' model_fit <- fit_volume(aapl_volume_training)
-#'
+#' aapl_volume_training <- aapl_volume[, 1:20]
+#' aapl_volume_testing <- aapl_volume[, 21:50]
+#' model_fit <- fit_volume(aapl_volume_training, fixed_pars = list(a_mu = 0.5, var_mu = 0.05),
+#'                         init_pars = list(a_eta = 0.5))
+#'                         
 #' # forecast testing volume
 #' forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
 #'
 #' # forecast testing volume with burn-in
-#' forecast_result <- forecast_volume(model_fit, aapl_volume, burn_in_days = 104)
-#' 
-#' }
+#' forecast_result <- forecast_volume(model_fit, aapl_volume[, 1:50], burn_in_days = 20)
 #'
 #' @export
 forecast_volume <- function(model, data, burn_in_days = 0) {

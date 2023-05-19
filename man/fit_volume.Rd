@@ -69,20 +69,19 @@ The model is fitted by expectation-maximization (EM) algorithms. The implementat
 The algorithm terminates when \code{maxit} is reached or the condition \eqn{\|\Delta \boldsymbol{\Theta}_i\| \le \textrm{abstol}}{||\Delta \Theta(i)|| <= abstol} is satisfied.
 }
 \examples{
-\dontrun{
-
+library(intradayModel)
 data(aapl_volume)
-
+aapl_volume_training <- aapl_volume[, 1:20]
+\donttest{
 # fit model with no prior knowledge
-model_fit <- fit_volume(aapl_volume)
-
+model_fit <- fit_volume(aapl_volume_training)
+}
 # fit model with fixed_pars and init_pars
-fixed_pars <- list(a_mu = 0.5, var_mu = 0.03)
-init_pars <- list(a_eta = 0.5)
-model_fit <- fit_volume(aapl_volume, fixed_pars = fixed_pars, init_pars = init_pars)
-
+model_fit <- fit_volume(aapl_volume_training, fixed_pars = list(a_mu = 0.5, var_mu = 0.05),
+                        init_pars = list(a_eta = 0.5))
+\donttest{
 # fit model with other control options
-model_fit <- fit_volume(aapl_volume, verbose = 2, 
+model_fit <- fit_volume(aapl_volume_training, verbose = 2, 
   control = list(acceleration = FALSE, maxit = 1000, abstol = 1e-4, log_switch = FALSE))
 }
 
