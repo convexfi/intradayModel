@@ -5,10 +5,9 @@
 \alias{intradayModel-package}
 \title{intradayModel: Modeling and Forecasting Financial Intraday Signals}
 \description{
-`intradayModel` package uses state-of-the-art state-space models to facilitate the modeling, analyzing and forecasting of 
-financial intraday signals. This package currently offers a univariate model for intraday trading volume, 
-with new features on intraday volatility and multivariate models in development. 
-It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
+This package uses state-of-the-art state-space models to facilitate the modeling, analyzing and forecasting of 
+financial intraday signals. It currently offers a univariate model for intraday trading volume, 
+with new features on intraday volatility and multivariate models in development.
 }
 \section{Functions}{
 
