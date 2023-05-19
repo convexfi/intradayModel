@@ -3,11 +3,11 @@
 # intradayModel
 
 Our package uses state-of-the-art state-space models to facilitate the
-modeling and forecasting of financial intraday signals. This package
-currently offers a univariate model for intraday trading volume, with
-new features on intraday volatility and multivariate models in
-development. It is a valuable tool for anyone interested in exploring
-intraday, algorithmic, and high-frequency trading.
+modeling and forecasting of financial intraday signals. It currently
+offers a univariate model for intraday trading volume, with new features
+on intraday volatility and multivariate models in development. It is a
+valuable tool for anyone interested in exploring intraday, algorithmic,
+and high-frequency trading.
 
 ## Installation
 
@@ -34,8 +34,8 @@ last 20 days for evaluation of forecasting performance.
 
 ``` r
 library(intradayModel)
-data(aapl_volume)
-aapl_volume[1:5, 1:5] # print the head of data
+data(volume_aapl)
+volume_aapl[1:5, 1:5] # print the head of data
 #>          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08
 #> 09:30 AM   10142172    3434769   20852127   15463747   14719388
 #> 09:45 AM    5691840   19751251   13374784    9962816    9515796
@@ -43,15 +43,15 @@ aapl_volume[1:5, 1:5] # print the head of data
 #> 10:15 AM    5273488   14841012   16024512    7270399    6031988
 #> 10:30 AM    4587159   18041115    8686059    7130980    5479852
 
-aapl_volume_training <- aapl_volume[, 1:104]
-aapl_volume_testing <- aapl_volume[, 105:124]
+volume_aapl_training <- volume_aapl[, 1:104]
+volume_aapl_testing <- volume_aapl[, 105:124]
 ```
 
 Next, we fit a univariate state-space model using `fit_volume()`
 function.
 
 ``` r
-model_fit <- fit_volume(aapl_volume_training)
+model_fit <- fit_volume(volume_aapl_training)
 ```
 
 Once the model is fitted, we can analyze the hidden components of any
@@ -62,7 +62,7 @@ incorporating both past and future observations to refine the state
 estimates.
 
 ``` r
-analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
+analysis_result <- decompose_volume(purpose = "analysis", model_fit, volume_aapl_training)
 
 # visualization
 plots <- generate_plots(analysis_result)
@@ -76,7 +76,7 @@ To see how well our model performs on new data, we call
 set.
 
 ``` r
-forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
+forecast_result <- forecast_volume(model_fit, volume_aapl_testing)
 
 # visualization
 plots <- generate_plots(forecast_result)

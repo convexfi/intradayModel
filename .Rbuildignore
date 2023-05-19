@@ -7,8 +7,8 @@
 ^README\.html$
 ^README_cache$
 ^README_files$
-^papers$
-^vignettes/ieee\.csl$
-^vignettes/refs\.bib$
 ^doc$
 ^Meta$
+^LICENSE$
+^vignettes/intradayModel_cache$
+^vignettes/intradayModel_files$

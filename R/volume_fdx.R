@@ -4,7 +4,7 @@
 #'
 #' @docType data
 #'
-#' @usage data(fdx_volume)
+#' @usage data(volume_fdx)
 #'
 #' @format An \code{xts} object.
 #' 
@@ -12,4 +12,4 @@
 #'
 #' @keywords dataset
 #'
-"fdx_volume"
+"volume_fdx"

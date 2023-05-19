@@ -356,11 +356,11 @@ display: none;
 <div id="intradaymodel" class="section level1">
 <h1>intradayModel</h1>
 <p>Our package uses state-of-the-art state-space models to facilitate
-the modeling and forecasting of financial intraday signals. This package
-currently offers a univariate model for intraday trading volume, with
-new features on intraday volatility and multivariate models in
-development. It is a valuable tool for anyone interested in exploring
-intraday, algorithmic, and high-frequency trading.</p>
+the modeling and forecasting of financial intraday signals. It currently
+offers a univariate model for intraday trading volume, with new features
+on intraday volatility and multivariate models in development. It is a
+valuable tool for anyone interested in exploring intraday, algorithmic,
+and high-frequency trading.</p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>The package can be installed from <a href="https://github.com/convexfi/intradayModel">GitHub</a>:</p>
@@ -376,8 +376,8 @@ intraday trading volume of AAPL from 2019-01-02 to 2019-06-28, covering
 124 trading days. We use the first 104 trading days for fitting, and the
 last 20 days for evaluation of forecasting performance.</p>
 <pre class="r"><code>library(intradayModel)
-data(aapl_volume)
-aapl_volume[1:5, 1:5] # print the head of data
+data(volume_aapl)
+volume_aapl[1:5, 1:5] # print the head of data
 #&gt;          2019-01-02 2019-01-03 2019-01-04 2019-01-07 2019-01-08
 #&gt; 09:30 AM   10142172    3434769   20852127   15463747   14719388
 #&gt; 09:45 AM    5691840   19751251   13374784    9962816    9515796
@@ -385,18 +385,18 @@ aapl_volume[1:5, 1:5] # print the head of data
 #&gt; 10:15 AM    5273488   14841012   16024512    7270399    6031988
 #&gt; 10:30 AM    4587159   18041115    8686059    7130980    5479852
 
-aapl_volume_training &lt;- aapl_volume[, 1:104]
-aapl_volume_testing &lt;- aapl_volume[, 105:124]</code></pre>
+volume_aapl_training &lt;- volume_aapl[, 1:104]
+volume_aapl_testing &lt;- volume_aapl[, 105:124]</code></pre>
 <p>Next, we fit a univariate state-space model using
 <code>fit_volume()</code> function.</p>
-<pre class="r"><code>model_fit &lt;- fit_volume(aapl_volume_training)</code></pre>
+<pre class="r"><code>model_fit &lt;- fit_volume(volume_aapl_training)</code></pre>
 <p>Once the model is fitted, we can analyze the hidden components of any
 intraday volume based on all its observations. By calling
 <code>decompose_volume()</code> function with
 <code>purpose = &quot;analysis&quot;</code>, we obtain the smoothed daily,
 seasonal, and intraday dynamic components. It involves incorporating
 both past and future observations to refine the state estimates.</p>
-<pre class="r"><code>analysis_result &lt;- decompose_volume(purpose = &quot;analysis&quot;, model_fit, aapl_volume_training)
+<pre class="r"><code>analysis_result &lt;- decompose_volume(purpose = &quot;analysis&quot;, model_fit, volume_aapl_training)
 
 # visualization
 plots &lt;- generate_plots(analysis_result)
@@ -405,7 +405,7 @@ plots$log_components</code></pre>
 <p>To see how well our model performs on new data, we call
 <code>forecast_volume()</code> function to do one-bin-ahead forecast on
 the testing set.</p>
-<pre class="r"><code>forecast_result &lt;- forecast_volume(model_fit, aapl_volume_testing)
+<pre class="r"><code>forecast_result &lt;- forecast_volume(model_fit, volume_aapl_testing)
 
 # visualization
 plots &lt;- generate_plots(forecast_result)

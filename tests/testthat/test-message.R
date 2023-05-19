@@ -1,8 +1,8 @@
-data(aapl_volume)
+data(volume_aapl)
 
 test_that("is_volume_model works", {
   skip_on_cran()
-  data <- aapl_volume
+  data <- volume_aapl
   n_bin <- 26
   fixed_pars <- list()
   fixed_pars$"a_mu" <- 1
@@ -36,7 +36,7 @@ test_that("is_volume_model works", {
 
 test_that("forecast_volume_model/Smooth works", {
   skip_on_cran()
-  data <- aapl_volume
+  data <- volume_aapl
   n_bin <- 26
   fixed_pars <- list()
   fixed_pars$"a_mu" <- 1
@@ -94,8 +94,8 @@ test_that("spec_volume_model message", {
 
 test_that("fit_volume message", {
   skip_on_cran()
-  data <- aapl_volume
-  data_train <- aapl_volume[, 1:104]
+  data <- volume_aapl
+  data_train <- volume_aapl[, 1:104]
   data_error_test <- data_train
   data_error_test[1,1] <- NA
   fixed_pars <- list(
@@ -123,11 +123,11 @@ test_that("fit_volume message", {
 
 test_that("clean_data message", {
   skip_on_cran()
-  data_error_test <- aapl_volume
+  data_error_test <- volume_aapl
   data_error_test[1,1] <- NA
   data_error_test[2,3] <- NA
   expect_warning(clean_data(data_error_test),"For input matrix:\n Remove trading days with missing bins: 2019-01-02, 2019-01-04.\n")
   
-  data("fdx_volume")
-  expect_warning(clean_data(fdx_volume),"For input xts:\n Remove trading days with missing bins: 2019-07-03, 2019-11-29, 2019-12-24.\n")
+  data("volume_fdx")
+  expect_warning(clean_data(volume_fdx),"For input xts:\n Remove trading days with missing bins: 2019-07-03, 2019-11-29, 2019-12-24.\n")
 })

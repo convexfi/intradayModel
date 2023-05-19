@@ -17,21 +17,21 @@
 #' @importFrom scales trans_breaks trans_format math_format
 #' @importFrom magrittr %>%
 #' @examples
-#' \dontrun{
-#'
-#' data(aapl_volume)
-#' aapl_volume_training <- aapl_volume[, 1:104]
-#' aapl_volume_testing <- aapl_volume[, 105:124]
+#' library(intradayModel)
+#' data(volume_aapl)
+#' volume_aapl_training <- volume_aapl[, 1:20]
+#' volume_aapl_testing <- volume_aapl[, 21:50]
 #'
 #' # obtain analysis and forecast result
-#' model_fit <- fit_volume(aapl_volume_training)
-#' analysis_result <- decompose_volume(purpose = "analysis", model_fit, aapl_volume_training)
-#' forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
+#' model_fit <- fit_volume(volume_aapl_training, fixed_pars = list(a_mu = 0.5, var_mu = 0.05),
+#'                         init_pars = list(a_eta = 0.5))
+#' analysis_result <- decompose_volume(purpose = "analysis", model_fit, volume_aapl_training)
+#' forecast_result <- forecast_volume(model_fit, volume_aapl_testing)
 #'
 #' # plot the analysis and forecast result
 #' generate_plots(analysis_result)
 #' generate_plots(forecast_result)
-#' }
+#' 
 #' @export
 generate_plots <- function(analysis_forecast_result) {
   plot_list <- list()

@@ -1,7 +1,7 @@
 test_that("fit_volume from raw (after zero constraint and initial noise), stock = ADBE", {
   skip_on_cran()
   data <- readRDS(test_path("fixtures", "ADBE_volume"))[,1:104]
-  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = FALSE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   # expected output
@@ -27,7 +27,7 @@ test_that("fit_volume from raw (after zero constraint and initial noise), stock 
 test_that("fit_volume from raw (after zero constraint and initial noise), stock = ACN", {
   skip_on_cran()
   data <- readRDS(test_path("fixtures", "ACN_volume"))[,1:104]
-  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = FALSE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   # expected output
@@ -54,7 +54,7 @@ test_that("fit_volume from raw (after zero constraint and initial noise), stock 
 test_that("fit_volume from raw (after zero constraint and initial noise), stock = CVS", {
   skip_on_cran()
   data <- readRDS(test_path("fixtures", "CVS_volume"))[, 1:104]
-  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE))
+  modelSpec.fit <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = FALSE))
   modelSpec.fit_acc <- fit_volume(data, control = list(maxit = 1000, abstol = 1e-4, log_switch = TRUE, acceleration = TRUE))
   
   # expected output

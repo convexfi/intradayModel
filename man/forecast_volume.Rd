@@ -28,20 +28,18 @@ Its mathematical expression is \eqn{\hat{y}_{\tau+1} = E[y_{\tau+1}|\{y_{j}\}_{j
 It is a wrapper of \code{decompose_volume()} with \code{purpose = "forecast"}.
 }
 \examples{
-\dontrun{
-
-data(aapl_volume)
-aapl_volume_training <- aapl_volume[, 1:104]
-aapl_volume_testing <- aapl_volume[, 105:124]
-model_fit <- fit_volume(aapl_volume_training)
-
+library(intradayModel)
+data(volume_aapl)
+volume_aapl_training <- volume_aapl[, 1:20]
+volume_aapl_testing <- volume_aapl[, 21:50]
+model_fit <- fit_volume(volume_aapl_training, fixed_pars = list(a_mu = 0.5, var_mu = 0.05),
+                        init_pars = list(a_eta = 0.5))
+                        
 # forecast testing volume
-forecast_result <- forecast_volume(model_fit, aapl_volume_testing)
+forecast_result <- forecast_volume(model_fit, volume_aapl_testing)
 
 # forecast testing volume with burn-in
-forecast_result <- forecast_volume(model_fit, aapl_volume, burn_in_days = 104)
-
-}
+forecast_result <- forecast_volume(model_fit, volume_aapl[, 1:50], burn_in_days = 20)
 
 }
 \references{
