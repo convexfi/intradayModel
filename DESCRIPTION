@@ -4,7 +4,7 @@ Version: 0.0.1
 Date: 2023-05-19
 Description: Models, analyzes, and forecasts financial intraday signals. This package
     currently supports a univariate state-space model for intraday trading volume provided
-    by Chen (2016) <doi: 10.2139/ssrn.3101695>.
+    by Chen (2016) <doi:10.2139/ssrn.3101695>.
 Authors@R: c(
   person("Shengjie", "Xiu", role =  "aut", email = "sxiu@connect.ust.hk"),
   person("Yifan", "Yu", role =  "aut", email = "yyuco@connect.ust.hk"),
