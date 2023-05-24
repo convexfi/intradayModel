@@ -1,6 +1,6 @@
 Package: intradayModel
 Title: Modeling and Forecasting Financial Intraday Signals
-Version: 0.0.1
+Version: 0.0.1.9000
 Date: 2023-05-20
 Description: Models, analyzes, and forecasts financial intraday signals. This package
     currently supports a univariate state-space model for intraday trading volume provided
