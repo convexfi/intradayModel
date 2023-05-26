@@ -11,11 +11,20 @@ and high-frequency trading.
 
 ## Installation
 
-The package can be installed from
-[GitHub](https://github.com/convexfi/intradayModel):
+To install the latest stable version of **intradayModel** from
+[CRAN](https://cran.r-project.org/web/packages/intradayModel/index.html),
+run the following commands in R:
 
 ``` r
-# install development version from GitHub
+install.packages("intradayModel")
+```
+
+To install the development version of **intradayModel** from
+[GitHub](https://github.com/convexfi/intradayModel), run the following
+commands in R:
+
+``` r
+install.packages("devtools")
 devtools::install_github("convexfi/intradayModel")
 ```
 
@@ -69,7 +78,7 @@ plots <- generate_plots(analysis_result)
 plots$log_components
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" />
 
 To see how well our model performs on new data, we call
 `forecast_volume()` function to do one-bin-ahead forecast on the testing
@@ -83,7 +92,7 @@ plots <- generate_plots(forecast_result)
 plots$original_and_forecast
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" />
 
 ## Contributing
 

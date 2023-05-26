@@ -26,9 +26,14 @@ knit_hooks$set(pngquant = hook_pngquant)
 Our package uses state-of-the-art state-space models to facilitate the modeling and forecasting of financial intraday signals. It currently offers a univariate model for intraday trading volume, with new features on intraday volatility and multivariate models in development. It is a valuable tool for anyone interested in exploring intraday, algorithmic, and high-frequency trading.
 
 ## Installation
-The package can be installed from [GitHub](https://github.com/convexfi/intradayModel):
+To install the latest stable version of **intradayModel** from [CRAN](https://cran.r-project.org/web/packages/intradayModel/index.html), run the following commands in R:
 ```{r, eval=FALSE}
-# install development version from GitHub
+install.packages("intradayModel")
+```
+
+To install the development version of **intradayModel** from  [GitHub](https://github.com/convexfi/intradayModel), run the following commands in R:
+```{r, eval=FALSE}
+install.packages("devtools")
 devtools::install_github("convexfi/intradayModel")
 ```
 
